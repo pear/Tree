@@ -136,7 +136,7 @@ class Tree
      *                  for XML it would be the filename
      * @param array     the options you want to set
      */
-    function setup( $type , $dsn , $options=array() )
+    function setup( $type , $dsn='' , $options=array() )
     {
         $type = explode( '_' , $type );
         $method = 'setup'.$type[0];
