@@ -18,8 +18,6 @@
 //
 //  $Id$
 
-require_once 'Tree/Error.php';
-
 /**
  * EXPERIMENTAL
  *

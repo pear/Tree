@@ -18,8 +18,6 @@
 //
 //  $Id$
 
-require_once 'Tree/Error.php';
-
 /**
  * the Filesystem interface to the tree class
  * this is a bit different, as id we use the entire path, since we know
@@ -135,8 +133,7 @@ require_once 'Tree/Error.php';
         # FIXXME do the mapping
         if (!@mkdir("$parent/{$newValues['name']}", 0700)) {
             return $this->_raiseError(TREE_ERROR_CANNOT_CREATE_FOLDER,
-                                      $newValues['name'].' under '.$parent,
-                                      __LINE__
+                                      $newValues['name'].' under '.$parent
                                      );
         }
         return "$parent/{$newValues['name']}";

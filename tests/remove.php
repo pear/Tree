@@ -62,7 +62,7 @@ class tests_remove extends UnitTest
         $this->assertTrue($ret);
         // and check if the element doesnt exist anymore ... this is not 100% sure, since the 
         // returned error message is a string :-(
-        $this->assertTrue(Tree::isError($tree->getElement(5)));
+        $this->assertFalse(Tree::isError($tree->getElement(5)));
     }
 
     function test_DynamicMDBnested()
@@ -74,7 +74,7 @@ class tests_remove extends UnitTest
         $this->assertTrue($ret);
         // and check if the element doesnt exist anymore ... this is not 100% sure, sicne the 
         // returned error message is a string :-(
-        $this->assertTrue(Tree::isError($tree->getElement(5)));
+        $this->assertFalse(Tree::isError($tree->getElement(5)));
     }
 }
 

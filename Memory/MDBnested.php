@@ -52,7 +52,7 @@ class Tree_Memory_MDBnested extends Tree_Dynamic_MDBnested
 
             //
             $orderBy = 'left';
-            if ($order=$this->getOption('order')) {
+            if ($order = $this->getOption('order')) {
                 $orderBy = $order;
             }
 
@@ -66,7 +66,7 @@ class Tree_Memory_MDBnested extends Tree_Dynamic_MDBnested
                                 $this->_getColName($orderBy)
                                 );
             if (MDB::isError($res = $this->dbh->getAll($query))) {
-                return $this->_throwError($res->getMessage(), __LINE__);
+                return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
             }
         }
 

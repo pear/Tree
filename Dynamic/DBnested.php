@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -207,7 +207,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                         );
         if (DB::isError($res = $this->dbh->query($query))) {
             // rollback
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         // commit here
 
@@ -247,7 +247,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $prevVisited);
         if (DB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
 
         $query = sprintf('UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
@@ -259,7 +259,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $prevVisited);
         if (DB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return true;
     }
@@ -294,7 +294,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         if (DB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
             //$this->dbh->rollback();
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
 
         if (Tree::isError($err = $this->_remove($element))) {
@@ -340,7 +340,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         if (DB::isError($res = $this->dbh->query($query))) {
             // the rollback shall be done by the method calling this one
             // since it is only private we can do that
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
 
         $query = sprintf("UPDATE
@@ -358,7 +358,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         if (DB::isError($res = $this->dbh->query($query))) {
             // the rollback shall be done by the method calling this one
             // since it is only private
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         // FIXXME commit:
         // should that not also be done in the method calling this one?
@@ -414,7 +414,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         // FIXXME the error in a nicer way, or even better
         // let the throwError method do it!!!
         if (sizeof($errors)) {
-            return $this->_throwError(serialize($errors), __LINE__);
+            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', serialize($errors));
         }
         return true;
     }
@@ -451,14 +451,13 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             $newParentId = $newPrevious['parentId'];
         } else {
             if ($newParentId == 0) {
-                return $this->_throwError('no parent id given', __LINE__);
+                return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 'no parent id given');
             }
             // if the element shall be moved under one of its children
             // return false
             if ($this->isChildOf($idToMove,$newParentId)) {
-                return $this->_throwError(
-                            'can not move an element under one of its children' ,
-                            __LINE__
+                return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 
+                            'can not move an element under one of its children'
                         );
             }
             // dont do anything to let an element be moved under itself
@@ -549,10 +548,10 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $lName,$element['left']-1,
                             $rName,$element['right']+1);
-        if (DB::isError($res=$this->dbh->query($query))) {
+        if (DB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
             //$this->dbh->rollback();
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
 
         // remove the part of the tree where the element(s) was/were before
@@ -597,8 +596,8 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
                             $id);
-        if (DB::isError($res=$this->dbh->query($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+        if (DB::isError($res = $this->dbh->query($query))) {
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
 
         return true;
@@ -620,9 +619,8 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      */
     function copy($id, $parentId = 0, $prevId = 0)
     {
-        return $this->_throwError(
-                'copy-method is not implemented yet!' ,
-                __LINE__
+        return Tree::raiseError('TREE_ERROR_NOT_IMPLANTED',
+                'copy-method is not implemented yet!'
            );
         // get element tree
         // $this->addTree
@@ -646,7 +644,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'));
         if (DB::isError($res = $this->dbh->getRow($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return !$res ? false : $this->_prepareResult($res);
     }
@@ -674,11 +672,10 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $id);
         $res = $this->dbh->getRow($query);
         if (DB::isError($res)) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         if (!$res) {
-            return $this->_throwError("Element with id $id does not exist!" ,
-                                        __LINE__);
+            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', "Element with id $id does not exist!");
         }
         return $this->_prepareResult($res);
     }
@@ -710,7 +707,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('left'),
                             $curElement['left']+1);
         if (DB::isError($res = $this->dbh->getRow($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return $this->_prepareResult($res);
     }
@@ -735,7 +732,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     {
         $res = $this->dbh->getAll($this->_getPathQuery($id));
         if (DB::isError($res)) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return $this->_prepareResults($res);
     }
@@ -772,7 +769,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         // i know this is not really beautiful ...
         $query = preg_replace('/^select \* /i','SELECT COUNT(*) ',$query);
         if (DB::isError($res = $this->dbh->getOne($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return $res-1;
     }
@@ -803,7 +800,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('right'),$element['left']-1,
                             $this->_getColName('left'),$element['left']-1);
         if (DB::isError($res = $this->dbh->getRow($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return $this->_prepareResult($res);
     }
@@ -833,7 +830,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('left'),$element['right']+1,
                             $this->_getColName('right'),$element['right']+1);
         if (DB::isError($res = $this->dbh->getRow($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return $this->_prepareResult($res);
     }
@@ -869,7 +866,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('id'),
                             $id);
         if (DB::isError($res = $this->dbh->getRow($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return $this->_prepareResult($res);
     }
@@ -923,7 +920,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                                     : $this->_getColName('left')
                        );
             if (DB::isError($_res = $this->dbh->getAll($query))) {
-                return $this->_throwError($_res->getMessage(), __LINE__);
+                return Tree::raiseError('TREE_ERROR_DB_ERROR', $_res->getMessage());
             }
 
             // Column names are now unmapped
@@ -989,7 +986,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('id'),
                             $id);
         if (DB::isError($res = $this->dbh->getRow($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return !$res ? false : $this->_prepareResult($res);
     }
@@ -1030,7 +1027,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('id'),
                             $id);
         if (DB::isError($res = $this->dbh->getRow($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return !$res ? false : $this->_prepareResult($res);
     }
@@ -1090,7 +1087,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('right')
                             );
         if (DB::isError($res = $this->dbh->getOne($query))) {
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         if (!$res) {
             return false;
@@ -1144,8 +1141,8 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     // in preference to only the id?
     {
         if ($separator == '') {
-            return $this->_throwError(
-                'getIdByPath: Empty separator not allowed', __LINE__);
+            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 
+                'getIdByPath: Empty separator not allowed');
         }
         if ($path == $separator) {
             $root = $this->getRoot();
@@ -1155,8 +1152,8 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             return $root['id'];
         }
         if (!($colname=$this->_getColName($nodeName))) {
-            return $this->_throwError(
-                'getIdByPath: Invalid node name', __LINE__);
+            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 
+                'getIdByPath: Invalid node name');
         }
         if ($startId != 0) {
             // If the start node has no child, returns false
@@ -1207,8 +1204,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         }
         $res = $this->dbh->getOne($query);
         if (DB::isError($res)) {
-            return $this->_throwError($res->getMessage(),
-                        __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         return ($res ? (int)$res : false);
     }

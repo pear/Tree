@@ -66,11 +66,11 @@ class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
                                 $this->_getColName($orderBy)
                                 );
             if (DB::isError($res = $this->dbh->getAll($query))) {
-                return $this->_throwError($res->getMessage(),__LINE__);
+                return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
             }
         }
 
-        return $this->_prepareResults( $res );
+        return $this->_prepareResults($res);
     }
 
 }

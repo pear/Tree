@@ -17,7 +17,6 @@
 
 // $Id$
 require_once 'Tree/OptionsDB.php';
-require_once 'Tree/Error.php';
 
 /**
  * the DB interface to the tree class
@@ -142,7 +141,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         if (DB::isError($res = $this->dbh->getAll($query))) {
             // FIXXME remove print use debug mode instead
             printf("ERROR - Tree::setup - %s - %s<br>", DB::errormessage($res), $query);
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
         }
         // if the db-column names need to be mapped to different names
         // FIXXME somehow we should be able to do this in the query, but i dont know how to select
@@ -325,20 +324,6 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         }
 
         return true;
-    }
-
-    // }}}
-    // {{{ _throwError()
-
-    /**
-     *
-     * @access private
-     * @version 2002/03/02
-     * @author Wolfram Kriesing <wolfram@kriesing.de>
-     */
-    function _throwError($msg, $line, $mode = null)
-    {
-        return new Tree_Error($msg, $line, __FILE__, $mode, $this->db->last_query);
     }
 
     // }}}

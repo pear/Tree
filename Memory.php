@@ -257,7 +257,7 @@ class Tree_Memory extends Tree_Common
     {
         if ($this->debug) {
             $startTime = split(' ',microtime());
-            $startTime = $startTime[1]+$startTime[0];
+            $startTime = $startTime[1] + $startTime[0];
         }
 
         if (PEAR::isError($res = $this->dataSourceClass->setup($data))) {
@@ -266,7 +266,7 @@ class Tree_Memory extends Tree_Common
 
         if ($this->debug) {
             $endTime = split(' ',microtime());
-            $endTime = $endTime[1]+$endTime[0];
+            $endTime = $endTime[1] + $endTime[0];
             echo ' reading and preparing tree data took: '.
                     ($endTime - $startTime) . '<br>';
         }
@@ -340,7 +340,7 @@ class Tree_Memory extends Tree_Common
                         $this->data[$lastPrevId]['next'] =   &$this->data[$key];
 
                         $this->data[$key]['prevId'] = $lastPrevId;
-                        $this->data[$key]['previous'] = &$this->data[ $lastPrevId ];
+                        $this->data[$key]['previous'] = &$this->data[$lastPrevId];
                     }
                     $lastPrevId = $key;
                 }
@@ -395,7 +395,7 @@ class Tree_Memory extends Tree_Common
 
         if ($this->debug) {
             $endTime = split(' ',microtime());
-            $endTime = $endTime[1]+$endTime[0];
+            $endTime = $endTime[1] + $endTime[0];
             echo ' building took: ' . ($endTime - $startTime) . ' <br>';
         }
 

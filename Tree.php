@@ -26,6 +26,21 @@
 *   @version    2001/06/27
 *   @package    Tree
 */
+
+define('TREE_ERROR_NOT_IMPLEMENTED',    -1);
+define('TREE_ERROR_ELEMENT_NOT_FOUND',  -2);
+define('TREE_ERROR_INVALID_NODE_NAME',  -3);
+define('TREE_ERROR_MOVE_TO_CHILDREN',   -4);
+define('TREE_ERROR_PARENT_ID_MISSED',   -5);
+define('TREE_ERROR_INVALID_PARENT',     -6);
+define('TREE_ERROR_EMPTY_PATH',         -7);
+define('TREE_ERROR_INVALID_PATH',       -8);
+define('TREE_ERROR_DB_ERROR',           -9);
+define('TREE_ERROR_PATH_SEPARATOR_EMPTY',-10);
+define('TREE_ERROR_CANNOT_CREATE_FOLDER',-11);
+define('TREE_ERROR_UNKNOWN_ERROR',       -99);
+
+
 class Tree
 {
     // {{{ setupMemory()
@@ -152,6 +167,78 @@ class Tree
     }
 
     // }}}
+
+    /**
+     * This method is used to communicate an error and invoke error
+     * callbacks etc.  Basically a wrapper for PEAR::raiseError
+     * without the message string.
+     * 
+     * @param mixed    integer error code, or a PEAR error object (all 
+     *                 other parameters are ignored if this parameter is
+     *                 an object
+     *
+     * @param string   Extra debug information.  Defaults to the last
+     *                 query and native error code.
+     * @param int      error mode, see PEAR_Error docs
+     *
+     * @param mixed    If error mode is PEAR_ERROR_TRIGGER, this is the
+     *                 error level (E_USER_NOTICE etc).  If error mode is
+     *                 PEAR_ERROR_CALLBACK, this is the callback function,
+     *                 either as a function name, or as an array of an
+     *                 object and method name.  For other error modes this
+     *                 parameter is ignored
+     *
+     *
+     * @return object  a PEAR error object
+     *
+     * @see PEAR_Error
+     */
+    function &raiseError($code = null, $userinfo = null, $mode = null,
+                         $options = null)
+    {
+        require_once 'PEAR.php';      
+        // The error is yet a Tree error object
+        if (is_object($code)) {
+            return PEAR::raiseError($code, null, null, null, null, null, true);
+        }
+
+        if (empty($code)) {
+            $code = TREE_ERROR_UNKNOW_ERROR;
+        }
+        $msg = Tree::errorMessage($code);
+        return PEAR::raiseError("Tree Error: $msg", $code, $mode, $options, $userinfo);
+    }
+
+    function errorMessage($value)
+    {
+         // make the variable static so that it only has to do the defining on the first call
+        static $errorMessages;
+        
+         // define the varies error messages
+         if (!isset($errorMessages)) {
+            $errorMessages = array(
+                TREE_ERROR_NOT_IMPLEMENTED    => 'This feature is currently not implanted',
+                TREE_ERROR_INVALID_PATH       => 'Invalid Path',
+                TREE_ERROR_DB_ERROR           => 'Database error',
+                TREE_ERROR_PARENT_ID_MISSED   => 'Parent ID is missing',
+                TREE_ERROR_MOVE_TO_CHILDREN   => 'Move to children',
+                TREE_ERROR_ELEMENT_NOT_FOUND  => 'Element not found',
+                TREE_ERROR_PATH_SEPARATOR_EMPTY => 'Path separator empty',
+                TREE_ERROR_INVALID_NODE_NAME  => 'Invalid node name',
+                TREE_ERROR_UNKNOWN_ERROR       => 'Unkown error',
+            );
+        }
+
+        // If this is an error object, then grab the corresponding error code
+        if (Tree::isError($value)) {
+            $value = $value->getCode();
+        }
+
+        // return the textual error message corresponding to the code
+        return isset($errorMessages[$value]) ? $errorMessages[$value] : 
+                                    $errorMessages[TREE_ERROR_UNKNOWN_ERROR];
+    }
+
     // {{{ isError()
 
     /**
@@ -165,9 +252,7 @@ class Tree
       */
     function isError($value)
     {
-        return (is_object($value) &&
-                (is_a($value, 'tree_error') ||
-                 is_subclass_of($value, 'tree_error')));
+        return is_a($value, 'tree_error');
     }
 
     // }}}

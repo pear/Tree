@@ -19,7 +19,6 @@
 //  $Id$
 
 require_once 'Tree/Tree.php';
-require_once 'Tree/Error.php';
 
 /**
  * common tree class, implements common functionality
@@ -406,8 +405,7 @@ class Tree_Common
      */
     function getPath($id)
     {
-        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                __FUNCTION__, __LINE__);
+        return Tree::raiseError('TREE_ERROR_NOT_IMPLEMENTED');
     }
 
     // }}}
@@ -423,7 +421,8 @@ class Tree_Common
      * @return  array   this array contains the path elements and the sublevels
      *                  to substract if no $cwd has been given.
      */
-    function _preparePath($path, $cwd = '/', $separator = '/'){
+    function _preparePath($path, $cwd = '/', $separator = '/')
+    {
         $elems = explode($separator, $path);
         $cntElems = sizeof($elems);
         // beginning with a slash
@@ -454,10 +453,9 @@ class Tree_Common
             list($_elems, $sublevel) = $this->_preparePath($cwd);
         }
         $i = 0;
-        foreach($elems as $val){
+        foreach($elems as $val) {
             if (trim($val) == '') {
-                return $this->_raiseError(TREE_ERROR_INVALID_PATH,
-                            __FUNCTION__, __LINE__);
+                return Tree::raiseError('TREE_ERROR_INVALID_PATH');
             }
             if ($val == '..') {
                  if ($i == 0) {
@@ -470,8 +468,7 @@ class Tree_Common
             }
         }
         if (sizeof($_elems) < 1){
-            return $this->_raiseError(TREE_ERROR_EMPTY_PATH,
-                        __FUNCTION__, __LINE__);
+            return Tree::raiseError('TREE_ERROR_EMPTY_PATH');
         }
         return array($_elems, $sublevel);
     }
@@ -492,8 +489,7 @@ class Tree_Common
      */
     function getLevel($id)
     {
-        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                        __FUNCTION__, __LINE__);
+        return Tree::raiseError('TREE_ERROR_NOT_IMPLEMENTED');
     }
 
     // }}}
@@ -513,8 +509,7 @@ class Tree_Common
      */
     function isChildOf($id, $childId, $checkAll = true)
     {
-        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                    __FUNCTION__, __LINE__);
+        return Tree::raiseError('TREE_ERROR_NOT_IMPLEMENTED');
     }
 
     // }}}
@@ -527,8 +522,7 @@ class Tree_Common
     function getIdByPath($path, $startId = 0,
                         $nodeName = 'name', $seperator = '/')
     {
-        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                    __FUNCTION__, __LINE__);
+        return Tree::raiseError('TREE_ERROR_NOT_IMPLEMENTED');
     }
 
     // }}}
@@ -626,52 +620,6 @@ class Tree_Common
     }
 
     // }}}
-    // {{{ _raiseError()
-
-    /**
-     *
-     *
-     * @access     private
-     * @version    2002/03/02
-     * @author     Pierre-Alain Joye <paj@pearfr.org>
-     * @param      string  the error message
-     * @param      int     the line in which the error occured
-     * @param      mixed   the error mode
-     * @return     object  a Tree_Error
-     */
-    function _raiseError($errorCode, $msg = '', $line = 0)
-    {
-        include_once 'Tree/Error.php';
-        return new Tree_Error(
-            $msg, $line, __FILE__, $mode, $this->dbh->last_query);
-    }
-
-    // }}}
-    // {{{ _throwError()
-
-    /**
-     *
-     *
-     * @access     private
-     * @version    2002/03/02
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      string  the error message
-     * @param      int     the line in which the error occured
-     * @param      mixed   the error mode
-     * @return     object  a Tree_Error
-     */
-    function _throwError($msg, $line, $mode = null)
-    {
-        include_once 'Tree/Error.php';
-        if ($mode === null && $this->debug > 0) {
-            $mode = PEAR_ERROR_PRINT;
-        }
-        return new Tree_Error(
-            $msg, $line, __FILE__, $mode, $this->dbh->last_query);
-    }
-
-    // }}}
-
 
     /*******************************************************************************/
     /************************ METHODS FROM Tree_Memory *****************************/
@@ -689,15 +637,11 @@ class Tree_Common
     function hasChildren($id = 0)
     {
         if (isset($this->data[$id]['children']) &&
-            sizeof($this->data[$id]['children']) > 0) {
+            count($this->data[$id]['children']) > 0) {
             return true;
         }
         return false;
     }
-
-
-
-
 
     /*******************************************************************************/
     /************************ METHODS FROM Tree_Options ****************************/

@@ -19,7 +19,6 @@
 
 // $Id$
 require_once 'Tree/OptionsMDB.php';
-require_once 'Tree/Error.php';
 
 /**
 * the MDB interface to the tree class
@@ -137,7 +136,7 @@ class Tree_Memory_MDBsimple extends Tree_OptionsMDB
         if (MDB::isError($res = $this->dbh->getAll($query))) {
             // FIXXME remove print use debug mode instead
             printf("ERROR - Tree::setup - %s - %s<br />", MDB::errorMessage($res), $query);
-            return $this->_throwError($res->getMessage(), __LINE__);
+            return Tree::raiseError('TREE_ERROR_RAISE_ERROR', $res->getMessage());
         }
         // if the db-column names need to be mapped to different names
         // FIXXME somehow we should be able to do this in the query, but I dont know
@@ -319,20 +318,6 @@ class Tree_Memory_MDBsimple extends Tree_OptionsMDB
         }
 
         return true;
-    }
-
-    // }}}
-    // {{{ _throwError()
-
-    /**
-     *
-     * @access private
-     * @version 2002/03/02
-     * @author Wolfram Kriesing <wolfram@kriesing.de>
-     */
-    function _throwError($msg, $line, $mode = null)
-    {
-        return new Tree_Error($msg, $line, __FILE__, $mode, $this->dbh->last_query);
     }
 
     // }}}
