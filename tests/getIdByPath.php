@@ -28,7 +28,7 @@ class tests_getIdByPath extends UnitTest
         $tree = $this->getDynamicDBnested();
         $id = $tree->getIdByPath('/Root/child 2/child 2_2');
 
-        $this->assertEquals(5,$id);
+        $this->assertEquals(5,$id,'This is not implemented, yet!!! (This test should fail ... for now)');
     }
     
 
