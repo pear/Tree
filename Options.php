@@ -40,6 +40,8 @@ class Tree_Options extends PEAR
     */
     var $options = array();
 
+    var $_forceSetOption = false;
+
     /**
     *   this constructor sets the options, since i normally need this and
     *   in case the constructor doesnt need to do anymore i already have it done :-)
@@ -47,10 +49,14 @@ class Tree_Options extends PEAR
     *   @version    02/01/08
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param      boolean true if loggedIn
+    *   @param      array       the key-value pairs of the options that shall be set
+    *   @param      boolean     if set to true options are also set
+    *                           even if no key(s) was/were found in the options property
     */
-    function Tree_Options( $options=array() )
+    function Tree_Options( $options=array() , $force=false )
     {
+        $this->_forceSetOption = $force;
+
         if( is_array($options) && sizeof($options) )
             foreach( $options as $key=>$value )
                 $this->setOption( $key , $value );
@@ -60,16 +66,38 @@ class Tree_Options extends PEAR
     *
     *   @access     public
     *   @author     Stig S. Baaken
-    *   @param      
+    *   @param
+    *   @param
+    *   @param      boolean     if set to true options are also set
+    *                           even if no key(s) was/were found in the options property
     */
-    function setOption( $option , $value )
+    function setOption( $option , $value , $force=false )
     {
-        if (isset($this->options[$option])) {
-            $this->options[$option] = $value;
+        if( is_array($value) )                      // if the value is an array extract the keys and apply only each value that is set
+        {                                           // so we dont override existing options inside an array, if an option is an array
+            foreach( $value as $key=>$aValue )
+                $this->setOption( array($option , $key) , $aValue );
+            return true;
+        }
+
+        if( is_array($option) )
+        {
+            $mainOption = $option[0];
+            $options = "['".implode("']['",$option)."']";
+            $evalCode = "\$this->options".$options." = \$value;";
+        }
+        else
+        {
+            $evalCode = "\$this->options[\$option] = \$value;";
+            $mainOption = $option;
+        }
+
+        if( $this->_forceSetOption==true || $force==true || isset($this->options[$mainOption]) )
+        {
+            eval($evalCode);
             return true;
         }
         return false;
-# may be better raise a PEAR error here :-)
     }
 
     /**
@@ -78,12 +106,18 @@ class Tree_Options extends PEAR
     *   @access     public
     *   @author
     *   @param
+    *   @param      boolean     if set to true options are also set
+    *                           even if no key(s) was/were found in the options property
     */
-    function setOptions( $options )
+    function setOptions( $options , $force=false )
     {
         if( is_array($options) && sizeof($options) )
+        {
             foreach( $options as $key=>$value )
-                $this->setOption( $key , $value );
+            {
+                $this->setOption( $key , $value , $force );
+            }
+        }
     }
 
     /**
@@ -94,13 +128,33 @@ class Tree_Options extends PEAR
     */
     function getOption($option)
     {
+        if( func_num_args() > 1 &&
+            is_array($this->options[$option]))
+        {
+            $args = func_get_args();
+            $evalCode = "\$ret = \$this->options['".implode( "']['" , $args )."'];";
+            eval( $evalCode );
+            return $ret;
+        }
+
         if (isset($this->options[$option])) {
             return $this->options[$option];
         }
-# may be better raise a PEAR error here :-)
 #        return $this->raiseError("unknown option $option");
         return false;
     }
 
+    /**
+    *   returns all the options
+    *
+    *   @version    02/05/20
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     string      all options as an array
+    */
+    function getOptions()
+    {
+        return $this->options;
+    }
 } // end of class
 ?>
