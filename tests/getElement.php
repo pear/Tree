@@ -52,7 +52,31 @@ class tests_getElement extends UnitTest
         $actual = $tree->getElement(3);
         $this->assertEquals('PEAR rulez',$actual['myComment']);
     }
-    
+
+    /**
+    * Empty the tree and add an element, retreive it and check if it is the one we added.
+    *
+    *
+    */
+    function test_DynamicDBnestedEmptyTree()
+    {
+        $tree = Tree::setup('Dynamic_DBnested',DB_DSN,array('table'=>TABLE_TREENESTED));
+        $tree->remove($tree->getRootId());
+        
+        $tree = Tree::setup('Memory_DBnested',DB_DSN,array('table'=>TABLE_TREENESTED));
+        $tree->setup();
+        $id = $tree->add(array('name'=>'Start'));
+        $tree->setup();
+        $el = $tree->getElement($id);
+        $this->assertEquals('Start',$el['name']);
+        $tree->remove($tree->getRootId());
+        
+        $tree = Tree::setup('Dynamic_DBnested',DB_DSN,array('table'=>TABLE_TREENESTED));
+        $id = $tree->add(array('name'=>'StartDyn'));
+        $el = $tree->getElement($id);
+        $this->assertEquals('StartDyn',$el['name']);
+    }    
+        
 }
 
 ?>
