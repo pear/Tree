@@ -280,8 +280,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
             $idColumnName = $map['id'];
         if( $map['parentId'] )
             $parentIdColumnName = $map['parentId'];
-
-# TODO previous stuff
+# FIXXME todo: previous stuff
 
         // set the parent in the DB
         $query = "UPDATE $this->table SET $parentIdColumnName=$newParentId WHERE $idColumnName=$idToMove";
@@ -311,21 +310,42 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     function update( $newData )
     {
 
-        // check $this->dbh->tableInfo to see if all the columns that shall be updated
-        // really exist, this will also extract nextId etc. before writing it in the DB
-        // in case they dont exist in the DB
+# FIXXME check $this->dbh->tableInfo to see if all the columns that shall be updated
+# really exist, this will also extract nextId etc. if given before writing it in the DB
+# in case they dont exist in the DB
 
-        // build the column names and the values which will be written in the DB
-/*
-        $query = "UPDATE $this->table SET parentId=$newParentId WHERE id=$idToMove";
-#print($query);
-        if( DB::isError( $res = $this->dbh->query( $query ) ) )
-        {
-# TODO raise PEAR error
-            printf("ERROR - tree::move - %s - %s<br>",DB::errormessage($res),$query);
+        if( !$newData['id'] ){
+# FIXXME raise PEAR error
+            printf('ERROR - tree::update no id given');
             return false;
         }
-*/
+
+        $id = $newData['id'];                       // get the id and remove it...
+        unset($newData['id']);                      // ...from the array, since we use it in the WHERE
+
+        $map = $this->getOption('columnNameMaps');
+
+        $setData = array();
+        foreach( $newData as $key=>$aDate )
+        {
+            if( $map[$key] )                        // was the column name mapped to a different name?
+                $setData[] = $map[$key]."='$aDate'";    // if so map back :-)
+            else
+                $setData[] = "$key='$aDate'";
+        }
+
+        $query = sprintf(   'UPDATE %s SET %s WHERE %s=%s',
+                            $this->table,
+                            implode( ',' , $setData ),
+                            $map['id'] ? $map['id'] : 'id',
+                            $id
+                        );
+        if( DB::isError( $res=$this->dbh->query($query) ) ){
+# FIXXME raise PEAR error
+            printf("ERROR - tree::update - %s - %s<br>",DB::errormessage($res),$query);
+            return false;
+        }
+
         return true;
     } // end of function
 
