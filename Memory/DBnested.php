@@ -64,7 +64,7 @@ class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
         if( DB::isError( $res = $this->dbh->getAll( $query ) ) )
         {
 # FIXXME remove print use debug mode instead
-            printf("ERROR - tree::setup - %s - %s<br>",DB::errormessage($res),$query);
+            printf("ERROR - Tree::setup - %s - %s<br>",DB::errormessage($res),$query);
             return $this->_throwError($res->getMessage(),__LINE__);
         }
 

@@ -139,7 +139,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         if( DB::isError( $res = $this->dbh->getAll( $query ) ) )
         {
 # FIXXME remove print use debug mode instead
-            printf("ERROR - tree::setup - %s - %s<br>",DB::errormessage($res),$query);
+            printf("ERROR - Tree::setup - %s - %s<br>",DB::errormessage($res),$query);
             return $this->_throwError($res->getMessage(),__LINE__);
         }
 
@@ -199,7 +199,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         if( DB::isError( $res = $this->dbh->query( $query ) ) )
         {
             # TODO raise PEAR error
-            printf("ERROR - tree::add - %s - %s<br>",DB::errormessage($res),$query);
+            printf("ERROR - Tree::add - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
 
@@ -239,7 +239,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         if( DB::isError( $res = $this->dbh->query( $query ) ) )
         {
 # TODO raise PEAR error
-            printf("ERROR - tree::remove - %s - %s<br>",DB::errormessage($res),$query);
+            printf("ERROR - Tree::remove - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
 # TODO if remove succeeded set prevId of the following element properly
@@ -280,7 +280,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         if( DB::isError( $res = $this->dbh->query( $query ) ) )
         {
 # TODO raise PEAR error
-            printf("ERROR - tree::move - %s - %s<br>",DB::errormessage($res),$query);
+            printf("ERROR - Tree::move - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
 # FIXXME update the prevId's of the elements where the element was moved away from and moved in
@@ -320,7 +320,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         if( DB::isError( $res=$this->dbh->query($query) ) )
         {
 # FIXXME raise PEAR error
-            printf("ERROR - tree::update - %s - %s<br>",DB::errormessage($res),$query);
+            printf("ERROR - Tree::update - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
 
