@@ -18,8 +18,8 @@
 //
 //  $Id$
 
-require_once('Tree/Common.php');
-require_once('Tree/Error.php');
+require_once 'Tree/Common.php';
+require_once 'Tree/Error.php';
 
 /**
 *   this class can be used to step through a tree using ['parent'], ['child'], etc.
@@ -144,6 +144,13 @@ class Tree_Memory extends Tree_Common
     */
     var $_getNodeCurParent;
 
+    /**
+    *   the maximum depth of the tree
+    *   @access private
+    *   @var    int     the maximum depth of the tree
+    */
+    var $_treeDepth = 0;
+    
     /**
     *   set up this object
     *
@@ -595,6 +602,10 @@ class Tree_Memory extends Tree_Common
         // always set the level to one higher than the parent's level, easy ha?
         if (isset($this->data[$parentId]['parent']['level'])) {  // this applies only to the root element(s)
             $this->data[$parentId]['level'] = $this->data[$parentId]['parent']['level']+1;
+            
+            if ($this->data[$parentId]['level']>$this->_treeDepth) {
+                $this->_treeDepth = $this->data[$parentId]['level'];
+            }
         } else {
             $this->data[$parentId]['level'] = 0;    // set first level number to 0
         }
