@@ -140,7 +140,8 @@ class Tree_Common extends Tree_OptionsDB
     *                       or false if there are no children
     */
     function getAllChildrenIds( $id )
-    {
+    {                      
+        $childrenIds = array();
         if( $allChildren = $this->getAllChildren($id) )
         {
             $childrenIds = array();
