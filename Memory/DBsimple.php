@@ -164,6 +164,9 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     *   the values' keys given have to match the db-columns, because the
     *   value gets inserted in the db directly
     *   to add an entire node containing children and so on see 'addNode()'
+    *
+    *   to ba compatible, to the DBnested u can also give the parent and previd as the second and third parameter
+    *
     *   @see        addNode()
     *   @version    2001/10/09
     *   @access     public
@@ -174,7 +177,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     */
     function add( $newValues )
     {
-
+# FIXXME make this compatible to the DBnested::add, see parameters!!!
         // do all the name mapping
         $idColumnName = 'id';
         $map = $this->getOption('columnNameMaps');
@@ -232,6 +235,10 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     */
     function remove( $id )
     {
+        // if the one to remove has children, get their id's to remove them too
+        if( $this->hasChildren($id) )
+            $id = $this->walk( array('_remove',$this) , $id , 'array' );
+
         $idColumnName = 'id';
         $map = $this->getOption('columnNameMaps');
         if( isset($map['id']) )                     // if there are maps given
