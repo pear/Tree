@@ -19,6 +19,7 @@
 //  $Id$
 
 require_once('Tree/Common.php');
+require_once('Tree/Error.php');
 
 /**
 *   this class can be used to step through a tree using ['parent'], ['child'], etc.
@@ -209,7 +210,7 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/19
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return
+    *   @return     true or Tree_Error
     */
     function setup()
     {
@@ -219,7 +220,8 @@ class Tree_Memory extends Tree_Common
             $startTime = $startTime[1]+$startTime[0];
         }
 
-        $res = $this->dataSourceClass->setup();
+        if(PEAR::isError($res = $this->dataSourceClass->setup()) )
+            return $res;
 
         if( $this->debug )
         {
@@ -311,7 +313,7 @@ class Tree_Memory extends Tree_Common
                 }
 
                 // was a child saved (in the above 'if')
-                if( sizeof( $this->children[$key] ) ) // see comment above
+                if( isset($this->children[$key]) && sizeof( $this->children[$key] ) ) // see comment above
                 {
                     // refer to the first child in the [child] and [childId] keys
                     $this->data[$key]['childId'] = $this->children[$key][0];
@@ -526,7 +528,7 @@ class Tree_Memory extends Tree_Common
         else
             $this->data[$parentId]['level'] = 0;    // set first level number to 0
 
-        if( sizeof($this->children[$parentId]) )
+        if( isset($this->children[$parentId]) && sizeof($this->children[$parentId]) )
         {
             // go thru all the folders
             foreach( $this->children[$parentId] as $child )
@@ -581,7 +583,7 @@ class Tree_Memory extends Tree_Common
         }
 
         unset($this->walkReturn);                   // a new walk starts, unset the return value
-        return $this->_walk( $walkFunction , &$useNode , $returnType );
+        return $this->_walk( $walkFunction , $useNode , $returnType );
     }
 
     /**
