@@ -161,6 +161,9 @@ class Tree_Memory extends Tree_Common
 
         $className = 'Tree_Memory_'.$type;
         $this->dataSourceClass =& new $className( $dsn , $options );
+        // copy the options to be able to get them via getOption(s)
+#FIXXME this is not really cool, maybe overwrite the *Option* methods!!!
+        $this->options = $this->dataSourceClass->options;
 
     } // end of function
 
@@ -471,7 +474,7 @@ class Tree_Memory extends Tree_Common
         // and it has to change the prevId of the element that will be after it
         // so we may be simply call some method like 'update' too?
 
-        return $this->dataSourceClass->move( $idToMove , $newParentId , $prevId=0 );
+        return $this->dataSourceClass->move( $idToMove , $newParentId , $prevId );
     } // end of function
 
     /**
@@ -1066,6 +1069,10 @@ class Tree_Memory extends Tree_Common
 
         $this->_getNodeMaxLevel = $depth ? ($depth + $level) : 0 ;
 #!!!        $this->_getNodeCurParent = $this->data['parent']['id'];
+
+        // if the tree is empty dont walk through it
+        if( !sizeof($this->data) )
+            return;
 
         return $this->walk( array(&$this,'_getNode') , $startId , 'ifArray' );
     } // end of function
