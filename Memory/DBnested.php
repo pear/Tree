@@ -30,11 +30,6 @@ require_once('Tree/Dynamic/DBnested.php');
 class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
 {
 
-/*    this class should simply use Tree_Dynamic_DBnested to provide all the
-    data of a nested tree for the Memory-way
-*/
-
-
     /**
     *   retreive all the data from the db and prepare the data so the structure can
     *   be built in the parent class
