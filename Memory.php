@@ -1473,7 +1473,7 @@ class Tree_Memory extends Tree_Common
                 print "$prefix {$aNode['name']}</td>";
                 foreach ($keys as $aKey) {
                     if (!is_array($key)) {
-                        $val = $aNode[$aKey] ? $aNode[$aKey] : '&nbsp;';
+                        $val = isset($aNode[$aKey]) ? $aNode[$aKey] : '&nbsp;';
                         print "<td>$val</td>";
                     }
                 }
