@@ -385,8 +385,8 @@ class Tree_Common extends Tree_OptionsDB
     function _prepareResults( $results )
     {
         $newResults = array();
-        foreach( $results as $aResult )
-            $newResults[] = $this->_prepareResult($aResult);
+        foreach( $results as $key=>$aResult )
+            $newResults[$key] = $this->_prepareResult($aResult);
         return $newResults;
     }
 
