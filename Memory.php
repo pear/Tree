@@ -19,7 +19,6 @@
 //  $Id$
 
 require_once 'Tree/Common.php';
-require_once 'Tree/Error.php';
 
 /**
  * this class can be used to step through a tree using ['parent'],['child']
@@ -261,12 +260,12 @@ class Tree_Memory extends Tree_Common
             $startTime = $startTime[1]+$startTime[0];
         }
 
-        if(PEAR::isError($res = $this->dataSourceClass->setup($data))) {
+        if (PEAR::isError($res = $this->dataSourceClass->setup($data))) {
             return $res;
         }
 
         if ($this->debug) {
-            $endTime = split(" ",microtime());
+            $endTime = split(' ',microtime());
             $endTime = $endTime[1]+$endTime[0];
             echo ' reading and preparing tree data took: '.
                     ($endTime - $startTime) . '<br>';
@@ -350,7 +349,7 @@ class Tree_Memory extends Tree_Common
 
         if ($this->debug) {
             $startTime = split(' ',microtime());
-            $startTime = $startTime[1]+$startTime[0];
+            $startTime = $startTime[1] + $startTime[0];
         }
 
         // when NO prevId is given, sort the entries in each level by the given

@@ -19,6 +19,7 @@
 //  $Id$
 
 require_once 'Tree/Tree.php';
+require_once 'Tree/Error.php';
 
 /**
  * common tree class, implements common functionality
