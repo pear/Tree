@@ -28,7 +28,7 @@ require_once('PEAR.php');
 *   this class only defines commonly used methods, etc.
 *   it is worthless without being extended
 *
-*   @package  myPEAR
+*   @package  Tree
 *   @access   public
 *   @author   Wolfram Kriesing <wolfram@kriesing.de>
 *

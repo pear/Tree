@@ -28,7 +28,7 @@ require_once('DB.php');
 *   this class additionally retreives a DB connection and saves it
 *   in the property "dbh"
 *
-*   @package  myPEAR
+*   @package  Tree
 *   @access   public
 *   @author   Wolfram Kriesing <wolfram@kriesing.de>
 *
