@@ -423,14 +423,15 @@ class Tree_Common extends Tree_OptionsDB
     *   @access     private
     *   @version    2002/03/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      array   the data to prepare
+    *   @return     array   prepared results
     */
-    function _prepareResults( $results )
+    function _prepareResults($results)
     {
         $newResults = array();
-        foreach( $results as $key=>$aResult )
+        foreach ($results as $key=>$aResult) {
             $newResults[$key] = $this->_prepareResult($aResult);
+		}
         return $newResults;
     }
 
@@ -440,19 +441,18 @@ class Tree_Common extends Tree_OptionsDB
     *   @access     private
     *   @version    2002/03/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      array   a result
+    *   @return     array   the prepared result
     */
     function _prepareResult( $result )
     {
         $map = $this->getOption('columnNameMaps');
-
-        if( $map )
-        foreach( $map as $key=>$columnName )
-        {
-            $result[$key] = $result[$columnName];
-            unset($result[$columnName]);
-        }
+        if ($map) {
+			foreach ($map as $key=>$columnName) {
+				$result[$key] = $result[$columnName];
+				unset($result[$columnName]);
+			}
+		}
         return $result;
     }
 
@@ -464,15 +464,15 @@ class Tree_Common extends Tree_OptionsDB
     *   @access     private
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      string  the internal name used
+    *   @return     string  the real name of the column
     */
-    function _getColName( $internalName )
+    function _getColName($internalName)
     {
-        if( $map = $this->getOption( 'columnNameMaps' ) )
-        {
-            if( isset($map[$internalName]) )
+        if ($map = $this->getOption('columnNameMaps')) {
+            if (isset($map[$internalName])) {
                 return $map[$internalName];
+			}
         }
         return $internalName;
     }
@@ -483,13 +483,16 @@ class Tree_Common extends Tree_OptionsDB
     *   @access     private
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      string  the error message
+    *   @param      int     the line in which the error occured
+    *   @param      mixed   the error mode
+    *   @return     object  a Tree_Error
     */
     function _throwError( $msg , $line , $mode=null )
     {
-        if( $mode===null && $this->debug>0 )
+        if ($mode===null && $this->debug>0) {
             $mode = PEAR_ERROR_PRINT;
+		}
         return new Tree_Error( $msg , $line , __FILE__ , $mode , $this->dbh->last_query );
     }
 

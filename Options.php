@@ -66,8 +66,8 @@ class Tree_Options extends PEAR
     *
     *   @access     public
     *   @author     Stig S. Baaken
-    *   @param
-    *   @param
+    *   @param      string  the option name
+    *   @param      mixed   the value for this option
     *   @param      boolean     if set to true options are also set
     *                           even if no key(s) was/were found in the options property
     */
@@ -104,8 +104,7 @@ class Tree_Options extends PEAR
     *   set a number of options which are simply given in an array
     *
     *   @access     public
-    *   @author
-    *   @param
+    *   @param      array   the values to set
     *   @param      boolean     if set to true options are also set
     *                           even if no key(s) was/were found in the options property
     */

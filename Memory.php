@@ -209,7 +209,7 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/19
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return
+    *   @return     boolean true if the setup succeeded
     */
     function setupByRawData( $string )
     {
@@ -554,10 +554,12 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/29
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param      array   $data   the data to update
-    *   @return
+	*   @param      integer the ID of the element that shall be updated
+    *   @param      array   the data to update
+    *   @return     mixed   either boolean or
+	*                       an error object if the method is not implemented
     */
-    function update( $id , $data )
+    function update($id ,$data )
     {
         if (method_exists($this->dataSourceClass,'update')) {
             return $this->dataSourceClass->update($id,$data);
@@ -807,7 +809,7 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/21
     *   @access     private
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      int     the element ID
     *
     */
     function &_getElement( $id , $what='' )
@@ -830,7 +832,7 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/21
     *   @access     private
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      int     the element ID
     *
     */
     function _getElementId( $id , $what )
@@ -847,7 +849,7 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/21
     *   @access     private
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      int     the element ID
     *
     */
     function &getElement($id)
@@ -880,7 +882,7 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/02/06
     *   @access     private
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      int     the element ID
     *
     */
     function getElementsContent( $ids , $fieldName )
@@ -923,7 +925,7 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/21
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      int     the element ID
     *
     */
 /* we already have a method getIdByPath, which one should we use ????

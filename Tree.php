@@ -79,7 +79,9 @@ class Tree extends PEAR
     *   @version    2002/02/05
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      string  the type of tree you want, currently only DBnested is supported
+    *   @param      string  the connection string, for DB* its a DSN, for XML it would be the filename
+    *   @param      array   the options you want to set
     */
     function &setupDynamic( $type , $dsn , $options=array() )
 # "dynamic" stands for retreiving a tree(chunk) dynamically when needed,
@@ -114,8 +116,9 @@ class Tree extends PEAR
     *   @access     private
     *   @version    2002/03/07
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      string  the type of tree you want, currently only Memory|Dynamic_DBnested|XML|... is supported
+    *   @param      string  the connection string, for DB* its a DSN, for XML it would be the filename
+    *   @param      array   the options you want to set
     */
     function setup( $type , $dsn , $options=array() )
     {

@@ -22,8 +22,8 @@ require_once('Tree/Common.php');
 require_once('Tree/Error.php');
 
 /**
-*   this class implements methods to work on a tree saved using the nested
-*   tree model
+*   This class implements methods to work on a tree saved using the nested
+*   tree model.
 *   explaination: http://research.calacademy.org/taf/proceedings/ballew/index.htm
 *
 *   @access     public
@@ -68,8 +68,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      string  the DSN for the DB connection
+    *   @return     void
     */
     function __construct( $dsn , $options=array() )
     {
@@ -82,8 +82,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      string  the DSN for the DB connection
+    *   @return     void
     */
     function Tree_Dynamic_DBnested( $dsn , $options=array() )
     {
@@ -533,10 +533,12 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
+    *   @param      integer the ID of the node that shall be copied
+	*   @param      integer the new parent ID
+	*   @param      integer the new previous ID, if given parent ID will be omitted
+    *   @return     boolean true on success
     */
-    function copy( $id , $parentId=0 , $prevId=0 )
+    function copy($id ,$parentId=0 ,$prevId=0 )
     {
         return $this->_throwError( 'copy-method is not implemented yet!' , __LINE__ );
         // get element tree
@@ -550,7 +552,6 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
     *   @return     mixed   either the data of the root element or an Tree_Error
     */
     function getRoot()
@@ -572,7 +573,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element to return
     *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getElement( $id )
@@ -598,7 +599,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element for which the children shall be returned
     *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getChild($id)
@@ -629,7 +630,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element for which the path shall be returned
     *   @return     mixed   either the data of the requested elements or an Tree_Error
     */
     function getPath($id)
@@ -672,7 +673,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/07
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element
     *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getLeft( $id )
@@ -699,7 +700,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/03/07
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element
     *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getRight( $id )
@@ -726,7 +727,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/04/15
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element
     *   @return     mixed   the array with the data of the parent element
     *                       or false, if there is no parent, if the element is the root
     *                       or an Tree_Error
@@ -817,7 +818,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/04/15
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element
     *   @return     mixed   the array with the data of the next element
     *                       or false, if there is no next
     *                       or Tree_Error
@@ -849,7 +850,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @access     public
     *   @version    2002/04/15
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      integer the ID of the element
     *   @return     mixed   the array with the data of the previous element
     *                       or false, if there is no previous
     *                       or a Tree_Error
@@ -970,7 +971,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @version    2002/04/20
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      string  the current where clause
-    *   @return
+    *   @return     string  the where clause we want to add to a query
     */
     function _getWhereAddOn( $addAfter=' AND ' , $tableName='' )
     {

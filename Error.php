@@ -37,8 +37,6 @@ class Tree_Error extends PEAR_Error
     *   @access     public
     *   @version    2002/03/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
     */
     function Tree_Error( $msg , $line , $file , $mode=null , $userinfo='no userinfo' )
     {

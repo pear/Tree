@@ -268,8 +268,6 @@ class Tree_Memory_XML extends XML_Parser
     *   @version    2001/10/10
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @param
     *   @param      integer if prevId is given the element with the id idToMove shall be moved _behind_ element with id=prevId
     *                       before would be easier, but then no element could be inserted at the end :-/
     *   @return     boolean     true for success

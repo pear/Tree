@@ -167,8 +167,6 @@ class Tree_Memory_Filesystem
     *   @access     private
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
     */
     function _throwError( $msg , $line , $mode=null )
     {
@@ -182,8 +180,6 @@ class Tree_Memory_Filesystem
     *   @access     private
     *   @version    2002/03/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
     */
     function _prepareResults( $results )
     {
@@ -199,8 +195,6 @@ class Tree_Memory_Filesystem
     *   @access     private
     *   @version    2002/03/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
     */
     function _prepareResult( $result )
     {
