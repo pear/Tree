@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE package SYSTEM "../../php4/pear/package.dtd">
+<!-- do not use the "Type" attribute here, that one is only for
+     generated package.xml files -->
+<package version="1.0">
+  <name>Tree</name>
+  <summary>
+  Generic tree management, currently supports DB and XML input
+  </summary>
+  <description>
+  </description>
+  <maintainers>
+    <maintainer>
+      <user>cain</user>
+      <name>Wolfram Kriesing</name>
+      <email>wolfram@kriesing.de</email>
+      <role>lead</role>
+    </maintainer>
+  </maintainers>
+  <release>
+    <license>PHP</license>
+    <state>snapshot</state>
+    <notes>
+     Initial snapshot release
+    </notes>
+    <filelist>
+      <dir name="/" baseinstalldir="/">
+	<file role="php">Tree.php</file>
+	<dir name="." baseinstalldir="Tree">
+	  <file role="php">Common.php</file>
+	  <file role="php">Memory.php</file>
+	  <file role="php">Options.php</file>
+	</dir>
+	<dir name="Memory" baseinstalldir="Tree/Memory">
+	  <file role="php">DBsimple.php</file>
+	  <file role="php">DBnested.php</file>
+	  <file role="php">XML.php</file>
+	</dir>
+	<dir name="Dynamic" baseinstalldir="Tree/Dynamic">
+	  <file role="php">DBnested.php</file>
+	</dir>
+	<dir name="examples" role="doc">
+	  <file role="doc">Memory_XML.php</file>
+	  <file role="doc">Memory_DBsimple.php</file>
+	  <file role="doc">config.xml</file>
+	</dir>
+      </dir>
+    </filelist>
+  </release>
+</package>
