@@ -100,6 +100,25 @@ class Tree_Common extends Tree_OptionsDB
     }
 
     /**
+    *   this gets all the preceeding nodes, the parent and it's parent and so on
+    *
+    *   @version    2002/08/19
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer $id the id of the element for which the parentId shall be retreived
+    *   @return     array   of the parent nodes including the node with id $id
+    */
+    function getParents( $id )
+    {
+        $path = $this->getPath($id);
+        $parents = array();
+        foreach( $path as $aNode )
+            $parents[] = $aNode;
+        return $parents;
+    }
+
+
+    /**
     *
     *
     *   @version    2002/01/18
