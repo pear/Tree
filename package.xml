@@ -31,28 +31,12 @@
     </maintainer>
   </maintainers>
     <release>
-        <version>0.2.3</version>
-        <date>2003-03-10</date>
+        <version>0.2.4</version>
+        <date>2003-03-17</date>
         <license>PHP License</license>
         <state>beta</state>
         <notes>
-* Make switchDataSource work for Memory/Array, this enables you to
-read the data from any source and switch the source on the run. This writes the data 
-from the current tree into the new source. I.e. you read the data from a DB and write
-it into an array. 
-Switching from DB to Array makes sense i.e. if you read a tree from the DB, which you want to show
-(i.e. using HTML_TreeMenu) but therefore you need to set additional properties for each
-node which you don't want to save in the DB, since they are only for the presentation.
-Properties for HTML_TreeMenu are i.e. the icon and some events (like 'onClick'). Since you switched 
-the source from DB to Array you can change any data without worrying that they are written into
-the DB and modify your actual data in the DB.
-* Bring Memory/Array closer to be fully useable.
-* getPathAsString() takes two more parameters where you can determine from and offset
-* getChildrenIds() has a new optional parameter for determining the level
-* Add getDepth() to determine the maximum depth of the tree
-* Make setup work with custom data optionally (only relevant for Memory_*)
-* Show a nicer varDump
-* add UML class diagram
+* bugfix in Memory_Array::add method, which made the last element being added in a bogus way
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
@@ -113,6 +97,31 @@ the DB and modify your actual data in the DB.
     </release>
 
     <changelog>
+        <release>
+            <version>0.2.3</version>
+            <date>2003-03-10</date>
+            <license>PHP License</license>
+            <state>beta</state>
+            <notes>
+    * Make switchDataSource work for Memory/Array, this enables you to
+    read the data from any source and switch the source on the run. This writes the data 
+    from the current tree into the new source. I.e. you read the data from a DB and write
+    it into an array. 
+    Switching from DB to Array makes sense i.e. if you read a tree from the DB, which you want to show
+    (i.e. using HTML_TreeMenu) but therefore you need to set additional properties for each
+    node which you don't want to save in the DB, since they are only for the presentation.
+    Properties for HTML_TreeMenu are i.e. the icon and some events (like 'onClick'). Since you switched 
+    the source from DB to Array you can change any data without worrying that they are written into
+    the DB and modify your actual data in the DB.
+    * Bring Memory/Array closer to be fully useable.
+    * getPathAsString() takes two more parameters where you can determine from and offset
+    * getChildrenIds() has a new optional parameter for determining the level
+    * Add getDepth() to determine the maximum depth of the tree
+    * Make setup work with custom data optionally (only relevant for Memory_*)
+    * Show a nicer varDump
+    * add UML class diagram
+            </notes>
+        </release>
         <release>
             <version>0.2.2</version>
             <date>2003-01-30</date>
