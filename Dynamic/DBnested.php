@@ -632,11 +632,18 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param
     *   @return     mixed   either the data of the requested elements or an Tree_Error
     */
-    function getPath( $id )
+    function getPath($id)
+    {
+        if (DB::isError( $res = $this->dbh->getAll($this->_getPathQuery($id)))) {
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+        return $this->_prepareResults($res);
+    }
+
+    function _getPathQuery($id)
     {
         // subqueries would be cool :-)
         $curElement = $this->getElement( $id );
-
         $query = sprintf(   'SELECT * FROM %s WHERE%s %s<=%s AND %s>=%s ORDER BY %s',
                             $this->table,
                             $this->_getWhereAddOn(),
@@ -645,12 +652,20 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $this->_getColName('right'),
                             $curElement['right'],
                             $this->_getColName('left') );
-        if (DB::isError( $res = $this->dbh->getAll($query))) {
-            return $this->_throwError( $res->getMessage() , __LINE__ );
-        }
-        return $this->_prepareResults( $res );
+        return $query;
     }
-
+    
+    function getLevel($id)
+    {
+        $query = $this->_getPathQuery($id);
+        // i know this is not really beautiful ... 
+        $query = preg_replace('/^select \* /i','select count(*) ',$query);
+        if (DB::isError($res = $this->dbh->getOne($query))) {
+            return $this->_throwError($res->getMessage(), __LINE__);
+        }
+        return $res-1;
+    }
+    
     /**
     *   gets the element to the left, the left visit
     *
@@ -914,6 +929,33 @@ class Tree_Dynamic_DBnested extends Tree_Common
         $element = $this->getElement($id);
         return $element['right']-$element['left']>1;    // if the diff between left and right>1 then there are children
     }
+
+    /**
+    *   return the id of the element which is referenced by $path
+    *   this is useful for xml-structures, like: getIdByPath( '/root/sub1/sub2' )
+    *   this requires the structure to use each name uniquely
+    *   if this is not given it will return the first proper path found
+    *   i.e. there should only be one path /x/y/z
+    *
+    *   @version    2003/04/29
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      string  $path       the path to search for
+    *   @param      integer $startId    the id where to search for the path
+    *   @param      string  $nodeName   the name of the key that contains the node name
+    *   @param      string  $seperator  the path seperator
+    *   @return     integer the id of the searched element
+    *
+    */
+/* i dont know how to do that ... yet
+    function getIdByPath($path,$startId=0,$nodeName='name',$seperator='/')
+// should this method be called getElementIdByPath ????
+    {
+        if ($startId!=0) {
+            $this->getElement($startId)
+        }
+    }
+*/    
 
 
     //
