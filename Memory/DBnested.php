@@ -18,6 +18,8 @@
 //
 //  $Id$
 
+require_once('Tree/Dynamic/DBnested.php');
+
 /**
 *
 *
@@ -25,10 +27,53 @@
 *   @author
 *   @package    Tree
 */
-class Tree_Memory_DBnested extends ???
+class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
 {
 
-    this class should simply use Tree_Dynamic_DBnested to provide all the
+/*    this class should simply use Tree_Dynamic_DBnested to provide all the
     data of a nested tree for the Memory-way
+*/
+
+
+    /**
+    *   retreive all the data from the db and prepare the data so the structure can
+    *   be built in the parent class
+    *
+    *   @version    2002/04/20
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     array   the result
+    */
+    function setup()
+    {
+        //
+        $whereAddOn = '';
+        if( $this->options['whereAddOn'] )
+        {
+            $whereAddOn = 'WHERE '.$this->getOption('whereAddOn');
+        }
+
+        //
+        $orderBy = 'left';
+        if( $order=$this->getOption('order') )
+        {
+            $orderBy = $order;
+        }
+
+        // build the query this way, that the root, which has no parent (parentId=0) is first
+        $query = sprintf(   'SELECT * FROM %s %s ORDER BY %s',
+                            $this->table,
+                            $whereAddOn,
+                            $this->_getColName($orderBy)  // sort by the left-column, so we have the data sorted as it is supposed to be :-)
+                            );
+        if( DB::isError( $res = $this->dbh->getAll( $query ) ) )
+        {
+# FIXXME remove print use debug mode instead
+            printf("ERROR - tree::setup - %s - %s<br>",DB::errormessage($res),$query);
+            return $this->_throwError($res->getMessage(),__LINE__);
+        }
+
+        return $this->_prepareResults( $res );
+    }
 
 }
