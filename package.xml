@@ -37,6 +37,9 @@
         <state>beta</state>
         <notes>
 * added parameter to getPathAsString(), which takes the key you want to have in the path
+* add method getLevel() to Tree_Common, so it is also available for Dynamic_*, thanks to Michael Johnson
+
+* add unit test, at least for all new/modified methods
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
