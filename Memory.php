@@ -260,7 +260,27 @@ class Tree_Memory extends Tree_Common
             $this->children[ $values['parentId'] ][] = $values['id'];
         }
 
-#print_r($this->data);
+        // walk through all the children on each level and set the next/previous relations
+        // of those children, since all children for "children[$id]" are on the same level we can do
+        // this here :-)
+        foreach( $this->children as $children )
+        {
+            $lastPrevId = 0;
+            if(sizeof($children))
+            foreach( $children as $key )
+            {
+                if( $lastPrevId )
+                {
+                    $this->data[$lastPrevId]['nextId'] = $key;  // remember the nextId too, so the build process can be sped up
+                    $this->data[$lastPrevId]['next'] =   &$this->data[$key];
+
+                    $this->data[$key]['prevId'] = $lastPrevId;
+                    $this->data[$key]['previous'] = &$this->data[ $lastPrevId ];
+                }
+                $lastPrevId = $key;
+            }
+        }
+
 #print_r($this->children);
 
         if( $this->debug )
@@ -283,23 +303,6 @@ class Tree_Memory extends Tree_Common
                 // most if checks in this foreach are for the following reason, if not stated otherwise:
                 // dont make an data[''] or data[0] since this was not read from the DB, because id is autoincrement and starts at 1
                 // and also in an xml tree there can not be an element </> , i hope :-)
-
-# it doesnt work properly for XML files
-# yet, since the data returned are not sorted by parentId
-# as assued here, correct that in here !!!
-                if( $lastParentId != $value['parentId'] ) // if we are still on the same level (since it is sorted by parentId we can do this)
-                {
-                    $lastPrevId = 0;                // every first element on a level has no previous (prevId=0)
-                }
-                else
-                {
-                    if( $lastPrevId )               // see comment above
-                    {
-                        $this->data[$lastPrevId]['nextId'] = $key;  // remember the nextId too, so the build process can be sped up
-                        $this->data[$lastPrevId]['next'] =   &$this->data[$key];
-                    }
-                }
-
                 if( $value['parentId'] )            // see comment above
                 {
                     $this->data[$key]['parent']    = &$this->data[ $value['parentId'] ];
@@ -307,19 +310,14 @@ class Tree_Memory extends Tree_Common
                     $this->data[ $value['parentId'] ]['children'][] = &$this->data[$key];
                 }
 
-                if( $lastPrevId )                   // see comment above
-                {
-                    $this->data[$key]['prevId'] = $lastPrevId;
-                    $this->data[$key]['previous'] = &$this->data[ $lastPrevId ];
-                }
-
+                // was a child saved (in the above 'if')
                 if( sizeof( $this->children[$key] ) ) // see comment above
                 {
+                    // refer to the first child in the [child] and [childId] keys
                     $this->data[$key]['childId'] = $this->children[$key][0];
                     $this->data[$key]['child'] =   &$this->data[ $this->children[$key][0] ];
                 }
 
-                $lastPrevId = $key;
                 $lastParentId = $value['parentId'];
             }
         }
@@ -1007,6 +1005,7 @@ class Tree_Memory extends Tree_Common
                     break;
                 }
                 $curId = $this->getNextId($curId);
+#print "curId = $curId<br>";
             }
             while( $curId );
 
@@ -1160,14 +1159,24 @@ class Tree_Memory extends Tree_Common
 
         foreach( $node as $aNode )
         {
-            print '<u>Element: </u>';
+            print '<u>Element</u> :';
             foreach( $aNode as $key=>$aElement )
             {
                 print "$key";
 
                 if( in_array( $key , $dontDump ) )
                 {
-                    print "['id']=".$aElement['id'];
+                    if( !$aElement['id'] && is_array($aElement) )
+                    {
+                        print "['ids']=";
+                        $ids = array();
+                        foreach( $aElement as $aSubElement )
+                            $ids[] = $aSubElement['id'];
+                        print implode(', ',$ids);
+                    }
+                    else
+
+                        print "['id']=".$aElement['id'];
                 }
                 else
                 {
