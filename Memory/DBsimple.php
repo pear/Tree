@@ -19,6 +19,7 @@
 //  $Id$
 
 require_once('Tree/OptionsDB.php');
+require_once('Tree/Error.php');
 
 /**
 *   the DB interface to the tree class
@@ -29,6 +30,8 @@ require_once('Tree/OptionsDB.php');
 *   @package    Tree
 */
 class Tree_Memory_DBsimple extends Tree_OptionsDB
+# FIXXME should actually extend Tree_Common, to use the methods provided in there... but we need to connect
+# to the db here, so we extend optionsDB for now, may be use "aggregate" function to fix that
 {
 
     /**
@@ -37,7 +40,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     */
     var $options =  array(  'order'     =>'',   // which column to order by when reading the data from the DB, this sorts the data even inside every level
                             'whereAddOn'=>'',   // add on for the where clause, this string is simply added behind the WHERE in the select
-                                                // so you better make sure its correct SQL :-), i.e. 'WHERE uid=3'
+                                                // so you better make sure its correct SQL :-), i.e. 'uid=3'
                                                 // this is needed i.e. when you are saving many trees for different user
                                                 // in one table where each entry has a uid (user id)
                             'table'     =>'',   //
@@ -107,7 +110,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         $whereAddOn = '';
         if( $this->options['whereAddOn'] )
         {
-            $whereAddOn = $this->options['whereAddOn'];
+            $whereAddOn = 'WHERE '.$this->getOption('whereAddOn');
         }
 
         //
@@ -118,7 +121,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         }
 
         $map = $this->getOption('columnNameMaps');
-        if( $map['parentId'] )
+        if( isset($map['parentId']) )
         {
             $orderBy = $map['parentId'].$orderBy;
         }
@@ -135,9 +138,9 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
                             $orderBy); #,prevId !!!!
         if( DB::isError( $res = $this->dbh->getAll( $query ) ) )
         {
-            # TODO raise PEAR error
-            printf("ERROR - tree::tree - %s - %s<br>",DB::errormessage($res),$query);
-            return false;
+# FIXXME remove print use debug mode instead
+            printf("ERROR - tree::setup - %s - %s<br>",DB::errormessage($res),$query);
+            return $this->_throwError($res->getMessage(),__LINE__);
         }
 
         // if the db-column names need to be mapped to different names
@@ -348,6 +351,21 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
 
         return true;
     } // end of function
+
+    /**
+    *
+    *
+    *   @access     private
+    *   @version    2002/03/02
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _throwError( $msg , $line , $mode=null )
+    {
+        return new Tree_Error( $msg , $line , __FILE__ , $mode , $this->db->last_query );
+    }
+
 
 } // end of class
 ?>
