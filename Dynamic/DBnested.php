@@ -932,7 +932,6 @@ class Tree_Dynamic_DBnested extends Tree_Common
                                     $this->getOption('order')
                                     : $this->_getColName('left')
                         );
-            echo $query."\n";
             if (DB::isError($_res = $this->dbh->getAll($query))) {
                 return $this->_throwError( $_res->getMessage() , __LINE__ );
             }
