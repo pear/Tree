@@ -85,6 +85,72 @@ class Tree_Common extends Tree_OptionsDB
     }
 
     /**
+    *   gets all the children and grand children
+    *   i know there is no such word as 'childrens' but it makes sense here :-)
+    *
+    *   @version    2002/09/30
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer $id     ID of the element that the children shall be retreived for
+    *   @return     mixed   an array of all the children of the element with id=$id,
+    *                       or false if there are no children
+    */
+    function getChildrens( $id )
+    {
+        $retChildrens = false;
+        if( $childrens = $this->hasChildren( $id ) )
+        {
+            $retChildrens = $this->_getChildrens( $id );
+        }
+        return $retChildrens;
+    }
+
+    /**
+    *   this method gets all the children recursively
+    *
+    *   @see    getChildrens()
+    *   @version    2002/09/30
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer $id     ID of the element that the children shall be retreived for
+    *   @return     mixed   an array of all the ids of the children of the element with id=$id,
+    *                       or false if there are no children
+    */
+    function &_getChildrens( $id )
+    {
+        $retChildrens = array();
+        if( $children = $this->getChildren( $id ) )
+        {
+            foreach( $children as $key=>$aChild )
+            {
+                $retChildrens[] = &$children[$key];
+                //$retChildrens = array_merge($retChildrens,$this->_getChildrens( $aChild['id'] ));
+            }
+        }
+        return $retChildrens;
+    }
+
+    /**
+    *   gets all the children-ids and grand children-ids
+    *
+    *   @version    2002/09/30
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer $id     ID of the element that the children shall be retreived for
+    *   @return     mixed   an array of all the ids of the children of the element with id=$id,
+    *                       or false if there are no children
+    */
+    function getChildrensIds( $id )
+    {
+        if( $childrens = $this->getChildrens($id) )
+        {
+            $childrensIds = array();
+            foreach( $childrens as $aNode )
+                $childrensIds[] = $aNode['id'];
+        }
+        return $childrensIds;
+    }
+    /**
     *   get the id of the parent for the given element
     *
     *   @version    2002/01/18
