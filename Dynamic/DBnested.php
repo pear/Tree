@@ -632,8 +632,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),
                             $curElement['left']+1 );
-        if( DB::isError( $res = $this->dbh->getRow($query) ) )
-        {
+        if (DB::isError( $res = $this->dbh->getRow($query))) {
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
         return $this->_prepareResult( $res );
@@ -664,8 +663,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $this->_getColName('right'),
                             $curElement['right'],
                             $this->_getColName('left') );
-        if( DB::isError( $res = $this->dbh->getAll($query) ) )
-        {
+        if (DB::isError( $res = $this->dbh->getAll($query))) {
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
         return $this->_prepareResults( $res );
