@@ -429,18 +429,63 @@ class Tree_Memory extends Tree_Common
     } // end of function
 
     /**
-    *   move an entry under a given parent or behind a given entry
+    *   move an entry under a given parent or behind a given entry.
+    *   !!! the 'move behind another element' is only implemented for nested trees now!!!
+    *   If a newPrevId is given the newParentId is dismissed!
+    *   call it either like this:
+    *       $tree->move( x , y )
+    *       to move the element (or entire tree) with the id x
+    *       under the element with the id y
+    *   or
+    *       $tree->move( x , 0 , y );   // ommit the second parameter by setting it to 0
+    *       to move the element (or entire tree) with the id x
+    *       behind the element with the id y
+    *   or
+    *       $tree->move( array(x1,x2,x3) , ...
+    *       the first parameter can also be an array of elements that shall be moved
+    *       the second and third para can be as described above
     *
+    *   @version    2002/06/08
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer     the id(s) of the element(s) that shall be moved
+    *   @param      integer     the id of the element which will be the new parent
+    *   @param      integer     if prevId is given the element with the id idToMove
+    *                           shall be moved _behind_ the element with id=prevId
+    *                           if it is 0 it will be put at the beginning
+    *   @return     boolean     true for success
+    */
+    function move( $idsToMove , $newParentId , $newPrevId=0 )
+    {
+        settype($idsToMove,'array');
+        $errors = array();
+        foreach( $idsToMove as $idToMove )
+        {
+            $ret = $this->_move( $idToMove , $newParentId , $newPrevId );
+            if( PEAR::isError($ret) )
+                $errors[] = $ret;
+        }
+# FIXXME return a Tree_Error, not an array !!!!!
+        if( sizeof($errors) )
+            return $errors;
+        return true;
+    }
+
+    /**
+    *   this method moves one tree element
+    *
+    *   @see        move()
     *   @version    2001/10/10
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @param
-    *   @param      integer if prevId is given the element with the id idToMove shall be moved _behind_ element with id=prevId
-    *                       before would be easier, but then no element could be inserted at the end :-/
-    *   @return     boolean     true for success
+    *   @param      integer     the id of the element that shall be moved
+    *   @param      integer     the id of the element which will be the new parent
+    *   @param      integer     if prevId is given the element with the id idToMove
+    *                           shall be moved _behind_ the element with id=prevId
+    *                           if it is 0 it will be put at the beginning
+    *   @return     mixed       true for success, Tree_Error on failure
     */
-    function move( $idToMove , $newParentId , $prevId=0 )
+    function _move( $idToMove , $newParentId , $prevId=0 )
     {
         if( $idToMove == $newParentId )             // itself can not be a parent of itself
 # TODO PEAR-ize error
@@ -455,7 +500,7 @@ class Tree_Memory extends Tree_Common
             $allChildren = $this->getChildren($idToMove);
 # FIXXME what happens here we are changing $allChildren, doesnt this change the
 # property data too??? since getChildren (might, not yet) return a reference
-            while (list(, $aChild) = each ($allChildren))   // use while since foreach only works on a copy, but we are changing $allChildren in the loop
+            while (list(, $aChild) = each ($allChildren))   // use while since foreach only works on a copy of the data to loop through, but we are changing $allChildren in the loop
             {
                 array_shift( $allChildren );        // remove the first element because if array_merge is called the array pointer seems to be
                                                     // set to the beginning and this way the beginning is always the current element, simply work off and truncate in front
@@ -1044,6 +1089,22 @@ class Tree_Memory extends Tree_Common
     } // end of function
 
     /**
+    *   since in a nested tree there can only be one root
+    *   which i think (now) is correct, we also need an alias for this method
+    *   this also makes all the methods in Tree_Common, which access the
+    *   root element work properly!
+    *
+    *   @access     public
+    *   @version    2002/07/26
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     returns the first root element
+    */
+    function &getRoot()
+    {
+        return $this->getFirstRoot();
+    }
+
+    /**
     *   gets the tree under the given element in one array, sorted
     *   so you can go through the elements from begin to end and list them
     *   as they are in the tree, where every child (until the deepest) is retreived
@@ -1053,7 +1114,8 @@ class Tree_Memory extends Tree_Common
     *   @version    2001/12/17
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      integer $startId    the id where to start walking
-    *   @param      integer $depth      this number says how deep into the structure the elements shall be retreived
+    *   @param      integer $depth      this number says how deep into
+    *                                   the structure the elements shall be retreived
     *   @return     array   sorted as listed in the tree
     */
     function &getNode( $startId=0 , $depth=0 )
