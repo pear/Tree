@@ -71,7 +71,7 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     mixed   an array of all the ids of the children of the element with id=$id,
     *                       or false if there are no children
     */
-    function getChildrenIds( $id , $levels=1 )
+    function getChildrenIds($id,$levels=1)
     {
         if (!($children = $this->getChildren($id,$levels))) {   // returns false if no children exist
             return array();                         // return an empty array, if you want to know if there are children, use hasChildren
@@ -96,11 +96,11 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     mixed   an array of all the children of the element with id=$id,
     *                       or false if there are no children
     */
-    function getAllChildren( $id )
+// FIXXXME remove this method and replace it by getChildren($id,0)    
+    function getAllChildren($id)
     {
         $retChildren = false;
-        if( $children = $this->hasChildren( $id ) )
-        {                  
+        if ($children = $this->hasChildren($id)) {                  
             $retChildren = $this->_getAllChildren( $id );
         }
         return $retChildren;
@@ -117,13 +117,11 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     mixed   an array of all the ids of the children of the element with id=$id,
     *                       or false if there are no children
     */
-    function &_getAllChildren( $id )
+    function &_getAllChildren($id)
     {
         $retChildren = array();
-        if( $children = $this->getChildren( $id ) )
-        {
-            foreach( $children as $key=>$aChild )
-            {
+        if ($children = $this->getChildren($id)) {
+            foreach ($children as $key=>$aChild) {
                 $retChildren[] = &$children[$key];
                 $retChildren = array_merge($retChildren,$this->_getAllChildren( $aChild['id'] ));
             }
