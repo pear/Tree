@@ -748,21 +748,18 @@ class Tree_Dynamic_DBnested extends Tree_Common
     {
         // subqueries would be cool :-)
         $curElement = $this->getElement( $id );
-        $query = sprintf(   'SELECT
-                                *
-                            FROM
-                                %s
-                            WHERE
-                                %s %s<=%s
-                                AND %s>=%s
-                            ORDER BY
-                                %s',
+        $query = sprintf(   'SELECT * FROM %s '.
+                            'WHERE %s %s<=%s AND %s>=%s '.
+                            'ORDER BY %s',
+                            // set the FROM %s
                             $this->table,
+                            // set the additional where add on
                             $this->_getWhereAddOn(),
-                            $this->_getColName('left'),
-                            $curElement['left'],
-                            $this->_getColName('right'),
-                            $curElement['right'],
+                            // render 'left<=curLeft'
+                            $this->_getColName('left'),$curElement['left'],
+                            // render right>=curRight'
+                            $this->_getColName('right'),$curElement['right'],
+                            // set the order column
                             $this->_getColName('left') );
         return $query;
     }
