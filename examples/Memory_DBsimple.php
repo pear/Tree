@@ -5,15 +5,20 @@
     *   @param  array   $para   the result returned by some method, that will be dumped
     *   @param  string  $string the explaining string
     */
-    function dumpHelper( $para , $string='' )
+    function dumpHelper( $para , $string='' , $addArray=false )
     {
-        global $tree;
+        global $tree,$element;
 
-        print '<i><u><font color="#008000">'.$string.'</font></u></i><br>';
+        if( $addArray )
+            eval( "\$res=array(".$para.');' );
+        else
+            eval( "\$res=".$para.';' );
+
+        print '<b>'.$para.' </b><i><u><font color="#008000">'.$string.'</font></u></i><br>';
         // this method dumps to the screen, since print_r or var_dump dont
         // work too good here, because the inner array is recursive
         // well, it looks ugly but one can see what is meant :-)
-        $tree->varDump($para);
+        $tree->varDump($res);
         print '<br>';
 
     }
@@ -101,35 +106,35 @@
     dumpAllNicely( 'dump all after creation' );
 
     // get the path of the last inserted element
-    dumpHelper( $tree->getPath( $id ) , 'dump the path from "myElement/anotherSubElement"' );
+    dumpHelper( '$tree->getPath( '.$id.' )' , 'dump the path from "myElement/anotherSubElement"' );
 
     $id = $tree->getIdByPath('myElement/subElement');
-    dumpHelper( array($tree->getParent($id)) , 'dump the parent of "myElement/subElement"' );
+    dumpHelper( '$tree->getParent('.$id.')' , 'dump the parent of "myElement/subElement"' , true );
     // you can also use:    $tree->data[$id]['parent']
 
     $id = $tree->getIdByPath('myElement');
-    dumpHelper( array($tree->getChild($id)) , 'dump the child of "myElement"' );
+    dumpHelper( '$tree->getChild('.$id.')' , 'dump the child of "myElement"' , true );
     // you can also use:    $tree->data[$id]['child']
 
     $id = $tree->getIdByPath('myElement');
-    dumpHelper( $tree->getChildren($id) , 'dump the children of "myElement"' );
+    dumpHelper( '$tree->getChildren('.$id.')' , 'dump the children of "myElement"' );
     // you can also use:    $tree->data[$id]['children']
 
     $id = $tree->getIdByPath('myElement/subElement');
-    dumpHelper( array($tree->getNext($id)) , 'dump the "next" of "myElement/subElement"' );
+    dumpHelper( '$tree->getNext('.$id.')' , 'dump the "next" of "myElement/subElement"' , true );
     // you can also use:    $tree->data[$id]['next']
 
     $id = $tree->getIdByPath('myElement/anotherSubElement');
-    dumpHelper( array($tree->getPrevious($id)) , 'dump the "previous" of "myElement/anotherSubElement"' );
+    dumpHelper( '$tree->getPrevious('.$id.')' , 'dump the "previous" of "myElement/anotherSubElement"' , true );
     // you can also use:    $tree->data[$id]['previous']
 
     $id = $tree->getIdByPath('myElement');
     $element = $tree->data[$id]['child']['next']['parent']; // refer to yourself again, in a very complicated way :-)
-    dumpHelper( $element['id'] , 'demo of using the internal array, for referencing tree-nodes' );
+    dumpHelper( '$element[\'id\']' , 'demo of using the internal array, for referencing tree-nodes, see the code' );
 
     $id = $tree->getIdByPath('myElement');
     $element = $tree->data[$id]['child']['next']; // refer to the second child of 'myElement'
-    dumpHelper( $element['id'] , 'demo2 of using the internal array, for referencing tree-nodes' );
+    dumpHelper( '$element[\'id\']' , 'demo2 of using the internal array, for referencing tree-nodes, see the code' );
 
     $id = $tree->getIdByPath('myElement/anotherSubElement');
     $tree->move( $id , 0 );
@@ -141,7 +146,6 @@
     $tree->move( $moveId , $id );
     $tree->setup(); // rebuild the structure again, since we had changed it
     dumpAllNicely( 'dump all, after "myElement" was moved under the "anotherSubElement"' );
-
 
     $tree->setRemoveRecursively(true);
     $tree->remove(0);
