@@ -192,7 +192,13 @@
     {else}
         <img src="folder">
 
-    &nbsp; <b>{$aNode['name']}</b>
+    &nbsp;
+    <b>
+        {if( $tree->getRootId() == $aNode['id'] )}
+            ...{echo substr($aNode['name'],-28)}
+        {else}
+            {$aNode['name']}
+    </b>
 
     {if( $tree->getRootId() == $aNode['id'] )}
         &nbsp; <a href="{$_SERVER['PHP_SELF']}?unfoldAll=true" title="unfold all">++</a>
