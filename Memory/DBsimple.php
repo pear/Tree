@@ -234,7 +234,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     {
         $idColumnName = 'id';
         $map = $this->getOption('columnNameMaps');
-        if( $map['id'] )                            // if there are maps given
+        if( isset($map['id']) )                     // if there are maps given
         {
             $idColumnName = $map['id'];
         }
@@ -279,9 +279,9 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         $idColumnName = 'id';
         $parentIdColumnName = 'parentId';
         $map = $this->getOption('columnNameMaps');
-        if( $map['id'] )
+        if( isset($map['id']) )
             $idColumnName = $map['id'];
-        if( $map['parentId'] )
+        if( isset($map['parentId']) )
             $parentIdColumnName = $map['parentId'];
 # FIXXME todo: previous stuff
 

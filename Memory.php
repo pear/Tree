@@ -605,12 +605,11 @@ class Tree_Memory extends Tree_Common
     {
         if( sizeof($curLevel) )
         {
-            $level++;
             foreach( $curLevel as $key=>$value )
             {
                 // call either an objects method or a function
                 if( is_array($walkFunction) )
-                    $ret = call_user_method( $walkFunction[0] , $walkFunction[1] , $this->data[$key] );
+                    $ret = call_user_func( array($walkFunction[1],$walkFunction[0]) , $this->data[$key] );
                 else
                     $ret = call_user_func( $walkFunction , $this->data[$key] );
 
@@ -1055,14 +1054,17 @@ class Tree_Memory extends Tree_Common
     */
     function &getNode( $startId=0 , $depth=0 )
     {
-        $level = $this->getLevel($startId);
         if( $startId == 0)
         {
             $level = 0;
         }
+        else
+        {
+            $level = $this->getLevel($startId);
+        }
 
         $this->_getNodeMaxLevel = $depth ? ($depth + $level) : 0 ;
-        $this->_getNodeCurParent = $this->data['parent']['id'];
+#!!!        $this->_getNodeCurParent = $this->data['parent']['id'];
 
         return $this->walk( array('_getNode',$this) , $startId , 'ifArray' );
     } // end of function
@@ -1102,7 +1104,7 @@ class Tree_Memory extends Tree_Common
     */
     function hasChildren( $id=0 )
     {
-        if( sizeof($this->data[$id]['children']) > 0 )
+        if( isset($this->data[$id]['children']) && sizeof($this->data[$id]['children']) > 0 )
             return true;
         return false;
     } // end of function
@@ -1168,7 +1170,7 @@ class Tree_Memory extends Tree_Common
 
                 if( in_array( $key , $dontDump ) )
                 {
-                    if( !$aElement['id'] && is_array($aElement) )
+                    if( !isset($aElement['id']) && is_array($aElement) )
                     {
                         print "['ids']=";
                         $ids = array();
