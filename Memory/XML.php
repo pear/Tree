@@ -52,9 +52,12 @@ class Tree_Memory_XML extends XML_Parser
     var $folding = false;   // turn off case folding
 
     /**
-    *   @var    integer $depth
+    *   @var    boolean     if true it converts all attributes and tag names etc to lower case
+    *                       this is default, since i dont see no way of case insensitive comparison
+    *                       in the tree class, since you can access the internal data directly
+    *                       or you get them returned ... i know this is not 100% proper OOP but that's how it is right now
     */
-    var $depth = 0;
+    var $_toLower = true;
 
     /**
     *
@@ -93,9 +96,16 @@ class Tree_Memory_XML extends XML_Parser
         $curId = sizeof($this->data);
 
         $this->data[$curId]['id'] = $curId;
-        $this->data[$curId]['name'] = $element;
+        $this->data[$curId]['name'] = $this->_toLower ? strtolower($element) : $element;
         $this->data[$curId]['level'] = $this->level;
         $this->data[$curId]['attributes'] = $attribs;
+        if( $this->_toLower )
+        {
+            $this->data[$curId]['attributes'] = array();
+            foreach( $attribs as $key=>$value )
+                $this->data[$curId]['attributes'][strtolower($key)] = $value;
+        }
+
         if( isset($this->data[$elementBeforeId]['level']) &&
             $this->level == $this->data[$elementBeforeId]['level'] )  // is that a new child, or just a 'next' of a child?
         {
@@ -149,6 +159,7 @@ class Tree_Memory_XML extends XML_Parser
 #         for each xml_parse() call.
         if( !isset($this->data[ sizeof($this->data)-1 ]['cdata']) )
             $this->data[ sizeof($this->data)-1 ]['cdata'] = '';
+#print "cdata = '$cdata'\r\n";
         $this->data[ sizeof($this->data)-1 ]['cdata'].= $cdata;
     }
 
