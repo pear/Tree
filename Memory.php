@@ -226,9 +226,10 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/01/19
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      array   the result of a query which retreives (all) the tree data from a source
     *   @return     true or Tree_Error
     */
-    function setup()
+    function setup($data=null)
     {
         if( $this->debug )
         {
@@ -236,7 +237,7 @@ class Tree_Memory extends Tree_Common
             $startTime = $startTime[1]+$startTime[0];
         }
 
-        if(PEAR::isError($res = $this->dataSourceClass->setup()) )
+        if(PEAR::isError($res = $this->dataSourceClass->setup($data)) )
             return $res;
 
         if( $this->debug )
@@ -1266,38 +1267,34 @@ class Tree_Memory extends Tree_Common
 
         // if $node is an array, we assume it is a collection of elements
         if( !is_array($node) )
-            $node = $this->getNode($node);  // if $node==0 then the entire tree is retreived
-
-        foreach( $node as $aNode )
-        {
-            print '<u>Element</u> :';
-            foreach( $aNode as $key=>$aElement )
-            {
-                print "$key";
-
-                if( in_array( $key , $dontDump ) )
-                {
-                    if( !isset($aElement['id']) && is_array($aElement) )
-                    {
-                        print "['ids']=";
-                        $ids = array();
-                        foreach( $aElement as $aSubElement )
-                            $ids[] = $aSubElement['id'];
-                        print implode(', ',$ids);
-                    }
-                    else
-
-                        print "['id']=".$aElement['id'];
+            $nodes = $this->getNode($node);  // if $node==0 then the entire tree is retreived
+            
+        if (sizeof($node)) {
+            print '<table border="1"><tr><th>name</th>';
+            $keys = array();
+            foreach ($this->getRoot() as $key=>$x) {
+                if (!is_array($x)) {
+                    print "<th>$key</th>";
+                    $keys[] = $key;
                 }
-                else
-                {
-                    print '=';
-                    print_r($aElement);
-                }
-                print " ... ";
             }
-            print "<br>\n";
-        }
+            print "</tr>";
+            
+            foreach ($nodes as $aNode) {
+                print '<tr><td nowrap="nowrap">';
+                $prefix = '';
+                for($i=0;$i<$aNode['level'];$i++) $prefix .= '- ';
+                print "$prefix {$aNode['name']}</td>";
+                foreach ($keys as $aKey) {
+                    if (!is_array($key)) {
+                        $val = $aNode[$aKey] ? $aNode[$aKey] : '&nbsp;';
+                        print "<td>$val</td>";
+                    }
+                }
+                print "</tr>";
+            }  
+            print "</table>";          
+        }            
     } // end of function
 
 
