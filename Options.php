@@ -82,7 +82,7 @@ class Tree_Options
             // so we dont override existing options inside an array
             // if an option is an array
             foreach ($value as $key=>$aValue) {
-                $this->setOption( array($option , $key) , $aValue );
+                $this->setOption(array($option,$key),$aValue);
             }
             return true;
         }
