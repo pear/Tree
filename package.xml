@@ -31,14 +31,22 @@
     </maintainer>
   </maintainers>
     <release>
-        <version>0.2.2</version>
-        <date>2003-01-30</date>
+        <version>0.2.3</version>
+        <date>2003-??-??</date>
         <license>PHP License</license>
         <state>beta</state>
         <notes>
-            - fixing a lot of E_ALL and CS issues
-            - enhancing getChildren method, now you can get children for more than one level
-            - moving the examples to docs and making TreeView and TreeEditor work properly with new php versions
+* Make switchDataSource work for Memory/Array, this enables you to
+read the data from any source and switch the source on the run. This writes the data 
+from the current tree into the new source. I.e. you read the data from a DB and write
+it into an array. 
+Switching from DB to Array makes sense i.e. if you read a tree from the DB, which you want to show
+(i.e. using HTML_TreeMenu) but therefore you need to set additional properties for each
+node which you don't want to save in the DB, since they are only for the presentation.
+Properties for HTML_TreeMenu are i.e. the icon and some events (like 'onClick'). Since you switched 
+the source from DB to Array you can change any data without worrying that they are written into
+the DB and modify your actual data in the DB.
+* Bring Memory/Array closer to be fully useable.
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
@@ -101,6 +109,17 @@
     </release>
 
     <changelog>
+        <release>
+            <version>0.2.2</version>
+            <date>2003-01-30</date>
+            <license>PHP License</license>
+            <state>beta</state>
+            <notes>
+                - fixing a lot of E_ALL and CS issues
+                - enhancing getChildren method, now you can get children for more than one level
+                - moving the examples to docs and making TreeView and TreeEditor work properly with new php versions
+            </notes>
+        </release>
         <release>
             <version>0.2.1</version>
             <date>2002-10-28</date>
