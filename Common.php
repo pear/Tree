@@ -67,18 +67,20 @@ class Tree_Common extends Tree_OptionsDB
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      integer $id             ID of the element that the children shall be retreived for
+    *   @param      integer how many levels deep into the tree
     *   @return     mixed   an array of all the ids of the children of the element with id=$id,
     *                       or false if there are no children
     */
-    function getChildrenIds( $id )
+    function getChildrenIds( $id , $levels=1 )
     {
-        if( !($children = $this->getChildren( $id )) )  // returns false if no children exist
+        if (!($children = $this->getChildren($id,$levels))) {   // returns false if no children exist
             return array();                         // return an empty array, if you want to know if there are children, use hasChildren
+        }
 
-        if( $children && sizeof($children) )
-        {
-            foreach( $children as $aChild )
+        if ($children && sizeof($children)) {
+            foreach ($children as $aChild) {
                 $childrenIds[] = $aChild['id'];
+            }
         }
 
         return $childrenIds;
