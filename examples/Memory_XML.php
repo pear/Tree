@@ -80,7 +80,7 @@
     // given methods
     $tree->setup();
 
-    dumpAllNicely( 'dump all after "$tree->setup"' );
+    dumpAllNicely( 'dump all after "$tree-&gt;setup"' );
 
     // get the path of the last inserted element
     $id = $tree->getIdByPath('SimpleTemplate/options/delimiter');
@@ -94,8 +94,6 @@
     dumpHelper( array($tree->getChild($id)) , 'dump the child of "SimpleTemplate"' );
     // you can also use:    $tree->data[$id]['child']
 
-/*
-!!!!!!!!!!!!!!!doenst work yet, see Tree_Memmory::_setup for comment
     $id = $tree->getIdByPath('SimpleTemplate/preFilter');
     dumpHelper( $tree->getChildren($id) , 'dump the children of "SimpleTemplate/preFilter"' );
     // you can also use:    $tree->data[$id]['children']
@@ -107,7 +105,7 @@
     $id = $tree->getIdByPath('SimpleTemplate/preFilter');
     dumpHelper( array($tree->getPrevious($id)) , 'dump the "previous" of "SimpleTemplate/preFilter"' );
     // you can also use:    $tree->data[$id]['previous']
-*/
+
 
     $id = $tree->getIdByPath('SimpleTemplate/preFilter/register');
     $element = $tree->data[$id]['child']['next']['next']; // refer to the third child of 'SimpleTemplate/preFilter/register'
