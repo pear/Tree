@@ -23,7 +23,7 @@ require_once "XML/Parser.php";
 /**
 *   the XML interface for the tree class
 *
-*   @package    Tree
+*   @package  Tree
 *   @author
 *   @version
 *   @access  public
@@ -31,12 +31,29 @@ require_once "XML/Parser.php";
 class Tree_Memory_XML extends XML_Parser
 {
 
-    var $data = array('');    // the first element has to be empty, so we can use the parentId=0 as "no parent"
+    /**
+    *   @var    array   $data   the first element has to be empty, so we can use the parentId=0 as "no parent"
+    */
+    var $data = array(0=>NULL);
+
+    /**
+    *   @var    integer $level
+    */
     var $level = 0;
 
+    /**
+    *   @var    array   $parentIdOnLevel
+    */
     var $parentIdOnLevel = array();
 
+    /**
+    *   @var    boolean $folding    set case folding for the XML_Parser to false
+    */
     var $folding = false;   // turn off case folding
+
+    /**
+    *   @var    integer $depth
+    */
     var $depth = 0;
 
     /**
@@ -79,7 +96,7 @@ class Tree_Memory_XML extends XML_Parser
         $this->data[$curId]['name'] = $element;
         $this->data[$curId]['level'] = $this->level;
         $this->data[$curId]['attributes'] = $attribs;
-        if( $this->data[$elementBeforeId]['level'] &&
+        if( isset($this->data[$elementBeforeId]['level']) &&
             $this->level == $this->data[$elementBeforeId]['level'] )  // is that a new child, or just a 'next' of a child?
         {
             $this->data[$curId]['parentId'] = $this->data[$elementBeforeId]['parentId'];
@@ -125,8 +142,10 @@ class Tree_Memory_XML extends XML_Parser
     */
     function cdataHandler($parser, $cdata)
     {
-# QUESTION why is this method called multiple times for one element?
+# QUESTION: why is this method called multiple times for one element?
 # is every space a cdata ???
+        if( !isset($this->data[ sizeof($this->data)-1 ]['cdata']) )
+            $this->data[ sizeof($this->data)-1 ]['cdata'] = '';
         $this->data[ sizeof($this->data)-1 ]['cdata'].= $cdata;
     }
 
@@ -141,6 +160,7 @@ class Tree_Memory_XML extends XML_Parser
     function defaultHandler($parser, $cdata)
     {
 #        $this->data[ sizeof($this->data)-1 ]['cdata'] = $cdata;
+# not in use yet :-( is that ok??
     }
 
 

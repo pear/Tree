@@ -258,8 +258,11 @@ class Tree_Memory extends Tree_Common
         // this i do to speed up the buildStructure
         foreach( $setupData as $values )
         {
-            $this->data[$values['id']] = $values;
-            $this->children[ $values['parentId'] ][] = $values['id'];
+            if( is_array($values) )
+            {
+                $this->data[$values['id']] = $values;
+                $this->children[ $values['parentId'] ][] = $values['id'];
+            }
         }
 
         // walk through all the children on each level and set the next/previous relations

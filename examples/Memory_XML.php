@@ -107,7 +107,7 @@
     // you can also use:    $tree->data[$id]['previous']
 
 
-    $id = $tree->getIdByPath('SimpleTemplate/preFilter/register');
+    $id = $tree->getIdByPath('SimpleTemplate/preFilter');
     $element = $tree->data[$id]['child']['next']['next']; // refer to the third child of 'SimpleTemplate/preFilter/register'
     dumpHelper( $element['id'] , 'demo of using the internal array, for referencing tree-nodes' );
 
