@@ -51,14 +51,11 @@ class Tree_Dynamic_DBnested extends Tree_Common
         // the internal names are used, which are:
         // id, left, right
         'columnNameMaps'=>array(
-                            // use "node_id" as "id"
-                            'id'        =>  'node_id',
                             // since mysql at least doesnt support 'left' ...
                             'left'      =>  'l',
                             // ...as a column name we set default to the first
                             //letter only
                             'right'     =>  'r',
-                            'name'      =>  'nodeName',
                             // parent id
                             'parentId'  =>  'parent'
                         ),
