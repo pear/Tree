@@ -31,12 +31,14 @@
     </maintainer>
   </maintainers>
     <release>
-        <version>0.2.1</version>
-        <date>2002-10-28</date>
+        <version>0.2.2</version>
+        <date>2003-01-30</date>
         <license>PHP License</license>
         <state>beta</state>
         <notes>
-            - bugfix in getAllChildren[Ids], before it only worked for one level below
+            - fixing a lot of E_ALL and CS issues
+            - enhancing getChildren method, now you can get children for more than one level
+            - moving the examples to docs and making TreeView and TreeEditor work properly with new php versions
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
@@ -56,22 +58,51 @@
                 <dir name="Dynamic">
                     <file role="php">DBnested.php</file>
                 </dir>
-                <dir name="examples" role="doc">
+                <dir name="docs" role="doc">
                     <file role="doc">Dynamic_DBnested.sql</file>
                     <file role="doc">Dynamic_DBnested.php</file>
                     <file role="doc">Memory_XML.php</file>
                     <file role="doc">Memory_DBsimple.php</file>
                     <file role="doc">Memory_DBnested.php</file>
                     <file role="doc">config.xml</file>
-                    <!--  well noone moved this dir for me yet :-( so u get no example 
-                    <dir name="TreeEditor_Memory">
-                        <file role="php">index.php</file>
+                    <dir name="TreeEditor">
+                        <file role="doc">index.php</file>
+                        <file role="doc">index.tpl</file>
+                        <file role="doc">closedFolder.gif</file>
+                        <file role="doc">config.xml</file>
+                        <file role="doc">copy.gif</file>
+                        <file role="doc">cut.gif</file>
+                        <file role="doc">delete.gif</file>
+                        <file role="doc">folder.gif</file>
+                        <file role="doc">mysql_db.sql</file>
+                        <file role="doc">openFolder.gif</file>
+                        <file role="doc">paste.gif</file>
+                        <file role="doc">treeClass.php</file>
                         <dir name="tmp">
                         </dir>
                     </dir>
-                    -->
+                    <dir name="TreeView">
+                        <file role="doc">index.php</file>
+                        <file role="doc">index.tpl</file>
+                        <dir name="tmp">
+                        </dir>
+                    </dir>
                 </dir>
             </dir>
         </filelist>
     </release>
+
+    <changelog>
+        <release>
+            <version>0.2.1</version>
+            <date>2002-10-28</date>
+            <license>PHP License</license>
+            <state>beta</state>
+            <notes>
+                - bugfix in getAllChildren[Ids], before it only worked for one level below
+            </notes>
+        </release>
+    </changelog>
+
+
 </package>
