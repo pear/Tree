@@ -102,8 +102,8 @@
             <deps>
                 <dep type="php" rel="ge" optional="no" version="4.2.0" />
                 <dep type="pkg" rel="ge" version="1.3.3">PEAR</dep>
-                <dep type="pkg" rel="ge" version="1.3" optional="yes">DB</dep>
-                <dep type="pkg" rel="ge" version="1.0" optional="yes">XML_Parser</dep>
+                <dep type="pkg" rel="ge" version="1.6.8" optional="yes">DB</dep>
+                <dep type="pkg" rel="ge" version="1.2.1" optional="yes">XML_Parser</dep>
             </deps>
 
         </filelist>
