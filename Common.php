@@ -192,8 +192,12 @@ class Tree_Common extends Tree_OptionsDB
     {
         $path = $this->getPath($id);
         foreach( $path as $aNode )
-            $ret.= $aNode['name'].$seperator;
-        return $ret;
+            $pathArray[] = $aNode['name'];
+
+        $pathString = '';
+        if( sizeof($pathArray) )
+            $pathString = implode($seperator,$pathArray);
+        return $pathString;
     } // end of function
 
 
