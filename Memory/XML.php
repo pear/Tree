@@ -226,7 +226,7 @@ class Tree_Memory_XML extends XML_Parser
     *   @param      array $newValues this array contains the values that shall be inserted in the db-table
     *   @return     mixed   either boolean false on failure or the id of the inserted row
     */
-    function add( $newValues )
+/*    function add( $newValues )
     {
         // add the data in the internal structure $this->data
         $this->data[sizeof($this->data)] = $newValues;
@@ -237,12 +237,12 @@ class Tree_Memory_XML extends XML_Parser
 # but that means writing the entire file every time any method that
 # changes the xml-file's structure the entire file is written,
 # can that not be done somehow better ???
-/*
-        // and regenerate the xml file
-        $this->_writeFile();
-*/
-    } // end of function
 
+#        // and regenerate the xml file
+#        $this->_writeFile();
+
+    } // end of function
+*/
     /**
     *   TO BE IMPLEMNTED
     *   removes the given node
@@ -253,14 +253,14 @@ class Tree_Memory_XML extends XML_Parser
     *   @param    mixed   $id   the id of the node to be removed
     *   @return   boolean true on success
     */
-    function remove( $id )
+/*    function remove( $id )
     {
         // remove the data from this->data
         unset($this->data[$id]);
 
 # see comment in "add"-method
     } // end of function
-
+*/
     /**
     *   TO BE IMPLEMNTED
     *   move an entry under a given parent or behind a given entry
@@ -274,14 +274,14 @@ class Tree_Memory_XML extends XML_Parser
     *                       before would be easier, but then no element could be inserted at the end :-/
     *   @return     boolean     true for success
     */
-    function move( $idToMove , $newParentId , $prevId=0 )
+/*    function move( $idToMove , $newParentId , $prevId=0 )
     {
         $this->data[$idToMove]['parentId'] = $newParentId;
         $this->data[$idToMove]['prevId'] = $prevId;
 
 # see comment in "add"-method
     } // end of function
-
+*/
 
 }
 ?>
