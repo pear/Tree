@@ -1118,6 +1118,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * this requires the structure to use each name uniquely
      * if this is not given it will return the first proper path found
      * i.e. there should only be one path /x/y/z
+     * experimental: the name can be non unique if same names are in different levels
      *
      * @version    2003/04/29
      * @access     public
@@ -1130,31 +1131,124 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @return     integer  the id of the searched element
      *
      */
-    function getIdByPath($path,$startId=0,$nodeName='name',$seperator='/')
+    function getIdByPath($path,$startId=0,$nodeName='name',$separator='/')
     // should this method be called getElementIdByPath ????
+    // Yes, with an optionnal private paramater to get the whole node
+    // in preference to only the id?
     {
-        if ($path==$separate) {
+        if($separator==''){
+            return $this->_throwError(
+                'getIdByPath: Empty separator not allowed' , __LINE__ );
+        }
+        if ($path==$separator) {
             $root = $this->getRoot();
             if (Tree::isError($root)) {
                 return $root;
             }
             return $root['id'];
         }
-        $elems = explode('$seperator',$path);
-        if ($cntElems = sizeof($elems)) {
-            $last = $elments[$cntElems-1];
-        }
-        $query = "SELECT
-                        $name
-                    FROM
-                        $table
-                    WHERE
-                        $name='$last'
-                    ";
         if ($startId!=0) {
-            $this->getElement($startId);
+            // If the start node has no child, returns false
+            // hasChildren calls getElement. Not very good right
+            // now. See the TODO
+            $startElem = $this->getElement($startId);
+            if (!is_array($startElem) || Tree::isError($startElem)){
+                return $startElem;
+            }
+            // No child? return
+            if (!is_array($startElem)) {
+                return false;
+            }
+            $rangeStart  = $startElem['left'];
+            $rangeEnd  = $startElem['right'];
+            // Not clean, we should call hasChildren, but I do not
+            // want to call getELement again :). See TODO
+            $startHasChild = ($rangeEnd-$rangeStart)>1?true:false;
+        } else {
+            $startHasChild = false;
         }
+
+        $elems = explode($separator,$path);
+        $cntElems=sizeof($elems);
+        if ($cntElems) {
+            $beginSlash=$beginSlash= false;
+            if ($cntElems==1 && empty($elems[0])) {
+                return $this->_throwError(
+                    'getIdByPath: Empty path not allowed' , __LINE__ );
+            }else {
+                for($i=1;$i<$cntElems-1;$i++){
+                    if(empty($elems[$i])){
+                        return $this->_throwError(
+                            "getIdByPath: Invalid path <$path>" , __LINE__ );
+                    }
+                }
+                // beginning with a slash
+                if(empty($elems[0])){
+                    $beginSlash = true;
+                    array_shift($elems);
+                    $cntElems--;
+                }
+                // ending with a slash
+                if (empty($elems[$cntElems-1])) {
+                    $endSlash = true;
+                    array_pop($elems);
+                    $cntElems--;
+                }
+                if (!$cntElems) {
+                    return $this->_throwError(
+                        "getIdByPath: Invalid path <$path>" , __LINE__ );
+                }
+                $cntElems = sizeof($elems);
+                if ($cntElems==1) {
+                    $query = "SELECT
+                            ".$this->_getColName('id')."
+                        FROM
+                            ".$this->table."
+                        WHERE
+                            ".$this->_getColName('name')."='".$elems[0]."'
+                        ";
+                    if ($startHasChild) {
+                        $query  .= " AND (".
+                                    $this->_getColName('left').">".$rangeStart.
+                                    " AND ".
+                                    $this->_getColName('right')."<".$rangeEnd.")";
+                    }
+                    $res = $this->dbh->getOne($query);
+                    if (DB::isError($res)) {
+                        return $this->_throwError($res->getMessage(),
+                                    __LINE__);
+                    }
+                } else {
+                    $query = "SELECT
+                                    ".$this->_getColName('id').",
+                                    ".$this->_getColName('left').",
+                                    ".$this->_getColName('right').",
+                                    ".$this->_getColName('name')."
+                                FROM
+                                    ".$this->table."
+                                WHERE
+                                    ".$this->_getColName('name').
+                                    "='".$elems[$cntElems-1]."'";
+                    if ($startHasChild) {
+                        $query  .= " AND (".
+                                    $this->_getColName('left').">".$rangeStart.
+                                    " AND ".
+                                    $this->_getColName('right')."<".$rangeEnd.")";
+                    }
+                    $res = $this->dbh->getOne($query);
+                    if (DB::isError($res)) {
+                        return $this->_throwError($res->getMessage(),
+                                    __LINE__);
+                    }
+
+                }
+                return ($res?(int)$res:false);
+            }
+        }
+        return $this->_throwError(
+            'getIdByPath: Empty path not allowed' , __LINE__ );
     }
+
     // }}}
 
     //
