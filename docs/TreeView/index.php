@@ -2,8 +2,8 @@
     //
     //  $Id$
     //
-ini_set('include_path',realpath(dirname(__FILE__).'/../../../').':'.realpath(dirname(__FILE__).'/../../../../includes').':'.ini_get('include_path'));
-ini_set('error_reporting',E_ALL);
+//ini_set('include_path',realpath(dirname(__FILE__).'/../../../').':'.realpath(dirname(__FILE__).'/../../../../includes').':'.ini_get('include_path'));
+//ini_set('error_reporting',E_ALL);
 
     ##################################################
     #
@@ -25,7 +25,7 @@ ini_set('error_reporting',E_ALL);
     #       actual tree stuff, using Dynamic_DBnested
     #
     require_once('Tree/Tree.php');
-    $tree = Tree::setup( 'Dynamic_DBnested' , 'mysql://root@localhost/test' , array('table'=>'TreeEditor_MemoryNested') );
+    $tree = Tree::setup( 'Dynamic_DBnested' , 'mysql://root@localhost/test' , array('table'=>'Tree_Nested') );
 
     if( @$_REQUEST['action_add'] )
     {
@@ -55,8 +55,8 @@ ini_set('error_reporting',E_ALL);
     if( @PEAR::isError($result) )
         $methodFailed = true;
 
-    $fid = $_REQUEST['fid'];
-    if( !@$fid )
+    $fid = @$_REQUEST['fid'];
+    if( !$fid )
         $fid = $tree->getRootId();
 
     $path = $tree->getPath( $fid );
@@ -68,7 +68,7 @@ ini_set('error_reporting',E_ALL);
     #
     require_once('Tree/Tree.php');
     $memTree = Tree::setup( 'Memory_DBnested' , 'mysql://root@localhost/test' , 
-                            array('table'=>'TreeEditor_MemoryNested') );
+                            array('table'=>'Tree_Nested') );
 
     $memTree->setup();
     $entireTree = $memTree->getNode();

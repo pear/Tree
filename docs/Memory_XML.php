@@ -1,5 +1,10 @@
 <?php
+    //
+    //  $Id$
+    //
 
+//ini_set('include_path',realpath(dirname(__FILE__).'/../../').':'.realpath(dirname(__FILE__).'/../../../includes').':'.ini_get('include_path'));
+//ini_set('error_reporting',E_ALL);
     /**
     *   this is a helper function, so i dont have to write so many prints :-)
     *   @param  array   $para   the result returned by some method, that will be dumped

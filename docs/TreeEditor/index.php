@@ -2,8 +2,8 @@
     //
     //  $Id$
     //
-ini_set('include_path',realpath(dirname(__FILE__).'/../../../').':'.realpath(dirname(__FILE__).'/../../../../includes').':'.ini_get('include_path'));
-ini_set('error_reporting',E_ALL);
+//ini_set('include_path',realpath(dirname(__FILE__).'/../../../').':'.realpath(dirname(__FILE__).'/../../../../includes').':'.ini_get('include_path'));
+//ini_set('error_reporting',E_ALL);
 
     ##################################################
     #
@@ -52,9 +52,9 @@ ini_set('error_reporting',E_ALL);
 
     ##################################################
     #
-    #       actual tree stuff, using Dynamic_DBnested
+    #       actual tree stuff
     #
-    define('TABLE_TREE','TreeEditor_MemoryNested');
+    define('TABLE_TREE','Tree_Nested');
     define('DB_DSN','mysql://root@localhost/test');
 
     require_once('treeClass.php');
