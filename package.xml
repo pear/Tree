@@ -52,6 +52,7 @@ the DB and modify your actual data in the DB.
 * Add getDepth() to determine the maximum depth of the tree
 * Make setup work with custom data optionally (only relevant for Memory_*)
 * Show a nicer varDump
+* add UML class diagram
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
