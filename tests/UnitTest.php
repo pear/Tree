@@ -3,12 +3,22 @@
 //  $Id$
 //
 
+require_once 'DB.php';
 require_once 'PHPUnit.php';
 
 class UnitTest extends PhpUnit_TestCase
 {
     function setUp()
     {
+        // common setup, setup the table structure and data in the db
+        // (this actually also does the tearDown, since we have the DROP TABLE queries in the setup too
+        require 'sql.php'; 
+        $db = DB::connect(DB_DSN);
+        foreach ($dbStructure[$db->phptype]['setup'] as $aQuery) {
+            if (DB::isError($ret=$db->query($aQuery))) {
+                die($ret->getUserInfo());
+            }
+        }
         
         $this->setLooselyTyped(true);
     }
