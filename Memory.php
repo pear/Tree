@@ -1373,8 +1373,10 @@ class Tree_Memory extends Tree_Common
      */
     function hasChildren( $id=0 )
     {
-        if( isset($this->data[$id]['children']) && sizeof($this->data[$id]['children']) > 0 )
+        if (isset($this->data[$id]['children']) &&
+            sizeof($this->data[$id]['children'])>0) {
             return true;
+        }
         return false;
     } // end of function
 
@@ -1401,7 +1403,6 @@ class Tree_Memory extends Tree_Common
                     $ret[$aId] = $this->data[$aId]['children'];
                 }
             }
-
         } else {
             if ($this->hasChildren( $ids )) {
                 $ret = $this->data[$ids]['children'];
@@ -1453,7 +1454,6 @@ class Tree_Memory extends Tree_Common
         if (!is_array($node)) {
             $nodes = $this->getNode($node);
         }
-
         // if $node==0 then the entire tree is retreived
         if (sizeof($node)) {
             print '<table border="1"><tr><th>name</th>';
@@ -1487,7 +1487,7 @@ class Tree_Memory extends Tree_Common
 
     //### TODO's ###
 
-    // {{{ varDump()
+    // {{{ copy()
     /**
      * NOT IMPLEMENTED YET
      * copies a part of the tree under a given parent
