@@ -147,7 +147,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      *                              'parentId' or 'prevId'.
      * @return     integer the ID of the element that had been inserted
      */
-    function add($newValues, $parentId=0, $prevId=0)
+    function add($newValues, $parentId = 0, $prevId = 0)
     {
         $lName = $this->_getColName('left');
         $rName = $this->_getColName('right');
@@ -197,12 +197,12 @@ class Tree_Dynamic_DBnested extends Tree_Common
         }
 
         // set the proper right and left values
-        $newData[$lName] = $prevVisited+1;
-        $newData[$rName] = $prevVisited+2;
+        $newData[$lName] = $prevVisited + 1;
+        $newData[$rName] = $prevVisited + 2;
 
         // use sequences to create a new id in the db-table
         $nextId = $this->dbh->nextId($this->table);
-        $query = sprintf(  'INSERT INTO %s (%s,%s) VALUES (%s,%s)',
+        $query = sprintf('INSERT INTO %s (%s,%s) VALUES (%s,%s)',
                             $this->table ,
                             $this->_getColName('id'),
                             implode(',', array_keys($newData)) ,
@@ -241,7 +241,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         $rName = $this->_getColName('right');
 
         // update the elements which will be affected by the new insert
-        $query = sprintf(  'UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
+        $query = sprintf('UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
                             $this->table,
                             $lName,$lName,
                             $numberOfElements*2,
@@ -253,7 +253,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $this->_throwError($res->getMessage(), __LINE__);
         }
 
-        $query = sprintf(  'UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
+        $query = sprintf('UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
                             $this->table,
                             $rName,$rName,
                             $numberOfElements*2,
@@ -289,7 +289,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
         // FIXXME start transaction
         //$this->dbh->autoCommit(false);
-        $query = sprintf(  'DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
+        $query = sprintf('DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),
@@ -300,7 +300,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $this->_throwError($res->getMessage(), __LINE__);
         }
 
-        if (Tree::isError($err=$this->_remove($element))) {
+        if (Tree::isError($err = $this->_remove($element))) {
             // FIXXME rollback
             //$this->dbh->rollback();
             return $err;
@@ -324,12 +324,12 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function _remove($element)
     {
-        $delta = $element['right'] - $element['left'] +1;
+        $delta = $element['right'] - $element['left'] + 1;
         $lName = $this->_getColName('left');
         $rName = $this->_getColName('right');
 
         // update the elements which will be affected by the remove
-        $query = sprintf(  "UPDATE
+        $query = sprintf("UPDATE
                                 %s
                             SET
                                 %s=%s-$delta,
@@ -346,7 +346,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $this->_throwError($res->getMessage(), __LINE__);
         }
 
-        $query = sprintf(  "UPDATE
+        $query = sprintf("UPDATE
                                 %s
                             SET %s=%s-$delta
                             WHERE
@@ -404,9 +404,9 @@ class Tree_Dynamic_DBnested extends Tree_Common
      *                      if it is 0 it will be put at the beginning
      * @return     mixed    true for success, Tree_Error on failure
      */
-    function move($idsToMove, $newParentId, $newPrevId=0)
+    function move($idsToMove, $newParentId, $newPrevId = 0)
     {
-        settype($idsToMove,'array');
+        settype($idsToMove, 'array');
         $errors = array();
         foreach ($idsToMove as $idToMove) {
             $ret = $this->_move($idToMove, $newParentId, $newPrevId);
@@ -417,7 +417,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         // FIXXME the error in a nicer way, or even better
         // let the throwError method do it!!!
         if (sizeof($errors)) {
-            return $this->_throwError(serialize($errors),__LINE__);
+            return $this->_throwError(serialize($errors), __LINE__);
         }
         return true;
     }
@@ -439,21 +439,21 @@ class Tree_Dynamic_DBnested extends Tree_Common
      *                  if it is 0 it will be put at the beginning
      * @return  mixed    true for success, Tree_Error on failure
      */
-    function _move($idToMove, $newParentId, $newPrevId=0)
+    function _move($idToMove, $newParentId, $newPrevId = 0)
     {
         // do some integrity checks first
         if ($newPrevId) {
             // dont let people move an element behind itself, tell it
             // succeeded, since it already is there :-)
-            if ($newPrevId==$idToMove) {
+            if ($newPrevId == $idToMove) {
                 return true;
             }
-            if (Tree::isError($newPrevious=$this->getElement($newPrevId))) {
+            if (Tree::isError($newPrevious = $this->getElement($newPrevId))) {
                 return $newPrevious;
             }
             $newParentId = $newPrevious['parentId'];
         } else {
-            if ($newParentId==0) {
+            if ($newParentId == 0) {
                 return $this->_throwError('no parent id given', __LINE__);
             }
             // if the element shall be moved under one of its children
@@ -466,7 +466,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             }
             // dont do anything to let an element be moved under itself
             // which is bullshit
-            if ($newParentId==$idToMove) {
+            if ($newParentId == $idToMove) {
                 return true;
             }
             // try to retreive the data of the parent element
@@ -479,7 +479,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $element;
         }
 
-        $numberOfElements = ($element['right'] - $element['left']+1)/2;
+        $numberOfElements = ($element['right'] - $element['left'] + 1) / 2;
         $prevVisited = $newPrevId ? $newPrevious['right'] : $newParent['left'];
 
         // FIXXME start transaction
@@ -494,7 +494,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         }
 
         // update the parentId of the element with $idToMove
-        $err=$this->update($idToMove,array('parentId'=>$newParentId));
+        $err = $this->update($idToMove,array('parentId' => $newParentId));
         if (Tree::isError($err)) {
             // FIXXME rollback
             //$this->dbh->rollback();
@@ -537,7 +537,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
         $lName = $this->_getColName('left');
         $rName = $this->_getColName('right');
-        $query = sprintf(  "UPDATE
+        $query = sprintf("UPDATE
                                 %s
                             SET
                                 %s=%s+$offset,
@@ -594,7 +594,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         foreach ($newValues as $key => $value) {
             $values[] = $this->_getColName($key).'='.$this->dbh->quote($value);
         }
-        $query = sprintf(  'UPDATE %s SET %s WHERE%s %s=%s',
+        $query = sprintf('UPDATE %s SET %s WHERE%s %s=%s',
                             $this->table,
                             implode(',',$values),
                             $this->_getWhereAddOn(),
@@ -644,7 +644,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function getRoot()
     {
-        $query = sprintf(  'SELECT * FROM %s WHERE%s %s=1',
+        $query = sprintf('SELECT * FROM %s WHERE%s %s=1',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'));
@@ -670,7 +670,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function getElement($id)
     {
-        $query = sprintf(  'SELECT * FROM %s WHERE %s %s=%s',
+        $query = sprintf('SELECT * FROM %s WHERE %s %s=%s',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
@@ -706,7 +706,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $curElement;
         }
 
-        $query = sprintf(  'SELECT * FROM %s WHERE%s %s=%s',
+        $query = sprintf('SELECT * FROM %s WHERE%s %s=%s',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),
@@ -749,7 +749,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     {
         // subqueries would be cool :-)
         $curElement = $this->getElement($id);
-        $query = sprintf(  'SELECT * FROM %s '.
+        $query = sprintf('SELECT * FROM %s '.
                             'WHERE %s %s<=%s AND %s>=%s '.
                             'ORDER BY %s',
                             // set the FROM %s
@@ -799,7 +799,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $element;
         }
 
-        $query = sprintf(  'SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
+        $query = sprintf('SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('right'),$element['left']-1,
@@ -829,7 +829,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         if (Tree::isError($element)) {
             return $element;
         }
-        $query = sprintf(  'SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
+        $query = sprintf('SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),$element['right']+1,
@@ -856,7 +856,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function getParent($id)
     {
-        $query = sprintf(  'SELECT
+        $query = sprintf('SELECT
                                 p.*
                             FROM
                                 %s p,%s e
@@ -901,7 +901,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             // if $ids is an array implode the values
             $getIds = is_array($ids) ? implode(',',$ids) : $ids;
 
-            $query = sprintf(  'SELECT
+            $query = sprintf('SELECT
                                     c.*
                                 FROM
                                     %s c,%s e
@@ -972,7 +972,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function getNext($id)
     {
-        $query = sprintf(  'SELECT
+        $query = sprintf('SELECT
                                 n.*
                             FROM
                                 %s n,%s e
@@ -993,7 +993,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         if (DB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
-        return !$res?false:$this->_prepareResult($res);
+        return !$res ? false : $this->_prepareResult($res);
     }
 
     // }}}
@@ -1013,7 +1013,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function getPrevious($id)
     {
-        $query = sprintf(  'SELECT
+        $query = sprintf('SELECT
                                 p.*
                             FROM
                                 %s p,%s e
@@ -1079,7 +1079,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function getDepth()
     {
-        $query = sprintf(   'SELECT COUNT(*) FROM %s p, %s e '.
+        $query = sprintf('SELECT COUNT(*) FROM %s p, %s e '.
                             'WHERE %s (e.%s BETWEEN p.%s AND p.%s) AND '.
                             '(e.%s BETWEEN p.%s AND p.%s)',
                             $this-> table,$this->table,
@@ -1091,8 +1091,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $this->_getColName('right'),$this->_getColName('left'),
                             $this->_getColName('right')
                             );
-        if (DB::isError($res=$this->dbh->getOne($query))) {
-            return $this->_throwError($res->getMessage(),__LINE__);
+        if (DB::isError($res = $this->dbh->getOne($query))) {
+            return $this->_throwError($res->getMessage(), __LINE__);
         }
         if (!$res) {
             return false;
@@ -1212,7 +1212,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $this->_throwError($res->getMessage(),
                         __LINE__);
         }
-        return ($res?(int)$res:false);
+        return ($res ? (int)$res : false);
     }
 
     // }}}
@@ -1233,7 +1233,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function _getWhereAddOn($addAfter = ' AND ', $tableName = '')
     {
-        if ($where=$this->getOption('whereAddOn')) {
+        if ($where = $this->getOption('whereAddOn')) {
             return ' '.($tableName ? $tableName.'.' : '')." $where$addAfter ";
         }
         return '';
