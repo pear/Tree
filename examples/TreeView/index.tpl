@@ -1,7 +1,7 @@
 <html>
 <body>
 <!--
-    $Id: index.tpl,v 1.1 2002-05-04 19:21:20 cain Exp $
+    $Id: index.tpl,v 1.2 2002-08-22 23:36:31 cain Exp $
 -->
 
 <style>
@@ -10,6 +10,11 @@
 
 {if($methodCall)}
     <font color="red">
+        {if( $methodFailed )}
+            ERROR
+        {else}
+            OK
+        <br>
         call: ${$methodCall}<br>
         method returned: {print_r($result)}
     </font>
