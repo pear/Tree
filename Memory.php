@@ -942,7 +942,7 @@ class Tree_Memory extends Tree_Common
     *   @param      mixed   $id     the id of the node to get the level for
     *
     */
-    function getLevel( $id )
+    function getLevel($id)
     {
         return $this->data[$id]['level'];
     } // end of function
@@ -1046,7 +1046,7 @@ class Tree_Memory extends Tree_Common
     *   @return     integer the id of the searched element
     *
     */
-    function getIdByPath($path,$startId=0,$nodeName='name',$seperator='/')
+    function getIdByPath($path, $startId=0, $nodeName = 'name', $seperator = '/')
 // should this method be called getElementIdByPath ????
     {
         // if no start ID is given get the root
