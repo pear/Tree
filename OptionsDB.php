@@ -22,7 +22,6 @@
 //  $Id$
 
 require_once('Tree/Options.php');
-require_once('DB.php');
 
 /**
 *   this class additionally retreives a DB connection and saves it
@@ -74,6 +73,9 @@ class Tree_OptionsDB extends Tree_Options
      */
     function _connectDB( $dsn )
     {
+        // only include the db if one really wants to connect
+        require_once('DB.php');
+
         if (is_string($dsn) || is_array($dsn) )
         {
             // put the dsn parameters in an array
