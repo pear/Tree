@@ -251,6 +251,7 @@ class Tree_Memory extends Tree_Common
         if( !$setupData )
             return false;
 
+//FIXXXXXME validate the structure. i.e. a problem occurs, if you give one node, which has a parentId=1 it screws up everything!!!
         // empty the data structures, since we are reading the data from the db (again)
         $this->structure = array();
         $this->data = array();
