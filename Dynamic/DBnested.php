@@ -58,7 +58,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             //letter only
                             'left'      =>  'l',
                             'right'     =>  'r',
-                            'name'      =>  'nodeName'
+                            'name'      =>  'nodeName',
                             'parentId'  =>  'parent'
                         ),
         // needed for sorting the tree, currently only used in Memory_DBnested
@@ -1255,7 +1255,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     {
         if ($startId) {
             $startNode = $this->getElement($startId);
-            if (Tree:isError($startNode)) {
+            if (Tree::isError($startNode)) {
                 return $startNode;
             }
 
