@@ -54,11 +54,12 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             // use "node_id" as "id"
                             'id'        =>  'node_id',
                             // since mysql at least doesnt support 'left' ...
+                            'left'      =>  'l',
                             // ...as a column name we set default to the first
                             //letter only
-                            'left'      =>  'l',
                             'right'     =>  'r',
                             'name'      =>  'nodeName',
+                            // parent id
                             'parentId'  =>  'parent'
                         ),
         // needed for sorting the tree, currently only used in Memory_DBnested
@@ -383,7 +384,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
      *  under the element with the id y
      * or
      *  $tree->move( x , 0 , y );   // ommit the second parameter by setting
-     *  it to 0 to move the element (or entire tree) with the id x
+     *  it to 0
+     *  to move the element (or entire tree) with the id x
      *  behind the element with the id y
      * or
      *  $tree->move( array(x1,x2,x3) , ...
@@ -651,7 +653,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         if (DB::isError( $res = $this->dbh->getRow($query))) {
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
-        return $this->_prepareResult( $res );
+        return !$res?false:$this->_prepareResult($res);
     } // end of function
 
     // }}}
