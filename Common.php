@@ -112,11 +112,32 @@ class Tree_Common extends Tree_OptionsDB
     {
         $path = $this->getPath($id);
         $parents = array();
-        foreach( $path as $aNode )
-            $parents[] = $aNode;
+        if( sizeof($path) )
+            foreach( $path as $aNode )
+                $parents[] = $aNode;
         return $parents;
     }
 
+    /**
+    *   get the ids of the parents and all it's parents and so on
+    *   it simply returns the ids of the elements returned by getParents()
+
+    *   @see    getParents()
+    *   @version    2002/08/19
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer $id the id of the element for which the parentId shall be retreived
+    *   @return     array   of the ids
+    */
+    function getParentsIds( $id )
+    {
+        $parents = $this->getParents($id);
+        $parentsIds = array();
+        if( sizeof($parents) )
+            foreach( $parents as $aNode )
+                $parentsIds[] = $aNode['id'];
+        return $parentsIds;
+    }
 
     /**
     *
