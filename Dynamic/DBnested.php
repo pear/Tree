@@ -204,9 +204,9 @@ class Tree_Dynamic_DBnested extends Tree_Common
         $query = sprintf(  'INSERT INTO %s (%s,%s) VALUES (%s,%s)',
                             $this->table ,
                             $this->_getColName('id'),
-                            implode(",", array_keys($newData)) ,
+                            implode(',', array_keys($newData)) ,
                             $nextId,
-                            implode(",", $newData)
+                            implode(',', $newData)
                         );
         if (DB::isError($res = $this->dbh->query($query))) {
             // rollback
@@ -367,7 +367,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         // like when an error occurs?
         //$this->dbh->commit();
         return true;
-    } // end of function
+    }
 
     // }}}
     // {{{ move()
@@ -567,7 +567,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         //$this->dbh->commit();
 
         return true;
-    } // end of function
+    }
 
     // }}}
     // {{{ update()
@@ -604,7 +604,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         }
 
         return true;
-    } // end of function
+    }
 
     // }}}
     // {{{ update()
@@ -628,7 +628,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
            );
         // get element tree
         // $this->addTree
-    } // end of function
+    }
 
     // }}}
     // {{{ getRoot()
@@ -651,7 +651,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return !$res?false:$this->_prepareResult($res);
-    } // end of function
+    }
 
     // }}}
     // {{{ getElement()
@@ -682,7 +682,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                                         __LINE__);
         }
         return $this->_prepareResult($res);
-    } // end of function
+    }
 
     // }}}
     // {{{ getChild()
@@ -1063,7 +1063,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return true;
         }
         return false;
-    } // end of function
+    }
 
     // }}}
     // {{{ getDepth()
@@ -1122,7 +1122,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @param      string   $seperator  the path seperator
      * @return     integer  the id of the searched element
      */
-    function getIdByPath($path,$startId=0,$nodeName='name',$separator='/')
+    function getIdByPath($path, $startId=0, $nodeName='name', $separator='/')
     // should this method be called getElementIdByPath ????
     // Yes, with an optionnal private paramater to get the whole node
     // in preference to only the id?
@@ -1172,11 +1172,11 @@ class Tree_Dynamic_DBnested extends Tree_Common
         $cntElems = sizeof($elems);
         $where = '';
 
-        $query = 'SELECT'
+        $query = 'SELECT '
                 .$this->_getColName('id')
                 .' FROM '
                 .$this->table
-                . 'WHERE '
+                . ' WHERE '
                 .$colname;
         if ($cntElems==1) {
             $query .= "='".$elems[0]."'";
