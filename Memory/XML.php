@@ -1,5 +1,5 @@
 <?php
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
@@ -21,52 +21,55 @@
 require_once "XML/Parser.php";
 
 /**
-*   the XML interface for the tree class
-*
-*   @package  Tree
-*   @author
-*   @version
-*   @access  public
-*/
+ *   the XML interface for the tree class
+ *
+ *   @package  Tree
+ *   @author
+ *   @version
+ *   @access  public
+ */
 class Tree_Memory_XML extends XML_Parser
 {
 
     /**
-    *   @var    array   $data   the first element has to be empty, so we can use the parentId=0 as "no parent"
-    */
+     * @var array   the first element has to be empty, so we can use
+     *              the parentId=0 as "no parent"
+     */
     var $data = array(0=>NULL);
 
     /**
-    *   @var    integer $level
-    */
+     * @var    integer $level
+     */
     var $level = 0;
 
     /**
-    *   @var    array   $parentIdOnLevel
-    */
+     * @var    array   $parentIdOnLevel
+     */
     var $parentIdOnLevel = array();
 
     /**
-    *   @var    boolean $folding    set case folding for the XML_Parser to false
-    */
+     * @var   boolean set case folding for the XML_Parser to false
+     */
     var $folding = false;   // turn off case folding
 
     /**
-    *   @var    boolean     if true it converts all attributes and tag names etc to lower case
-    *                       this is default, since i dont see no way of case insensitive comparison
-    *                       in the tree class, since you can access the internal data directly
-    *                       or you get them returned ... i know this is not 100% proper OOP but that's how it is right now
-    */
+     * @var boolean if true it converts all attributes and tag names etc
+     *              to lower case this is default, since i dont see no way
+     *              of case insensitive comparison in the tree class, since
+     *              you can access the internal data directly or you get
+     *              them returned I know this is not 100% proper OOP but that's
+     *              how it is right now.
+     */
     var $_toLower = true;
 
     /**
-    *
-    *
-    *   @version    2002/01/17
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return     boolean     true on success
-    */
+     *
+     *
+     * @version    2002/01/17
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @return     boolean     true on success
+     */
     function Tree_Memory_XML( $dsn , $options )
     {
         $handle = $dsn;
@@ -83,20 +86,21 @@ class Tree_Memory_XML extends XML_Parser
     }
 
     /**
-    *
-    *
-    *   @version    2002/01/17
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return     boolean     true on success
-    */
+     *
+     *
+     * @version    2002/01/17
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @return     boolean     true on success
+     */
     function startHandler($parser, $element, $attribs)
     {
         $elementBeforeId = sizeof($this->data)-1;
         $curId = sizeof($this->data);
 
         $this->data[$curId]['id'] = $curId;
-        $this->data[$curId]['name'] = $this->_toLower ? strtolower($element) : $element;
+        $this->data[$curId]['name'] = $this->_toLower?
+                                        strtolower($element):$element;
         $this->data[$curId]['level'] = $this->level;
         $this->data[$curId]['attributes'] = $attribs;
         if( $this->_toLower )
@@ -106,50 +110,46 @@ class Tree_Memory_XML extends XML_Parser
                 $this->data[$curId]['attributes'][strtolower($key)] = $value;
         }
 
-        if( isset($this->data[$elementBeforeId]['level']) &&
-            $this->level == $this->data[$elementBeforeId]['level'] )  // is that a new child, or just a 'next' of a child?
-        {
-            $this->data[$curId]['parentId'] = $this->data[$elementBeforeId]['parentId'];
-        }
-        else    // set stuff for the first child !!!
-        {
-            if( $this->level>0 )    // the root has no parent
-            {
+        // is that a new child, or just a 'next' of a child?
+        if (isset($this->data[$elementBeforeId]['level']) &&
+            $this->level == $this->data[$elementBeforeId]['level'] ) {
+            $this->data[$curId]['parentId'] =
+                    $this->data[$elementBeforeId]['parentId'];
+        } else {
+            // set stuff for the first child !!!
+            // the root has no parent
+            if ($this->level>0) {
                 $parentId = $this->parentIdOnLevel[$this->level-1];
                 $this->data[$curId]['parentId'] = $parentId;
-            }
-            else
-            {
+            } else {
                 $this->data[$curId]['parentId'] = 0;
             }
         }
         $this->parentIdOnLevel[$this->level] = $curId;
-
-#print "$curId $element ".$this->data[$curId]['parentId'].'<br>';
         $this->level++;
     }
 
     /**
-    *
-    *
-    *   @version    2002/01/17
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return     boolean     true on success
-    */
+     *
+     *
+     * @version    2002/01/17
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @return     boolean     true on success
+     */
     function endHandler($parser, $element)
     {
         $this->level--;
     }
 
     /**
-    *
-    *
-    *   @version    2002/01/17
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return     boolean     true on success
-    */
+     *
+     *
+     * @version    2002/01/17
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @return     boolean     true on success
+     */
     function cdataHandler($parser, $cdata)
     {
 # QUESTION: why is this method called multiple times for one element?
@@ -164,31 +164,31 @@ class Tree_Memory_XML extends XML_Parser
     }
 
     /**
-    *
-    *
-    *   @version    2002/01/17
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return     boolean     true on success
-    */
+     *
+     *
+     * @version 2002/01/17
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @return  boolean     true on success
+     */
     function defaultHandler($parser, $cdata)
     {
-#        $this->data[ sizeof($this->data)-1 ]['cdata'] = $cdata;
-# not in use yet :-( is that ok??
+        // $this->data[ sizeof($this->data)-1 ]['cdata'] = $cdata;
+        // not in use yet :-( is that ok??
     }
 
 
 
 
     /**
-    *   read the data from the xml file and prepare them so the tree
-    *   class can work with it, the preparation is mainly done in startHandler
-    *
-    *   @version    2002/01/17
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return     boolean     true on success
-    */
+     * read the data from the xml file and prepare them so the tree
+     * class can work with it, the preparation is mainly done in startHandler
+     *
+     * @version 2002/01/17
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @return  boolean     true on success
+     */
     function setup()
     {
         $this->parse();
@@ -197,14 +197,14 @@ class Tree_Memory_XML extends XML_Parser
     } // end of function
 
     /**
-    *   read the data from an xml string and prepare them so the tree
-    *   class can work with it, the preparation is mainly done in startHandler
-    *
-    *   @version    2002/02/05
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @return     boolean     true on success
-    */
+     * read the data from an xml string and prepare them so the tree
+     * class can work with it, the preparation is mainly done in startHandler
+     *
+     * @version    2002/02/05
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @return     boolean     true on success
+     */
     function setupByRawData( $xmlString )
     {
         $this->parseString( $xmlString , true );
@@ -213,19 +213,21 @@ class Tree_Memory_XML extends XML_Parser
     }
 
     /**
-    *   TO BE IMPLEMNTED
-    *   adds _one_ new element in the tree under the given parent
-    *   the values' keys given have to match the db-columns, because the
-    *   value gets inserted in the db directly
-    *   to add an entire node containing children and so on see 'addNode()'
-    *
-    *   @see        addNode()
-    *   @version    2001/10/09
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param      array $newValues this array contains the values that shall be inserted in the db-table
-    *   @return     mixed   either boolean false on failure or the id of the inserted row
-    */
+     * TO BE IMPLEMNTED
+     * adds _one_ new element in the tree under the given parent
+     * the values' keys given have to match the db-columns, because the
+     * value gets inserted in the db directly
+     * to add an entire node containing children and so on see 'addNode()'
+     *
+     * @see addNode()
+     * @version 2001/10/09
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   array   this array contains the values that shall be
+     *                  inserted in the db-table
+     * @return  mixed   either boolean false on failure or the id
+     *                  of the inserted row
+     */
 /*    function add( $newValues )
     {
         // add the data in the internal structure $this->data
@@ -244,14 +246,14 @@ class Tree_Memory_XML extends XML_Parser
     } // end of function
 */
     /**
-    *   TO BE IMPLEMNTED
-    *   removes the given node
+    * TO BE IMPLEMNTED
+    * removes the given node
     *
-    *   @version  2001/10/09
-    *   @access     public
-    *   @author   Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param    mixed   $id   the id of the node to be removed
-    *   @return   boolean true on success
+    * @version  2001/10/09
+    * @access     public
+    * @author   Wolfram Kriesing <wolfram@kriesing.de>
+    * @param    mixed   $id   the id of the node to be removed
+    * @return   boolean true on success
     */
 /*    function remove( $id )
     {
@@ -262,15 +264,15 @@ class Tree_Memory_XML extends XML_Parser
     } // end of function
 */
     /**
-    *   TO BE IMPLEMNTED
-    *   move an entry under a given parent or behind a given entry
+    * TO BE IMPLEMNTED
+    * move an entry under a given parent or behind a given entry
     *
-    *   @version    2001/10/10
-    *   @access     public
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param      integer if prevId is given the element with the id idToMove shall be moved _behind_ element with id=prevId
-    *                       before would be easier, but then no element could be inserted at the end :-/
-    *   @return     boolean     true for success
+    * @version    2001/10/10
+    * @access     public
+    * @author     Wolfram Kriesing <wolfram@kriesing.de>
+    * @param      integer if prevId is given the element with the id idToMove shall be moved _behind_ element with id=prevId
+    *                     before would be easier, but then no element could be inserted at the end :-/
+    * @return     boolean     true for success
     */
 /*    function move( $idToMove , $newParentId , $prevId=0 )
     {

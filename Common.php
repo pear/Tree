@@ -19,13 +19,10 @@
 //  $Id$
 require_once('Tree/OptionsDB.php');
 
-define("TREE_ERROR",                    -1);
-define("TREE_ERROR_INVALID_PARENT",     -2);
-
 /**
  * common tree class, implements common functionality
  *
- * this class extends Tree_OptionsDB so every class that extends this oe can
+ * this class extends Tree_OptionsDB so every class that extends this one can
  * connect to a db and set options
  *
  * @access     public
@@ -35,10 +32,10 @@ define("TREE_ERROR_INVALID_PARENT",     -2);
  */
 class Tree_Common extends Tree_OptionsDB
 {
-
     /**
-     * put proper value-keys are given in each class, depending on the implementation
-     * only some options are needed or allowed, see the classes which extend this one
+     * put proper value-keys are given in each class, depending
+     * on the implementation only some options are needed or allowed,
+     * see the classes which extend this one
      *
      * @access public
      * @var    array   saves the options passed to the constructor
@@ -60,20 +57,23 @@ class Tree_Common extends Tree_OptionsDB
     /**
      * get the ids of the children of the given element
      *
-     * @version    2002/02/06
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      integer $id             ID of the element that the children shall be retreived for
-     * @param      integer how many levels deep into the tree
-     * @return     mixed   an array of all the ids of the children of the element with id=$id,
-     *                       or false if there are no children
+     * @version 2002/02/06
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   integer ID of the element that the children shall be
+     *                  retreived for
+     * @param   integer how many levels deep into the tree
+     * @return  mixed   an array of all the ids of the children of the element
+     *                  with id=$id, or false if there are no children
      */
     function getChildrenIds($id,$levels=1)
     {
-        if (!($children = $this->getChildren($id,$levels))) {   // returns false if no children exist
-            return array();                         // return an empty array, if you want to know if there are children, use hasChildren
+        // returns false if no children exist
+        if (!($children = $this->getChildren($id,$levels))) {
+            return array();
         }
-
+        // return an empty array, if you want to know
+        // if there are children, use hasChildren
         if ($children && sizeof($children)) {
             foreach ($children as $aChild) {
                 $childrenIds[] = $aChild['id'];
@@ -86,12 +86,14 @@ class Tree_Common extends Tree_OptionsDB
     /**
      * gets all the children and grand children etc.
      *
-     * @version    2002/09/30
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      integer $id     ID of the element that the children shall be retreived for
-     * @return     mixed   an array of all the children of the element with id=$id,
-     *                       or false if there are no children
+     * @version 2002/09/30
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   integer ID of the element that the children shall be
+     *                  retreived for
+     *
+     * @return  mixed   an array of all the children of the element with
+     *                  id=$id, or false if there are no children
      */
      // FIXXXME remove this method and replace it by getChildren($id,0)
     function getAllChildren($id)
@@ -106,13 +108,15 @@ class Tree_Common extends Tree_OptionsDB
     /**
      * this method gets all the children recursively
      *
-     * @see    getAllChildren()
-     * @version    2002/09/30
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      integer $id     ID of the element that the children shall be retreived for
-     * @return     mixed   an array of all the ids of the children of the element with id=$id,
-     *                       or false if there are no children
+     * @see getAllChildren()
+     * @version 2002/09/30
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   integer ID of the element that the children shall be
+     *                  retreived for
+     *
+     * @return  mixed   an array of all the ids of the children of the element
+     *                  with id=$id, or false if there are no children
      */
     function &_getAllChildren($id)
     {
@@ -120,7 +124,8 @@ class Tree_Common extends Tree_OptionsDB
         if ($children = $this->getChildren($id)) {
             foreach ($children as $key=>$aChild) {
                 $retChildren[] = &$children[$key];
-                $retChildren = array_merge($retChildren,$this->_getAllChildren( $aChild['id'] ));
+                $retChildren = array_merge($retChildren,
+                        $this->_getAllChildren( $aChild['id'] ));
             }
         }
         return $retChildren;
@@ -129,12 +134,15 @@ class Tree_Common extends Tree_OptionsDB
     /**
      * gets all the children-ids and grand children-ids
      *
-     * @version    2002/09/30
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      integer $id     ID of the element that the children shall be retreived for
-     * @return     mixed   an array of all the ids of the children of the element with id=$id,
-     *                       or false if there are no children
+     * @version 2002/09/30
+     * @access  public
+     * @author  Kriesing <wolfram@kriesing.de>
+     * @param   integer ID of the element that the children shall
+     *          be retreived for
+     *
+     * @return  mixed   an array of all the ids of the children of the element
+     *                  with id=$id,
+     *                  or false if there are no children
      */
     function getAllChildrenIds( $id )
     {
@@ -147,13 +155,15 @@ class Tree_Common extends Tree_OptionsDB
         }
         return $childrenIds;
     }
+
     /**
      * get the id of the parent for the given element
      *
-     * @version    2002/01/18
-     * @access     public
-     * @param      integer $id the id of the element for which the parentId shall be retreived
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @version 2002/01/18
+     * @access  public
+     * @param   integer the id of the element for which the parentId
+     *                  shall be retreived
+     * @author Wolfram Kriesing <wolfram@kriesing.de>
      */
     function getParentId( $id )
     {
@@ -164,11 +174,12 @@ class Tree_Common extends Tree_OptionsDB
     /**
      * this gets all the preceeding nodes, the parent and it's parent and so on
      *
-     * @version    2002/08/19
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      integer $id the id of the element for which the parentId shall be retreived
-     * @return     array   of the parent nodes including the node with id $id
+     * @version 2002/08/19
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   integer the id of the element for which the parentId shall
+     *                  be retreived
+     * @return  array   of the parent nodes including the node with id $id
      */
     function getParents( $id )
     {
@@ -184,11 +195,13 @@ class Tree_Common extends Tree_OptionsDB
      * get the ids of the parents and all it's parents and so on
      * it simply returns the ids of the elements returned by getParents()
      *
-     * @see    getParents()
-     * @version    2002/08/19
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      integer $id the id of the element for which the parentId shall be retreived
+     * @see getParents()
+     * @version 2002/08/19
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   integer $id the id of the element for which the parentId
+     *          shall be retreived
+     *
      * @return     array   of the ids
      */
     function getParentsIds( $id )
@@ -224,8 +237,6 @@ class Tree_Common extends Tree_OptionsDB
     }
 
     /**
-     *
-     *
      * @version    2002/01/18
      * @access     public
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -237,8 +248,6 @@ class Tree_Common extends Tree_OptionsDB
     }
 
     /**
-     *
-     *
      * @version    2002/01/18
      * @access     public
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -250,7 +259,7 @@ class Tree_Common extends Tree_OptionsDB
     }
 
     /**
-     * @version    2002/01/18
+     * @version    2002/04/16
      * @access     public
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
@@ -274,27 +283,32 @@ class Tree_Common extends Tree_OptionsDB
     /**
      * returns the path as a string
      *
-     * @access     public
-     * @version    2002/03/28
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      mixed   $id     the id of the node to get the path for
-     * @param      integer If offset is positive, the sequence will
-     *                     start at that offset in the array .  If
-     *                     offset is negative, the sequence will start that far from the end of the array .
-     * @param      integer If length is given and is positive, then
-     *                     the sequence will have that many elements in it. If
-     *                     length is given and is negative then the
-     *                     sequence will stop that many elements from the end of the
-     *                     array. If it is omitted, then the sequence will have everything
-     *                     from offset up until the end of the array.
-     * @param      string  you can tell the key the path shall be used to be constructed with
-     *                     i.e. giving 'name' (=default) would use the value of the
-     *                     $element['name'] for the node-name
-     *                     thanks to Michael Johnson
-     * @return     array   this array contains all elements from the root to the element given by the id
+     * @access  public
+     * @version 2002/03/28
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   mixed   $id     the id of the node to get the path for
+     * @param   integer If offset is positive, the sequence will
+     *                  start at that offset in the array .  If
+     *                  offset is negative, the sequence will start that far
+     *                  from the end of the array.
+     * @param   integer If length is given and is positive, then
+     *                  the sequence will have that many elements in it. If
+     *                  length is given and is negative then the
+     *                  sequence will stop that many elements from the end of
+     *                  the array. If it is omitted, then the sequence will
+     *                  have everything from offset up until the end
+     *                  of the array.
+     * @param   string  you can tell the key the path shall be used to be
+     *                  constructed with i.e. giving 'name' (=default) would
+     *                  use the value of the $element['name'] for the node-name
+     *                  (thanks to Michael Johnson).
+     *
+     * @return  array   this array contains all elements from the root
+     *                  to the element given by the id
      */
-    function getPathAsString($id, $seperator='/', $offset=0, $length=0, $key='name')
+    function getPathAsString($id, $seperator='/',
+                                $offset=0, $length=0, $key='name')
     {
         $path = $this->getPath($id);
         foreach ($path as $aNode) {
@@ -323,15 +337,17 @@ class Tree_Common extends Tree_OptionsDB
      * gets the path to the element given by its id
      *
      * @abstract
-     * @version    2001/10/10
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      mixed   $id     the id of the node to get the path for
-     * @return     array   this array contains all elements from the root to the element given by the id
+     * @version 2001/10/10
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   mixed   $id     the id of the node to get the path for
+     * @return  array   this array contains all elements from the root
+     *                  to the element given by the id
      */
     function getPath($id)
     {
-        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
+                __FUNCTION__, __LINE__ );
     } // end of function
 
 
@@ -378,8 +394,8 @@ class Tree_Common extends Tree_OptionsDB
         $i = 0;
         foreach($elems as $val){
             if (trim($val)=='') {
-                return $this->_throwError(
-                    "getIdByPath: Invalid path <$path>" , __LINE__ );
+                return $this->_raiseError(TREE_ERROR_INVALID_PATH,
+                            __FUNCTION__, __LINE__ );
             }
             if ($val=='..') {
                  if ($i==0) {
@@ -392,14 +408,15 @@ class Tree_Common extends Tree_OptionsDB
             }
         }
         if(sizeof($_elems)<1){
-            return $this->_throwError(
-                'getIdByPath: Empty path not allowed' , __LINE__ );
+            return $this->_raiseError(TREE_ERROR_EMPTY_PATH,
+                        __FUNCTION__, __LINE__ );
         }
         return array($_elems, $sublevel);
     }
 
     /**
-     * get the level, which is how far below the root the element with the given id is
+     * get the level, which is how far below the root the element
+     * with the given id is
      *
      * @abstract
      * @version    2001/11/25
@@ -410,7 +427,8 @@ class Tree_Common extends Tree_OptionsDB
      */
     function getLevel($id)
     {
-        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
+                        __FUNCTION__, __LINE__ );
     } // end of function
 
     /**
@@ -427,16 +445,19 @@ class Tree_Common extends Tree_OptionsDB
      */
     function isChildOf($id, $childId, $checkAll = true)
     {
-        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
+                    __FUNCTION__, __LINE__ );
     } // end of function
 
     /**
      *
      *
      */
-    function getIdByPath($path, $startId=0, $nodeName = 'name', $seperator = '/')
+    function getIdByPath($path, $startId=0,
+                        $nodeName = 'name', $seperator = '/')
     {
-        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+        return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
+                    __FUNCTION__, __LINE__ );
     } // end of function
 
     /**
@@ -483,7 +504,7 @@ class Tree_Common extends Tree_OptionsDB
      * @param      array   a result
      * @return     array   the prepared result
      */
-    function _prepareResult( $result )
+    function _prepareResult($result)
     {
         $map = $this->getOption('columnNameMaps');
         if ($map) {
@@ -521,20 +542,39 @@ class Tree_Common extends Tree_OptionsDB
      *
      * @access     private
      * @version    2002/03/02
+     * @author     Pierre-Alain Joye <paj@pearfr.org>
+     * @param      string  the error message
+     * @param      int     the line in which the error occured
+     * @param      mixed   the error mode
+     * @return     object  a Tree_Error
+     */
+    function _raiseError($errorCode, $msg='', $line=0)
+    {
+        include_once 'Tree/Error.php';
+        return new Tree_Error(
+            $msg , $line, __FILE__, $mode, $this->dbh->last_query);
+    }
+
+    /**
+     *
+     *
+     * @access     private
+     * @version    2002/03/02
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param      string  the error message
      * @param      int     the line in which the error occured
      * @param      mixed   the error mode
      * @return     object  a Tree_Error
      */
-    function _throwError( $msg , $line , $mode=null )
+    function _throwError($msg, $line, $mode=null)
     {
+        include_once 'Tree/Error.php';
         if ($mode===null && $this->debug>0) {
             $mode = PEAR_ERROR_PRINT;
 		}
-        return new Tree_Error( $msg , $line , __FILE__ , $mode , $this->dbh->last_query );
+        return new Tree_Error(
+            $msg , $line, __FILE__, $mode, $this->dbh->last_query);
     }
-
 }
 
 /*

@@ -1,5 +1,5 @@
 <?php
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
@@ -17,32 +17,63 @@
 // +----------------------------------------------------------------------+
 //
 //  $Id$
+require_once 'PEAR.php';
 
 /**
-*
-*
-*   @author     Wolfram Kriesing <wolfram@kriesing.de>
-*   @package    Tree
-*/
+ * Errors constants definitions
+ */
+define('TREE_ERROR_NOT_IMPLEMENTED',    -1);
+define('TREE_ERROR_ELEMENT_NOT_FOUND',  -2);
+define('TREE_ERROR_INVALID_NODE_NAME',  -3);
+define('TREE_ERROR_MOVE_TO_CHILDREN',   -4);
+define('TREE_ERROR_PARENT_ID_MISSED',   -5);
+define('TREE_ERROR_INVALID_PARENT',     -6);
+define('TREE_ERROR_EMPTY_PATH',         -7);
+define('TREE_ERROR_INVALID_PATH',       -8);
+define('TREE_ERROR_DB_ERROR',           -9);
+define('TREE_ERROR_PATH_SEPARATOR_EMPTY',-10);
+define('TREE_ERROR_CANNOT_CREATE_FOLDER',-11);
+define('TREE_ERROR_UNKNOW_ERROR',       -99);
+
+/**
+ *
+ *
+ *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+ *   @package    Tree
+ */
 class Tree_Error extends PEAR_Error
 {
     /**
-    *   @var  string    prefix for error messages.
-    */
+     * @var  string    prefix for error messages.
+     */
     var $error_message_prefix = "Tree Error: ";
 
     /**
-    *
-    *
-    *   @access     public
-    *   @version    2002/03/03
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    */
-    function Tree_Error( $msg , $line , $file , $mode=null , $userinfo='no userinfo' )
+     * @access     public
+     * @version    2002/03/03
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     */
+    function Tree_Error( $msg, $line, $file,
+                        $mode=null, $userinfo='no userinfo')
     {
         $this->PEAR_Error(  sprintf("%s <br/>in %s [%d].", $msg, $file, $line),
                             null , $mode , null, $userinfo );
     }
 
+    function getMessage($id) {
+        $messages = array(
+            TREE_ERROR_NOT_IMPLEMENTED    =>'',
+            TREE_ERROR_INVALID_PATH       =>'',
+            TREE_ERROR_DB_ERROR           =>'',
+            TREE_ERROR_PARENT_ID_MISSED   =>'',
+            TREE_ERROR_MOVE_TO_CHILDREN   =>'',
+            TREE_ERROR_ELEMENT_NOT_FOUND  =>'',
+            TREE_ERROR_PATH_SEPARATOR_EMPTY =>'',
+            TREE_ERROR_INVALID_NODE_NAME  =>'',
+            TREE_ERROR_UNKNOW_ERROR       =>''
+            );
+        return isset($messages[$id])?$messages[$id]:
+                    $messages[TREE_ERROR_UNKNOW_ERROR];
+    }
 } // end of class
 ?>
