@@ -1,0 +1,6 @@
+TODO
+
+- add a Cache-Decorator for the Dynamic_* way so the user can determine if he wants to
+  use cached results. i.e. when calling getElement(2) three times, normally it would read
+  the data from the DB 3 times, but with a cache it could use cached results.
+  of course not cached permanently only for the current script life time
