@@ -18,6 +18,7 @@
 //
 //  $Id$
 
+require_once 'Tree/Tree.php';
 require_once 'Tree/Common.php';
 
 /**
@@ -1071,15 +1072,32 @@ class Tree_Dynamic_DBnested extends Tree_Common
     /**
      * return the maximum depth of the tree
      *
-     * @version    2003/02/25
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @return     int     the depth of the tree
+     * @version 2003/02/25
+     * @access public
+     * @author "Denis Joloudov" <dan@aitart.ru>, Wolfram Kriesing <wolfram@kriesing.de>
+     * @return integer the depth of the tree
      */
     function getDepth()
     {
-        // FIXXXME TODO!!!
-        return $this->_throwError('not implemented yet', __LINE__);
+        $query = sprintf(   'SELECT COUNT(*) FROM %s p, %s e '.
+                            'WHERE %s (e.%s BETWEEN p.%s AND p.%s) AND '.
+                            '(e.%s BETWEEN p.%s AND p.%s)',
+                            $this-> table,$this->table,
+                            // first line in where
+                            $this->_getWhereAddOn(' AND ','p'),
+                            $this->_getColName('left'),$this->_getColName('left'),
+                            $this->_getColName('right'),
+                            // second where line
+                            $this->_getColName('right'),$this->_getColName('left'),
+                            $this->_getColName('right')
+                            );
+        if (DB::isError($res=$this->dbh->getOne($query))) {
+            return $this->_throwError($res->getMessage(),__LINE__);
+        }
+        if(!$res) {
+            return false;
+        }
+        return $this->_prepareResult($res);
     }
 
     // }}}
