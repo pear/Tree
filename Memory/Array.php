@@ -73,8 +73,13 @@ class Tree_Memory_Array
     {
         foreach( $array as $aNode )
         {
-            $this->_id++;
-            $this->data[] = array('id'=>$this->_id,'name'=>$aNode['name'],'parentId'=>$parentId);
+            $this->_id++;                                                                          
+            $newData = array('id'=>$this->_id,'name'=>$aNode['name'],'parentId'=>$parentId);
+            foreach( $aNode as $key=>$val )
+                if( !is_array($val) )
+                    $newData[$key] = $val;
+            $this->data[] = $newData;
+            //$this->data[] = array('id'=>$this->_id,'name'=>$aNode['name'],'parentId'=>$parentId);
             if( $aNode['children'] )
                 $this->_setup( $aNode['children'] , $this->_id );
         }
