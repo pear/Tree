@@ -14,6 +14,15 @@
     $show[] = '$tree->remove( $res )';  // remove the last element that was added in the line before :-)
     $show[] = '$tree->getRight( 5 )';
     $show[] = '$tree->getLeft( 5 )';
+    $show[] = '$tree->getChildren( 1 )';
+    $show[] = '$tree->getParent( 2 )';
+    $show[] = '$tree->getNext( 2 )';
+    $show[] = '$tree->getNext( 4 )';
+    $show[] = '$tree->getNext( 8 )';
+    $show[] = '$tree->getPrevious( 2 )';
+    $show[] = '$tree->getPrevious( 4 )';
+    $show[] = '$tree->getPrevious( 8 )';
+    $show[] = '$tree->getPreviousId( 8 )';
 
 
     foreach( $show as $aRes )
