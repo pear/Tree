@@ -39,26 +39,13 @@ class Tree_Common extends Tree_OptionsDB
 {
 
     /**
+    *   put proper value-keys are given in each class, depending on the implementation
+    *   only some options are needed or allowed, see the classes which extend this one
+    *
     *   @access public
     *   @var    array   saves the options passed to the constructor
     */
-    var $options =  array(
-                            // those keyName maps are supposed to name the keys that are used in the internal array (data)
-                            // if you prefer different names, or your db-columns have different names
-                            // then define them here
-                            // be sure to set i.e. the columnNameMaps for the DB so that it works with those maps
-                            // the default is as you see given
-# FIXXME, finish this and let the user define its own key maps, use that throughout the entire class
-# i didnt do it yet, since it requires quite some testing and i didnt need it yet, i just use the columnNameMaps in the DB for now
-# but one fine day ...
-/*                            'keyNameMaps'   =>  array(
-                                                'id'            =>  'id',
-                                                'parentId'      =>  'parentId',
-                                                'prevId'        =>  'prevId',
-                                                'name'          =>  'name'  //
-                                                )
-*/
-                            );
+    var $options =  array();
 
 
     /**
@@ -244,6 +231,94 @@ class Tree_Common extends Tree_OptionsDB
     function getLevel( $id )
     {
     } // end of function
+
+
+
+
+
+
+    //
+    //  PRIVATE METHODS
+    //
+
+
+    /**
+    *   prepare multiple results
+    *
+    *   @see        _prepareResult()
+    *   @access     private
+    *   @version    2002/03/03
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _prepareResults( $results )
+    {
+        $newResults = array();
+        foreach( $results as $aResult )
+            $newResults[] = $this->_prepareResult($aResult);
+        return $newResults;
+    }
+
+    /**
+    *   map back the index names to get what is expected
+    *
+    *   @access     private
+    *   @version    2002/03/03
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _prepareResult( $result )
+    {
+        $map = $this->getOption('columnNameMaps');
+
+        if( $map )
+        foreach( $map as $key=>$columnName )
+        {
+            $result[$key] = $result[$columnName];
+            unset($result[$columnName]);
+        }
+        return $result;
+    }
+
+    /**
+    *   this method retreives the real column name, as used in the DB
+    *   since the internal names are fixed, to be portable between different
+    *   DB-column namings, we map the internal name to the real column name here
+    *
+    *   @access     private
+    *   @version    2002/03/02
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _getColName( $internalName )
+    {
+        if( $map = $this->getOption( 'columnNameMaps' ) )
+        {
+            if( isset($map[$internalName]) )
+                return $map[$internalName];
+        }
+        return $internalName;
+    }
+
+    /**
+    *
+    *
+    *   @access     private
+    *   @version    2002/03/02
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _throwError( $msg , $line , $mode=null )
+    {
+        if( $mode===null && $this->debug>0 )
+            $mode = PEAR_ERROR_PRINT;
+        return new Tree_Error( $msg , $line , __FILE__ , $mode , $this->dbh->last_query );
+    }
+
 
 
 
