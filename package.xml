@@ -32,7 +32,7 @@
   </maintainers>
     <release>
         <version>0.1</version>
-        <date>2002-07-27</date>
+        <date>2002-08-13</date>
         <license>PHP License</license>
         <state>beta</state>
         <notes>
@@ -46,12 +46,12 @@
                 <file role="php">Options.php</file>
                 <file role="php">OptionsDB.php</file>
                 <file role="php">Error.php</file>
-                <dir name="Memory" baseinstalldir="Memory">
+                <dir name="Memory">
                     <file role="php">DBsimple.php</file>
                     <file role="php">DBnested.php</file>
                     <file role="php">XML.php</file>
                 </dir>
-                <dir name="Dynamic" baseinstalldir="Dynamic">
+                <dir name="Dynamic">
                     <file role="php">DBnested.php</file>
                 </dir>
                 <dir name="examples" role="doc">
