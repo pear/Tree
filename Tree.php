@@ -95,14 +95,18 @@ class Tree extends PEAR
     /**
     *   this is just a wrapper around the two setup methods above
     *   some example calls:
+    *   <code>
     *   $tree = Tree::setup( 'Dynamic_DBnested' , 'mysql://root@localhost/test' , array('table'=>'nestedTree') );
     *   $tree = Tree::setup( 'Memory_DBsimple' , 'mysql://root@localhost/test' , array('table'=>'simpleTree') );
     *   $tree = Tree::setup( 'Memory_XML' , '/path/to/some/xml/file.xml' );
+    *   </code>
     *
     *   you can call the following too, but the functions/classes are not implemented yet
     *   or not finished
+    *   <code>
     *   $tree = Tree::setup( 'Memory_DBnested' , 'mysql://root@localhost/test' , array('table'=>'nestedTree') );
     *   $tree = Tree::setup( 'Dynamic_XML' , '/path/to/some/xml/file.xml' );
+    *   </code>
     *
     *   and those would be really cool to have one day:
     *   LDAP, Filesystem, WSDL, ...
