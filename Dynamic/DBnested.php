@@ -99,7 +99,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   i.e.    // insert a new element under the parent with the ID=7
     *           $tree->add( array('name'=>'new element name') , 7 );
     *   2.
-    *   give the $prevId ($parentId would be optional) and the new element
+    *   give the $prevId ($parentId will be dismissed) and the new element
     *   will be inserted in the tree after the element with the ID=$prevId
     *   the parentId is not necessary because the prevId defines exactly where
     *   the new element has to be place in the tree, and the parent is the same as
@@ -131,7 +131,17 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
         if( $parentId || $prevId )                  // if no parent and no prevId is given the root shall be added
         {
-            $element = $this->getElement( $prevId ? $prevId : $parentId );
+            if( $prevId )
+            {
+                $element = $this->getElement( $prevId );
+                $parentId = $element['parentId'];       // we also need the parent id of the element, to write it in the db
+            }
+            else
+            {
+                $element = $this->getElement( $parentId );
+            }
+            $newValues['parentId'] = $parentId;
+
             if( PEAR::isError($element) )
                 return $element;
 
@@ -270,6 +280,41 @@ class Tree_Dynamic_DBnested extends Tree_Common
     function move()
     {
 # FIXXME to be done :-)
+    } // end of function
+
+    /**
+    *   update the tree element given by $id with the values in $newValues
+    *
+    *   @access     public
+    *   @author
+    *   @param      int     the id of the element to update
+    *   @param      array   the new values, the index is the col name
+    *   @return
+    */
+    function update( $id , $newValues )
+    {
+        // jsut to be sure nothing gets screwed up :-)
+        unset( $newValues[$this->_getColName('left')] );
+        unset( $newValues[$this->_getColName('right')] );
+        unset( $newValues[$this->_getColName('parentId')] );
+
+        // updating _one_ element in the tree
+        $values = array();
+        foreach( $newValues as $key=>$value )
+            $values[] = $this->_getColName($key).'='.$this->dbh->quote($value);
+
+
+        $query = sprintf(   'UPDATE %s SET %s WHERE %s=%s',
+                            $this->table,
+                            implode(',',$values),
+                            $this->_getColName('id'),
+                            $id);
+        if( DB::isError( $res=$this->dbh->query($query) ) ){
+# FIXXME raise PEAR error
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+
+        return true;
     } // end of function
 
     /**
@@ -481,12 +526,15 @@ class Tree_Dynamic_DBnested extends Tree_Common
     */
     function getChildren( $id )
     {
-        $query = sprintf(   'SELECT c.* FROM %s c,%s e WHERE e.%s=c.%s AND e.%s=%s',
+        $query = sprintf(   'SELECT c.* FROM %s c,%s e WHERE e.%s=c.%s AND e.%s=%s '.
+                            'ORDER BY c.%s',    // order by left, so we have it in the order as it is in the tree
                             $this->table,$this->table,
                             $this->_getColName('id'),
                             $this->_getColName('parentId'),
                             $this->_getColName('id'),
-                            $id);
+                            $id,
+                            $this->_getColName('left')
+                            );
         if( DB::isError( $res = $this->dbh->getAll($query) ) )
         {
             return $this->_throwError( $res->getMessage() , __LINE__ );
