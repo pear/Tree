@@ -28,6 +28,27 @@
     $modifiers = new SimpleTemplate_Filter_Modifier($tpl->options);
     $tpl->registerPrefilter(array(&$modifiers,'imgSrc'),array(dirname(__FILE__),'http://'.$HTTP_HOST.dirname($PHP_SELF)));
 
+
+    // session stuff to save the opened folders etc.
+    session_start();
+    if(!session_is_registered('session'))
+    {
+        $session = new stdClass;    // standard PHP-class constructor
+        session_register('session');
+        $session->data = array();
+        $session->use = 'Filesystem';
+    }
+    else    // since the class is read from the session it is not automatically made global
+    {
+        $session = &$_SESSION['session'];
+    }
+
+    // set the source to use
+    if( $_REQUEST['use_DB'] )
+        $session->use = 'DB';
+    if( $_REQUEST['use_Filesystem'] )
+        $session->use = 'Filesystem';
+
     ##################################################
     #
     #       actual tree stuff, using Dynamic_DBnested
@@ -36,27 +57,25 @@
     define('DB_DSN','mysql://root@localhost/test');
 
     require_once('treeClass.php');
-    $options = array( 'table' => TABLE_TREE , 'order' =>  'name');
-    $tree = new treeClass( 'DBnested' , DB_DSN , $options );
+    if( $session->use == 'DB' )
+    {
+        $options = array( 'table' => TABLE_TREE , 'order' =>  'name');
+        $tree = new treeClass( 'DBnested' , DB_DSN , $options );
+    }
+    else
+    {
+        # to let it work on the filesystem :-)
+        $options = array( 'order' =>  'name');
+        $tree = new treeClass( 'Filesystem' , '/home/cain/tmp' , $options );
+    }
 
-# to let it work on the filesystem :-)
-#    $options = array( 'order' =>  'name');
-#    $tree = new treeClass( 'Filesystem' , '/home/wk/tmp' , $options );
+    if( PEAR::isError($res=$tree->setup()) )
+    {
+        $methodFailed = true;
+        $results[] = $res;
+    }
 
-    $tree->setup();
     $tree->setRemoveRecursively();
-
-    session_start();
-    if(!session_is_registered('session'))
-    {
-        $session = new stdClass;    // standard PHP-class constructor
-        session_register('session');
-        $session->data = array();
-    }
-    else    // since the class is read from the session it is not automatically made global
-    {
-        $session = &$_SESSION['session'];
-    }
 
     // detect action
 

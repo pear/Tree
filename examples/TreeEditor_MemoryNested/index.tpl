@@ -32,6 +32,7 @@
 </style>
 
 <form method="post" action="{$_SERVER['PHP_SELF']}">
+
     {if($session->action == 'cut')}
         <img src="cut"> &nbsp;
         <img src="copy"> &nbsp;
@@ -46,6 +47,25 @@
         <img src="delete"> &nbsp;
     {else}
         <input id="delete" src="delete" name="action_delete" type="image" class="button" onmousedown="document.getElementById('delete').style.border='1px inset black'" title="delete">
+
+    &nbsp;
+    <img src="" width="1" height="22" class="button"> &nbsp;
+
+    &nbsp;
+    work on: &nbsp;
+    <input type="submit" value="DB" name="use_DB">
+    &nbsp;
+    <input type="submit" value="Filesystem" name="use_Filesystem">
+
+    <br><br>
+
+    current tree instanciation used:
+    <code>
+    {if( $session->use == 'DB' )}
+        $tree = new treeClass( 'DBnested' , 'mysql://root@localhost/test' , array('table'=&gt;TABLE_TREE , 'order' =&gt;  'name') );
+    {else}
+        $tree = new treeClass( 'Filesystem' , '/home/cain/tmp' ,array('order' =&gt;  'name') );
+    </code>
 
     <hr>
 
