@@ -73,6 +73,30 @@ class Tree_Common extends Tree_Options
     }
 
     /**
+    *   get the ids of the children of the given element
+    *
+    *   @version    2002/02/06
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer $id             ID of the element that the children shall be retreived for
+    *   @return     mixed   an array of all the ids of the children of the element with id=$id,
+    *                       or false if there are no children
+    */
+    function getChildrenIds( $id )
+    {
+        if( !($children = $this->getChildren( $id )) )  // returns false if no children exist
+            return array();                         // return an empty array, if you want to know if there are children, use hasChildren
+
+        if( $children && sizeof($children) )
+        {
+            foreach( $children as $aChild )
+                $childrenIds[] = $aChild['id'];
+        }
+
+        return $childrenIds;
+    }
+
+    /**
     *   get the id of the parent for the given element
     *
     *   @version    2002/01/18
