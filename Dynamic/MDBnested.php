@@ -176,7 +176,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
             $prevVisited = $prevId ? $element['right'] : $element['left'];
 
             // FIXXME start transaction here
-            if (Tree::isError($err=$this->_add($prevVisited, 1))) {
+            if (Tree::isError($err = $this->_add($prevVisited, 1))) {
                 // FIXXME rollback
                 //$this->dbh->rollback();
                 return $err;
@@ -186,7 +186,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         // inserting _one_ new element in the tree
         $newData = array();
         // quote the values, as needed for the insert
-        foreach ($newValues as $key=>$value) {
+        foreach ($newValues as $key => $value) {
 
             ///////////FIX ME: Add proper quote handling
 
@@ -1170,7 +1170,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
             $rangeEnd   = $startElem['right'];
             // Not clean, we should call hasChildren, but I do not
             // want to call getELement again :). See TODO
-            $startHasChild = ($rangeEnd-$rangeStart)>1?true:false;
+            $startHasChild = ($rangeEnd-$rangeStart) > 1 ? true : false;
             $cwd = '/'.$this->getPathAsString($startId);
         } else {
             $cwd = '/';
@@ -1206,7 +1206,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
             return $this->_throwError($res->getMessage(),
                         __LINE__);
         }
-        return ($res?(int)$res:false);
+        return ($res ? (int)$res : false);
     }
 
     // }}}

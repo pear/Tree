@@ -189,7 +189,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         $newData = array();
         // quote the values, as needed for the insert
         foreach ($newValues as $key => $value) {
-            $newData[$this->_getColName($key)] = $this->dbh->quote($value);
+            $newData[$this->_getColName($key)] = $this->dbh->quoteSmart($value);
         }
 
         // set the proper right and left values
@@ -589,7 +589,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         // updating _one_ element in the tree
         $values = array();
         foreach ($newValues as $key => $value) {
-            $values[] = $this->_getColName($key).'='.$this->dbh->quote($value);
+            $values[] = $this->_getColName($key).'='.$this->dbh->quoteSmart($value);
         }
         $query = sprintf('UPDATE %s SET %s WHERE%s %s=%s',
                             $this->table,

@@ -58,7 +58,7 @@ class Tree_Memory_MDBnested extends Tree_Dynamic_MDBnested
 
             // build the query this way, that the root, which has no parent
             // (parentId=0) is first
-            $query = sprintf(   'SELECT * FROM %s %s ORDER BY %s',
+            $query = sprintf('SELECT * FROM %s %s ORDER BY %s',
                                 $this->table,
                                 $whereAddOn,
                                 // sort by the left-column, so we have the data
