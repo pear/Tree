@@ -112,7 +112,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   this method does not (yet) check if there is already a root element saved !!!
     *
     *   @access     public
-    *   @author
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      array   $newValues  this array contains the values that shall be inserted in the db-table
     *   @param      integer $parentId   the id of the element which shall be the parent of the new element
     *   @param      integer $prevId     the id of the element which shall preceed the one to be inserted
@@ -152,30 +152,13 @@ class Tree_Dynamic_DBnested extends Tree_Common
             // i.e. at: http://research.calacademy.org/taf/proceedings/ballew/sld034.htm
             $prevVisited = $prevId ? $element['right'] : $element['left'];
 
-    # FIXXME start transaction here
-            // update the elements which will be affected by the new insert
-            $query = sprintf(   'UPDATE %s SET %s=%s+2 WHERE%s %s>%s',
-                                $this->table,
-                                $lName,$lName,
-                                $this->_getWhereAddOn(),
-                                $lName,
-                                $prevVisited );
-            if( DB::isError( $res = $this->dbh->query($query) ) )
-            {
-    # FIXXME rollback
-                return $this->_throwError( $res->getMessage() , __LINE__ );
-            }
+# FIXXME start transaction here
 
-            $query = sprintf(   'UPDATE %s SET %s=%s+2 WHERE%s %s>%s',
-                                $this->table,
-                                $rName,$rName,
-                                $this->_getWhereAddOn(),
-                                $rName,
-                                $prevVisited );
-            if( DB::isError( $res = $this->dbh->query($query) ) )
+            if( PEAR::isError($err=$this->_add( $prevVisited , 1 )) )
             {
     # FIXXME rollback
-                return $this->_throwError( $res->getMessage() , __LINE__ );
+                #$this->dbh->rollback();
+                return $err;
             }
         }
 
@@ -210,12 +193,60 @@ class Tree_Dynamic_DBnested extends Tree_Common
     } // end of function
 
     /**
+    *   this method only updates the left/right values of all the
+    *   elements that are affected by the insertion
+    *   be sure to set the parentId of the element(s) you insert
+    *
+    *   @param  int     this parameter is not the ID!!!
+    *                   it is the previous visit number, that means
+    *                   if you are inserting a child, you need to use the left-value
+    *                   of the parent
+    *                   if you are inserting a "next" element, on the same level
+    *                   you need to give the right value !!
+    *   @param  int     the number of elements you plan to insert
+    *   @return mixed   either true on success or a Tree_Error on failure
+    */
+    function _add( $prevVisited , $numberOfElements=1 )
+    {
+        $lName = $this->_getColName('left');
+        $rName = $this->_getColName('right');
+
+        // update the elements which will be affected by the new insert
+        $query = sprintf(   'UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
+                            $this->table,
+                            $lName,$lName,
+                            $numberOfElements*2,
+                            $this->_getWhereAddOn(),
+                            $lName,
+                            $prevVisited );
+        if( DB::isError( $res = $this->dbh->query($query) ) )
+        {
+# FIXXME rollback
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+
+        $query = sprintf(   'UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
+                            $this->table,
+                            $rName,$rName,
+                            $numberOfElements*2,
+                            $this->_getWhereAddOn(),
+                            $rName,
+                            $prevVisited );
+        if( DB::isError( $res = $this->dbh->query($query) ) )
+        {
+# FIXXME rollback
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+        return true;
+    }
+
+    /**
     *   remove a tree element
     *   this automatically remove all children and their children
     *   if a node shall be removed that has children
     *
     *   @access     public
-    *   @author
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      integer $id the id of the element to be removed
     *   @return     boolean returns either true or throws an error
     */
@@ -225,16 +256,12 @@ class Tree_Dynamic_DBnested extends Tree_Common
         if( PEAR::isError($element) )
             return $element;
 
-        $delta = $element['right'] - $element['left'] +1;
-        $lName = $this->_getColName('left');
-        $rName = $this->_getColName('right');
-
 # FIXXME start transaction
         #$this->dbh->autoCommit(false);
         $query = sprintf(   'DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
                             $this->table,
                             $this->_getWhereAddOn(),
-                            $lName,
+                            $this->_getColName('left'),
                             $element['left'],$element['right']);
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
@@ -243,7 +270,33 @@ class Tree_Dynamic_DBnested extends Tree_Common
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
-        // update the elements which will be affected by the new insert
+        if( PEAR::isError($err=$this->_remove( $element )) )
+        {
+# FIXXME rollback
+            #$this->dbh->rollback();
+            return $err;
+        }
+        return true;
+    }
+
+    /**
+    *   removes a tree element, but only updates the left/right values
+    *   to make it seem as if the given element would not exist anymore
+    *   it doesnt remove the row(s) in the db itself!
+    *
+    *   @see        getElement()
+    *   @access     private
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      array   the entire element returned by "getElement"
+    *   @return     boolean returns either true or throws an error
+    */
+    function _remove( $element )
+    {
+        $delta = $element['right'] - $element['left'] +1;
+        $lName = $this->_getColName('left');
+        $rName = $this->_getColName('right');
+
+        // update the elements which will be affected by the remove
         $query = sprintf(   "UPDATE %s SET %s=%s-$delta, %s=%s-$delta WHERE%s %s>%s",
                             $this->table,
                             $lName,$lName,
@@ -252,8 +305,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $lName,$element['left'] );
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+            // the rollback shall be done by the method calling this one, since it is only private
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
@@ -265,8 +317,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $rName,$element['right'] );
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+            // the rollback shall be done by the method calling this one, since it is only private
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 # FIXXME commit
@@ -275,26 +326,159 @@ class Tree_Dynamic_DBnested extends Tree_Common
     } // end of function
 
     /**
-    *   move a tree element
+    *   move an entry under a given parent or behind a given entry.
+    *   If a newPrevId is given the newParentId is dismissed!
+    *   call it either like this:
+    *       $tree->move( x , y )
+    *       to move the element (or entire tree) with the id x
+    *       under the element with the id y
+    *   or
+    *       $tree->move( x , 0 , y );   // ommit the second parameter by setting it to 0
+    *       to move the element (or entire tree) with the id x
+    *       behind the element with the id y
     *
+    *   @version    2002/04/29
     *   @access     public
-    *   @author
-    *   @param
-    *   @return
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer     the id of the element that shall be moved
+    *   @param      integer     the id of the element which will be the new parent
+    *   @param      integer     if prevId is given the element with the id idToMove
+    *                           shall be moved _behind_ the element with id=prevId
+    *                           if it is 0 it will be put at the beginning
+    *   @return     mixed       true for success, Tree_Error on failure
     */
-    function move()
+    function move( $idToMove , $newParentId , $newPrevId=0 )
     {
-# FIXXME to be done :-)
+        // do some integrity checks first
+        if( $newPrevId )
+        {
+            if( $newPrevId == $idToMove )           // dont let people move an element behind itself, tell it succeeded, since it already is there :-)
+            {
+                return true;
+            }
+            if( PEAR::isError($newPrevious = $this->getElement( $newPrevId )) )
+                return $newPrevious;
+            $newParentId = $newPrevious['parentId'];
+        }
+        else
+        {
+            if( $newParentId == 0 )
+            {
+                return $this->_throwError( 'no parent id given' , __LINE__ );
+            }
+            if( $this->isChildOf( $idToMove , $newParentId ) )  // if the element shall be moved under one of its children, return false
+            {
+                return $this->_throwError( 'can not move an element under one of its children' , __LINE__ );
+            }
+            if( $newParentId == $idToMove )         // dont do anything to let an element be moved under itself, which is bullshit
+            {
+                return true;
+            }
+            if( PEAR::isError($newParent = $this->getElement( $newParentId )) ) // try to retreive the data of the parent element
+            {
+                return $newParent;
+            }
+        }
+
+        if( PEAR::isError($element=$this->getElement($idToMove)) )  // get the data of the element itself
+        {
+            return $element;
+        }
+
+        $numberOfElements = ($element['right'] - $element['left']+1)/2;
+        $prevVisited = $newPrevId ? $newPrevious['right'] : $newParent['left'];
+
+# FIXXME start transaction
+
+        // add the left/right values in the new parent, to have the space to move the new values in
+        if( PEAR::isError($err=$this->_add( $prevVisited , $numberOfElements )) )
+        {
+# FIXXME rollback
+            #$this->dbh->rollback();
+            return $err;
+        }
+
+        // update the parentId of the element with $idToMove
+        if( PEAR::isError($err=$this->update( $idToMove , array('parentId'=>$newParentId) )) )
+        {
+# FIXXME rollback
+            #$this->dbh->rollback();
+            return $err;
+        }
+
+        // update the lefts and rights of those elements that shall be moved
+
+        // first get the offset we need to add to the left/right values
+        // if $newPrevId is given we need to get the right value, otherwise the left
+        // since the left/right has changed, because we already updated it up there we need to
+        // get them again, we have to do that anyway, to have the proper new left/right values
+        if( $newPrevId )
+        {
+            if( PEAR::isError($temp = $this->getElement( $newPrevId )) )
+            {
+# FIXXME rollback
+                #$this->dbh->rollback();
+                return $temp;
+            }
+            $calcWith = $temp['right'];
+        }
+        else
+        {
+            if( PEAR::isError($temp = $this->getElement( $newParentId )) )
+            {
+# FIXXME rollback
+                #$this->dbh->rollback();
+                return $temp;
+            }
+            $calcWith = $temp['left'];
+        }
+
+        // get the element that shall be moved again, since the left and right might have changed by the add-call
+        if( PEAR::isError($element=$this->getElement($idToMove)) )
+        {
+            return $element;
+        }
+
+        $offset = $calcWith - $element['left'];     // calc the offset that the element to move has to the spot where it should go
+        $offset++;                                  // correct the offset by one, since it needs to go inbetween!
+
+        $lName = $this->_getColName('left');
+        $rName = $this->_getColName('right');
+        $query = sprintf(   "UPDATE %s SET %s=%s+$offset,%s=%s+$offset WHERE%s %s>%s AND %s<%s",
+                            $this->table,
+                            $rName,$rName,
+                            $lName,$lName,
+                            $this->_getWhereAddOn(),
+                            $lName,$element['left']-1,
+                            $rName,$element['right']+1 );
+        if( DB::isError( $res = $this->dbh->query($query) ) )
+        {
+# FIXXME rollback
+            #$this->dbh->rollback();
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+
+        // remove the part of the tree where the element(s) was/were before
+        if( PEAR::isError($err=$this->_remove( $element )) )
+        {
+# FIXXME rollback
+            #$this->dbh->rollback();
+            return $err;
+        }
+# FIXXME commit all changes
+        #$this->dbh->commit();
+
+        return true;
     } // end of function
 
     /**
     *   update the tree element given by $id with the values in $newValues
     *
     *   @access     public
-    *   @author
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      int     the id of the element to update
     *   @param      array   the new values, the index is the col name
-    *   @return
+    *   @return     mixed   either true or an Tree_Error
     */
     function update( $id , $newValues )
     {
@@ -328,7 +512,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *
     *
     *   @access     public
-    *   @author
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
     *   @return
     */
@@ -346,7 +530,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
-    *   @return
+    *   @return     mixed   either the data of the root element or an Tree_Error
     */
     function getRoot()
     {
@@ -368,7 +552,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
-    *   @return
+    *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getElement( $id )
     {
@@ -394,7 +578,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
-    *   @return
+    *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getChild( $id )
     {
@@ -425,7 +609,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @version    2002/03/02
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
-    *   @return
+    *   @return     mixed   either the data of the requested elements or an Tree_Error
     */
     function getPath( $id )
     {
@@ -454,7 +638,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @version    2002/03/07
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
-    *   @return
+    *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getLeft( $id )
     {
@@ -481,7 +665,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @version    2002/03/07
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
-    *   @return
+    *   @return     mixed   either the data of the requested element or an Tree_Error
     */
     function getRight( $id )
     {
@@ -510,6 +694,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param
     *   @return     mixed   the array with the data of the parent element
     *                       or false, if there is no parent, if the element is the root
+    *                       or an Tree_Error
     */
     function getParent( $id )
     {
@@ -566,6 +751,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param
     *   @return     mixed   the array with the data of the next element
     *                       or false, if there is no next
+    *                       or Tree_Error
     */
     function getNext( $id )
     {
@@ -597,6 +783,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param
     *   @return     mixed   the array with the data of the previous element
     *                       or false, if there is no previous
+    *                       or a Tree_Error
     */
     function getPrevious( $id )
     {
@@ -618,6 +805,32 @@ class Tree_Dynamic_DBnested extends Tree_Common
         return $this->_prepareResult( $res );
     }
 
+    /**
+    *   returns if $childId is a child of $id
+    *
+    *   @abstract
+    *   @version    2002/04/29
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      int     id of the element
+    *   @param      int     id of the element to check if it is a child
+    *   @return     boolean true if it is a child
+    */
+    function isChildOf( $id , $childId )
+    {
+        // check simply if the left and right of the child are within the
+        // left and right of the parent, if so it definitly is a child :-)
+        $parent = $this->getElement( $id );
+        $child = $this->getElement( $childId );
+
+        if( $parent['left'] < $child['left'] &&
+            $parent['right'] > $child['right'] )
+        {
+            return true;
+        }
+
+        return false;
+    } // end of function
 
 
 
