@@ -178,6 +178,19 @@ class Tree_Common extends Tree_OptionsDB
     }
 
     /**
+    *
+    *
+    *   @version    2002/04/16
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    */
+    function getRootId()
+    {
+        $firstRoot = $this->getRoot();
+        return $firstRoot['id'];
+    }
+
+    /**
     *   returns the path as a string
     *
     *   @access     public
