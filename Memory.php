@@ -850,9 +850,9 @@ class Tree_Memory extends Tree_Common
     *   @param
     *
     */
-    function &getElement( $id )
+    function &getElement($id)
     {
-        return $this->_getElement( $id );
+        return $this->_getElement($id);
     }
 
     /**
@@ -908,11 +908,12 @@ class Tree_Memory extends Tree_Common
     *   @return     integer the id of the searched element
     *
     */
-    function &getElementByPath( $path , $startId=0 , $nodeName='name' , $seperator='/' )
+    function &getElementByPath($path,$startId=0,$nodeName='name',$seperator='/')
     {
-        $id = $this->getIdByPath( $path , $startId );
-        if( $id )
-            return $this->getElement( $id );
+        $id = $this->getIdByPath($path,$startId);
+        if ($id) {
+            return $this->getElement($id);
+        }
         return NULL;                                // return NULL since false might be interpreted as id 0
     }
 
@@ -1045,47 +1046,43 @@ class Tree_Memory extends Tree_Common
     *   @return     integer the id of the searched element
     *
     */
-    function getIdByPath( $path , $startId=0 , $nodeName='name' , $seperator='/' )
+    function getIdByPath($path,$startId=0,$nodeName='name',$seperator='/')
 // should this method be called getElementIdByPath ????
     {
         // if no start ID is given get the root
-        if( $startId==0 )
+        if ($startId==0) {
             $startId = $this->getFirstRootId();
-        else    // if a start id is given, get its first child to start searching there
-        {
+        } else {   // if a start id is given, get its first child to start searching there
             $startId = $this->getChildId($startId);
-            if( $startId == false )                 // is there a child to this element?
+            if ($startId==false) {                 // is there a child to this element?
                 return false;
+            }
         }
 
-        if( strpos( $path , $seperator )===0 )  // if a seperator is at the beginning strip it off
-            $path = substr( $path , strlen($seperator) );
-
-        $nodes = explode( $seperator , $path );
-
+        if (strpos($path,$seperator)===0) {  // if a seperator is at the beginning strip it off
+            $path = substr($path,strlen($seperator));
+        }
+        $nodes = explode($seperator,$path);
         $curId = $startId;
-        foreach( $nodes as $key=>$aNodeName )
-        {
+        foreach ($nodes as $key=>$aNodeName) {
             $nodeFound = false;
-            do
-            {
+            do {
 //print "search $aNodeName, in ".$this->data[$curId][$nodeName]."<br>";
-                if( $this->data[$curId][$nodeName] == $aNodeName )
-                {
+                if ($this->data[$curId][$nodeName] == $aNodeName) {
                     $nodeFound = true;
                     // do only save the child if we are not already at the end of path
                     // because then we need curId to return it
-                    if( $key < (sizeof($nodes)-1) )
+                    if ($key < (sizeof($nodes)-1)) {
                         $curId = $this->getChildId($curId);
+                    }
                     break;
                 }
                 $curId = $this->getNextId($curId);
 //print "curId = $curId<br>";
             }
-            while( $curId );
+            while($curId);
 
-            if( $nodeFound==false )
-            {
+            if($nodeFound==false) {
 //print 'NOT FOUND<br><br>';
                 return false;
             }
