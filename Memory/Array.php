@@ -203,12 +203,17 @@ print "<br>";
     }
 
     /**
-    *
+    *   add a new item to the tree
+    *   what is tricky here, we also need to add it to the source array
+    *   
+    *   @param  array   the data for the new node
+    *   @param  int     the ID of the parent node
+    *   @param  int     the ID of the previous node
     */
     function add( $data , $parentId , $previousId=null )
     {
         if (!isset($data['id'])) {
-            $data['id'] = $this->_id++;
+            $data['id'] = ++$this->_id;
         } elseif((int)$data['id'] > $this->_id) {
             // update the $this->_id if the data['id'] has a higher number, since
             // we dont want to overwrite anything. just in case
@@ -229,7 +234,18 @@ print "<br>";
         return $data['id'];
     }
 
-    // this one was a real quicky !!!
+    /**
+    *   we need to add the node to the source array
+    *   for this we have this private method which loops through 
+    *   the source array and adds it in the right place
+    *   
+    *   @param  mixed   the value of the array, as a reference, so we work right on the source
+    *   @param  mixed   the key of the node
+    *   @param  array   an array which contains the following
+    *                       new data, 
+    *                       parent ID under which to add the node, 
+    *                       the prvious ID
+    */
     function _add( &$val , $key , $data )
     {
         if ($val['id']==$data[1]) { // is the id of the current elment ($val) == to the parentId ($data[1])
