@@ -85,8 +85,7 @@ class Tree_Common extends Tree_OptionsDB
     }
 
     /**
-    *   gets all the children and grand children
-    *   i know there is no such word as 'childrens' but it makes sense here :-)
+    *   gets all the children and grand children etc.
     *
     *   @version    2002/09/30
     *   @access     public
@@ -97,12 +96,12 @@ class Tree_Common extends Tree_OptionsDB
     */
     function getAllChildren( $id )
     {
-        $retChildrens = false;
-        if( $childrens = $this->hasChildren( $id ) )
-        {
-            $retChildrens = $this->_getAllChildren( $id );
+        $retChildren = false;
+        if( $children = $this->hasChildren( $id ) )
+        {                  
+            $retChildren = $this->_getAllChildren( $id );
         }
-        return $retChildrens;
+        return $retChildren;
     }
 
     /**
@@ -118,16 +117,16 @@ class Tree_Common extends Tree_OptionsDB
     */
     function &_getAllChildren( $id )
     {
-        $retChildrens = array();
+        $retChildren = array();
         if( $children = $this->getChildren( $id ) )
         {
             foreach( $children as $key=>$aChild )
             {
-                $retChildrens[] = &$children[$key];
-                //$retChildrens = array_merge($retChildrens,$this->_getAllChildren( $aChild['id'] ));
+                $retChildren[] = &$children[$key];
+                $retChildren = array_merge($retChildren,$this->_getAllChildren( $aChild['id'] ));
             }
         }
-        return $retChildrens;
+        return $retChildren;
     }
 
     /**
@@ -142,13 +141,13 @@ class Tree_Common extends Tree_OptionsDB
     */
     function getAllChildrenIds( $id )
     {
-        if( $childrens = $this->getAllChildren($id) )
+        if( $allChildren = $this->getAllChildren($id) )
         {
-            $childrensIds = array();
-            foreach( $childrens as $aNode )
-                $childrensIds[] = $aNode['id'];
+            $childrenIds = array();
+            foreach( $allChildren as $aNode )
+                $childrenIds[] = $aNode['id'];
         }
-        return $childrensIds;
+        return $childrenIds;
     }
     /**
     *   get the id of the parent for the given element
