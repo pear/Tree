@@ -465,7 +465,7 @@ class Tree_Memory extends Tree_Common
         if ($this->removeRecursively != true) {
             if (isset( $this->data[$id]['child'] )) {
                 // TODO raise PEAR warning
-                return $this->_throwError("Element with id=$id has children "
+                return $this->_throwError("Element with id=$id has children ".
                                           "that cant be removed. Set ".
                                           "'setRemoveRecursively' to true to ".
                                           "allow this.",
@@ -1184,11 +1184,12 @@ class Tree_Memory extends Tree_Common
      * @param      mixed   $id     the id of the node to get
      *
      */
+/*
     function &getNode( $id )
     {
         //return $this->_getElement( $id );
     } // end of function
-
+*/
 
     // }}}
     // {{{ getIdByPath()
