@@ -403,7 +403,7 @@ class Tree_Memory extends Tree_Common
             if( isset( $this->data[$id]['child'] )  )
             {
 # TODO raise PEAR warning
-                return TREE_ERROR_HAS_CHILDREN;
+                return $this->_throwError("Element with id=$id has children, cant be removed. Set 'setRemoveRecursively' to true to allow this.",__LINE__);
             }
         }
 
@@ -1285,6 +1285,7 @@ class Tree_Memory extends Tree_Common
     */
     function copy( $srcId , $destId )
     {
+        return $this->dataSourceClass->copy( $srcId , $destId );
 /*
     remove all array elements after 'parent' since those had been created
     and remove id and set parentId and that should be it, build the tree and pass it to addNode
