@@ -483,9 +483,9 @@ class Tree_Memory extends Tree_Common
     *   @param      array   $data   the data to update
     *   @return     
     */
-    function update( $data )
+    function update( $id , $data )
     {
-        return $this->dataSourceClass->update($data);
+        return $this->dataSourceClass->update($id,$data);
     } // end of function
 
 
@@ -607,11 +607,7 @@ class Tree_Memory extends Tree_Common
         {
             foreach( $curLevel as $key=>$value )
             {
-                // call either an objects method or a function
-                if( is_array($walkFunction) )
-                    $ret = call_user_func( array($walkFunction[1],$walkFunction[0]) , $this->data[$key] );
-                else
-                    $ret = call_user_func( $walkFunction , $this->data[$key] );
+                $ret = call_user_func( $walkFunction , $this->data[$key] );
 
                 switch( $returnType )
                 {
@@ -1066,7 +1062,7 @@ class Tree_Memory extends Tree_Common
         $this->_getNodeMaxLevel = $depth ? ($depth + $level) : 0 ;
 #!!!        $this->_getNodeCurParent = $this->data['parent']['id'];
 
-        return $this->walk( array('_getNode',$this) , $startId , 'ifArray' );
+        return $this->walk( array(&$this,'_getNode') , $startId , 'ifArray' );
     } // end of function
 
     /**
