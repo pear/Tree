@@ -11,13 +11,25 @@ class tests_move extends UnitTest
     function test_MemoryDBnested()
     {
         $tree = $this->getMemoryDBnested();        
-        $ret=$tree->move(5,1);
+        $ret = $tree->move(5, 1);
         $tree->setup();
 
         // be sure true is returned
-        $this->assertSame(true,$ret);
+        $this->assertTrue($ret);
         // and check if the move succeeded, by checking the new parentId
         $this->assertEquals(1,$tree->getParentId(5));
+    }
+
+    function test_MemoryMDBnested()
+    {
+        $tree = $this->getMemoryMDBnested();        
+        $ret = $tree->move(5, 1);
+        $tree->setup();
+
+        // be sure true is returned
+        $this->assertTrue($ret);
+        // and check if the move succeeded, by checking the new parentId
+        $this->assertEquals(1, $tree->getParentId(5));
     }
 
     function test_MemoryDBnestedNoAction()
@@ -25,13 +37,25 @@ class tests_move extends UnitTest
         $tree = $this->getMemoryDBnested();        
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $parentId = $tree->getParentId(5);
-        $ret = $tree->move(5,5);
+        $ret = $tree->move(5, 5);
         $tree->setup();
         // be sure true is returned
-        $this->assertSame(true,$ret);
-        $this->assertEquals($parentId,$tree->getParentId(5));
+        $this->assertTrue($ret);
+        $this->assertEquals($parentId, $tree->getParentId(5));
     }
-    
+
+    function test_MemoryMDBnestedNoAction()
+    {
+        $tree = $this->getMemoryMDBnested();        
+//        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
+        $parentId = $tree->getParentId(5);
+        $ret = $tree->move(5, 5);
+        $tree->setup();
+        // be sure true is returned
+        $this->assertTrue($ret);
+        $this->assertEquals($parentId, $tree->getParentId(5));
+    }
+
     // do this for XML
             
     // do this for Filesystem
@@ -42,25 +66,46 @@ class tests_move extends UnitTest
     function test_DynamicDBnested()
     {
         $tree =& $this->getDynamicDBnested();
-        $ret=$tree->move(5,1);
+        $ret = $tree->move(5, 1);
 
         // be sure true is returned
-        $this->assertSame(true,$ret);
+        $this->assertTrue($ret);
         // and check if the move succeeded, by checking the new parentId
-        $this->assertEquals(1,$tree->getParentId(5));
+        $this->assertEquals(1, $tree->getParentId(5));
     }
-    
+
+    function test_DynamicMDBnested()
+    {
+        $tree =& $this->getDynamicDBnested();
+        $ret = $tree->move(5, 1);
+
+        // be sure true is returned
+        $this->assertTrue($ret);
+        // and check if the move succeeded, by checking the new parentId
+        $this->assertEquals(1, $tree->getParentId(5));
+    }
+
     function test_DynamicDBnestedNoAction()
     {
         $tree =& $this->getDynamicDBnested();
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $parentId = $tree->getParentId(5);
-        $ret = $tree->move(5,5);
+        $ret = $tree->move(5, 5);
         // be sure true is returned
-        $this->assertSame(true,$ret);
-        $this->assertEquals($parentId,$tree->getParentId(5));
+        $this->assertTrue($ret);
+        $this->assertEquals($parentId, $tree->getParentId(5));
     }
-    
+
+    function test_DynamicMDBnestedNoAction()
+    {
+        $tree =& $this->getDynamicMDBnested();
+//        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
+        $parentId = $tree->getParentId(5);
+        $ret = $tree->move(5, 5);
+        // be sure true is returned
+        $this->assertTrue($ret);
+        $this->assertEquals($parentId, $tree->getParentId(5));
+    }  
 }
 
 ?>

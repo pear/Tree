@@ -14,6 +14,12 @@ class tests_getPath extends UnitTest
         $this->_testPath($tree);
     }
 
+    function test_MemoryMDBnested()
+    {
+        $tree =& $this->getMemoryMDBnested();        
+        $this->_testPath($tree);
+    }
+
     // do this for XML
             
     // do this for Filesystem
@@ -26,6 +32,12 @@ class tests_getPath extends UnitTest
         $tree =& $this->getDynamicDBnested();
         $this->_testPath($tree);
     }
+
+    function test_DynamicMDBnested()
+    {
+        $tree =& $this->getDynamicMDBnested();
+        $this->_testPath($tree);
+    }
     
     function _testPath(&$tree)
     {
@@ -33,10 +45,10 @@ class tests_getPath extends UnitTest
         $id = 5;
         $path = $tree->getPath($id);
         
-        $this->assertEquals(3,sizeof($path));
-        $this->assertEquals('Root',$path[0]['name']);
-        $this->assertEquals('child 2',$path[1]['name']);
-        $this->assertEquals('child 2_2',$path[2]['name']);
+        $this->assertEquals(3, sizeof($path));
+        $this->assertEquals('Root', $path[0]['name']);
+        $this->assertEquals('child 2', $path[1]['name']);
+        $this->assertEquals('child 2_2', $path[2]['name']);
     }
 
 

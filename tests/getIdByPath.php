@@ -13,7 +13,15 @@ class tests_getIdByPath extends UnitTest
         $tree = $this->getMemoryDBnested();        
         $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         
-        $this->assertEquals(5,$id);
+        $this->assertEquals(5, $id);
+    }
+
+    function test_MemoryMDBnested()
+    {
+        $tree = $this->getMemoryMDBnested();        
+        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
+        
+        $this->assertEquals(5, $id);
     }
 
     // do this for XML
@@ -28,10 +36,16 @@ class tests_getIdByPath extends UnitTest
         $tree = $this->getDynamicDBnested();
         $id = $tree->getIdByPath('/Root/child 2/child 2_2');
 
-        $this->assertEquals(5,$id,'This is not implemented, yet!!! (This test should fail ... for now)');
+        $this->assertEquals(5, $id,'This is not implemented, yet!!! (This test should fail ... for now)');
     }
     
+    function test_DynamicMDBnested()
+    {
+        $tree = $this->getDynamicMDBnested();
+        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
 
+        $this->assertEquals(5, $id,'This is not implemented, yet!!! (This test should fail ... for now)');
+    }
 
 }
 

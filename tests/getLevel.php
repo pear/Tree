@@ -12,7 +12,14 @@ class tests_getLevel extends UnitTest
     {
         $tree = $this->getMemoryDBnested();        
         $id = $tree->getIdByPath('/Root/child 2/child 2_2');
-        $this->assertEquals(2,$tree->getLevel($id));
+        $this->assertEquals(2, $tree->getLevel($id));
+    }
+
+    function test_MemoryMDBnested()
+    {
+        $tree = $this->getMemoryMDBnested();        
+        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
+        $this->assertEquals(2, $tree->getLevel($id));
     }
 
     // do this for XML
@@ -27,9 +34,16 @@ class tests_getLevel extends UnitTest
         $tree =& $this->getDynamicDBnested();
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $id = 5;
-        $this->assertEquals(2,$tree->getLevel($id));
+        $this->assertEquals(2, $tree->getLevel($id));
     }
-    
+
+    function test_DynamicMDBnested()
+    {
+        $tree =& $this->getDynamicMDBnested();
+//        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
+        $id = 5;
+        $this->assertEquals(2, $tree->getLevel($id));
+    }
 }
 
 ?>

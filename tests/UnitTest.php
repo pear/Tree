@@ -15,7 +15,7 @@ class UnitTest extends PhpUnit_TestCase
         require 'sql.php'; 
         $db = DB::connect(DB_DSN);
         foreach ($dbStructure[$db->phptype]['setup'] as $aQuery) {
-            if (DB::isError($ret=$db->query($aQuery))) {
+            if (DB::isError($ret = $db->query($aQuery))) {
                 die($ret->getUserInfo());
             }
         }
@@ -39,16 +39,29 @@ class UnitTest extends PhpUnit_TestCase
     
     function &getMemoryDBnested()
     {
-        $tree = Tree::setup('Memory_DBnested',DB_DSN,array('table'=>TABLE_TREENESTED));
+        $tree = Tree::setup('Memory_DBnested', DB_DSN, array('table' => TABLE_TREENESTED));
         $tree->setup();
         return $tree;
     }
     
     function &getDynamicDBnested()
     {
-        $tree = Tree::setup('Dynamic_DBnested',DB_DSN,array('table'=>TABLE_TREENESTED));
+        $tree = Tree::setup('Dynamic_DBnested', DB_DSN, array('table' => TABLE_TREENESTED));
         return $tree;
     }
+ 
+    function &getMemoryMDBnested()
+    {
+        $tree = Tree::setup('Memory_MDBnested', DB_DSN, array('table' => TABLE_TREENESTED));
+        $tree->setup();
+        return $tree;
+    }
+    
+    function &getDynamicMDBnested()
+    {
+        $tree = Tree::setup('Dynamic_MDBnested', DB_DSN, array('table' => TABLE_TREENESTED));
+        return $tree;
+    } 
     
 }
 
