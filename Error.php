@@ -40,7 +40,7 @@ class Tree_Error extends PEAR_Error
     *   @param
     *   @return
     */
-    function Tree_Error( $msg , $line , $file , $mode=null , $userinfo )
+    function Tree_Error( $msg , $line , $file , $mode=null , $userinfo='no userinfo' )
     {
         $this->PEAR_Error(  sprintf("%s <br/>in %s [%d].", $msg, $file, $line),
                             null , $mode , null, $userinfo );
