@@ -66,7 +66,7 @@
     {
         # to let it work on the filesystem :-)
         $options = array( 'order' =>  'name');
-        $tree = new treeClass( 'Filesystem' , '/home/cain/tmp' , $options );
+        $tree = new treeClass( 'Filesystem' , dirname(__FILE__).'/tmp' , $options );
     }
 
     if( PEAR::isError($res=$tree->setup()) )
