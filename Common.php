@@ -175,6 +175,25 @@ class Tree_Common extends Tree_Options
         return $firstRoot['id'];
     }
 
+    /**
+    *   returns the path as a string
+    *
+    *   @access     public
+    *   @version    2002/03/28
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      mixed   $id     the id of the node to get the path for
+    *   @return     array   this array contains all elements from the root to the element given by the id
+    *
+    */
+    function getPathAsString( $id , $seperator='/' )
+    {
+        $path = $this->getPath($id);
+        foreach( $path as $aNode )
+            $ret.= $aNode['name'].$seperator;
+        return $ret;
+    } // end of function
+
 
 
 
