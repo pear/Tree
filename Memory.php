@@ -195,11 +195,9 @@ class Tree_Memory extends Tree_Common
     */
     function setupByRawData( $string )
     {
-# i dont know if this method is so cool since it is only for xml data
-# finding a better way would be cool
-# i.e. setupByRawData, which expects
+#  expects
 #   for XML an XML-String,
-#   for DB-a result set, may be or an array, dont know here
+#   for DB-a result set, may be or an array, dont know here - not implemented yet
         $res = $this->dataSourceClass->setupByRawData( $string );
         return $this->_setup( $res );
     }
@@ -372,13 +370,15 @@ class Tree_Memory extends Tree_Common
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      array $newValues this array contains the values that shall be inserted in the db-table
+    *   @param      int     the parent id
+    *   @param      int     the prevId
     *   @return     mixed   either boolean false on failure or the id of the inserted row
     */
-    function add( $newValues )
+    function add( $newValues , $parentId=0 , $prevId=0 )
     {
         // see comments in 'move' and 'remove'
 
-        return $this->dataSourceClass->add( $newValues );
+        return $this->dataSourceClass->add( $newValues , $parentId , $prevId );
     } // end of function
 
 
@@ -389,10 +389,9 @@ class Tree_Memory extends Tree_Common
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      mixed   $id     the id of the node to be removed
-    *                               or 0 or nothing if the entire tree shall be removed
     *   @return     boolean true on success
     */
-    function remove( $id=0 )
+    function remove( $id )
     {
         // if removing recursively is not allowed, which means every child should be removed
         // then check if this element has a child and return "sorry baby cant remove :-) "
@@ -405,13 +404,11 @@ class Tree_Memory extends Tree_Common
             }
         }
 
-        $ret = $this->walk( array('_remove',$this) , $id , 'array' );
-
         // see comment in 'move'
         // if the prevId is in use we need to update the prevId of the element after the one that
         // is removed too, to have the prevId of the one that is removed!!!
 
-        return $this->dataSourceClass->remove( $ret );
+        return $this->dataSourceClass->remove( $id );
     }
 
     /**
