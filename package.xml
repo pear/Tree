@@ -36,7 +36,7 @@
         <license>PHP License</license>
         <state>beta</state>
         <notes>
-            - change in API! getChildrens[Ids] became getAllChildren[Ids] (since that is proper english)
+            - bugfix in getAllChildren[Ids], before it only worked for one level below
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
