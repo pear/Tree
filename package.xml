@@ -8,6 +8,19 @@
   Generic tree management, currently supports DB and XML as data sources
   </summary>
   <description>
+    Provides methods to read and manipulate trees, which are stored in the DB
+    or an XML file. The trees can be stored in the DB either as nested trees.
+    Or as simple trees ('brain dead method'), which use parentId-like structure.
+    Currently XML data can only be read from a file and accessed.
+    The package offers a big number of methods to access and manipulate trees.
+    For example methods like: getRoot, getChild[ren], getParent, getPath and many
+    more.
+    There are two ways of retreiving the data from the place where they are stored,
+    one is by reading the entire tree into the memory - the Memory way. The other
+    is reading the tree nodes as needed (very useful in combination with huge trees
+    and the nested set model).
+    The package is designed that way that it is possible to convert/copy tree data
+    from either structure to another (from XML into DB).
   </description>
   <maintainers>
     <maintainer>
@@ -18,8 +31,10 @@
     </maintainer>
   </maintainers>
     <release>
-        <license>PHP</license>
-        <state>snapshot</state>
+        <version>0.1</version>
+        <date>2002-07-27</date>
+        <license>PHP License</license>
+        <state>beta</state>
         <notes>
             Initial snapshot release
         </notes>
