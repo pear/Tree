@@ -381,7 +381,10 @@ class Tree_Memory extends Tree_Common
     {
         // see comments in 'move' and 'remove'
 
-        return $this->dataSourceClass->add( $newValues , $parentId , $prevId );
+        if( method_exists($this->dataSourceClass,'add') )
+            return $this->dataSourceClass->add( $newValues , $parentId , $prevId );
+        else
+            return $this->_throwError( 'method not implemented yet.' , __LINE__ );
     } // end of function
 
 
@@ -411,7 +414,10 @@ class Tree_Memory extends Tree_Common
         // if the prevId is in use we need to update the prevId of the element after the one that
         // is removed too, to have the prevId of the one that is removed!!!
 
-        return $this->dataSourceClass->remove( $id );
+        if( method_exists($this->dataSourceClass,'add') )
+            return $this->dataSourceClass->remove( $id );
+        else
+            return $this->_throwError( 'method not implemented yet.' , __LINE__ );
     }
 
     /**
@@ -519,7 +525,10 @@ class Tree_Memory extends Tree_Common
         // and it has to change the prevId of the element that will be after it
         // so we may be simply call some method like 'update' too?
 
-        return $this->dataSourceClass->move( $idToMove , $newParentId , $prevId );
+        if( method_exists($this->dataSourceClass,'add') )
+            return $this->dataSourceClass->move( $idToMove , $newParentId , $prevId );
+        else
+            return $this->_throwError( 'method not implemented yet.' , __LINE__ );
     } // end of function
 
     /**
@@ -529,11 +538,14 @@ class Tree_Memory extends Tree_Common
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      array   $data   the data to update
-    *   @return     
+    *   @return
     */
     function update( $id , $data )
     {
-        return $this->dataSourceClass->update($id,$data);
+        if( method_exists($this->dataSourceClass,'add') )
+            return $this->dataSourceClass->update($id,$data);
+        else
+            return $this->_throwError( 'method not implemented yet.' , __LINE__ );
     } // end of function
 
 
@@ -1285,7 +1297,10 @@ class Tree_Memory extends Tree_Common
     */
     function copy( $srcId , $destId )
     {
-        return $this->dataSourceClass->copy( $srcId , $destId );
+        if( method_exists($this->dataSourceClass,'add') )
+            return $this->dataSourceClass->copy( $srcId , $destId );
+        else
+            return $this->_throwError( 'method not implemented yet.' , __LINE__ );
 /*
     remove all array elements after 'parent' since those had been created
     and remove id and set parentId and that should be it, build the tree and pass it to addNode
