@@ -32,7 +32,13 @@ class Tree_Memory_Array
 {
 
     var $data = array();
-
+             
+    /**
+    *   this is the internal id that will be assigned if no id is given
+    *   it simply counts from 1, so we can check if( $id ) i am lazy :-)
+    */
+    var $_id = 1;
+    
     /**
     *   set up this object
     *
@@ -62,26 +68,42 @@ class Tree_Memory_Array
         if( is_array($this->_array) )
         {
             $this->data[0] = null;
-            $this->_setup(array($this->_array));
+            $theData = array(&$this->_array);
+            $this->_setup($theData);
         }
-
+                              
         return $this->data;
     }
-
-    var $_id = 0;
-    function _setup( $array , $parentId=0 )
+             
+    /**
+    *   we modify the $this->_array in here, we also add the id
+    *   so methods like 'add' etc can find the elements they are searching for,
+    *   if you dont like your data to be modified dont pass them as reference!
+    */
+    function _setup( &$array , $parentId=0 )
     {
-        foreach( $array as $aNode )
+        foreach( $array as $nodeKey=>$aNode )
         {
-            $this->_id++;                                                                          
-            $newData = array('id'=>$this->_id,'name'=>$aNode['name'],'parentId'=>$parentId);
-            foreach( $aNode as $key=>$val )
-                if( !is_array($val) )
-                    $newData[$key] = $val;
+            $newData = $aNode;
+            if( !$newData['id'] )
+            {
+                $newData['id'] = $this->_id++;
+                $array[$nodeKey]['id'] = $newData['id'];
+            }
+
+            $newData['parentId'] = $parentId;
+            $children = null;
+            foreach( $newData as $key=>$val ) // remove the 'children' array, since this is only info for this class
+            {
+                if( $key=='children' )
+                {
+                    unset($newData[$key]);
+                }
+            }
+
             $this->data[] = $newData;
-            //$this->data[] = array('id'=>$this->_id,'name'=>$aNode['name'],'parentId'=>$parentId);
             if( $aNode['children'] )
-                $this->_setup( $aNode['children'] , $this->_id );
+                $this->_setup( $array[$nodeKey]['children'] , $newData['id'] );
         }
     }
 
@@ -139,7 +161,35 @@ class Tree_Memory_Array
         }
         return $result;
     }
+                                       
+    /**
+    *
+    */
+    function add( $data , $parentId , $previousId=0 )
+    {
+        $data['id'] = $this->_id++;
+        $data['parentId'] = $parentId;
+        $this->data[] = $data;
 
+        // add the element itself also in the source array, where we actually read the structure from
+        //$path = $this->getPathById($parentId);
+        array_walk($this->_array['children'],array(&$this,'_add'),array($data,$parentId));
+
+        //$this->_array
+        return $data['id'];
+    }
+
+    // this one was a real quicky !!!
+    function _add( &$val , $key , $data )
+    {
+        if( $val['id']==$data[1] )
+            $val['children'][] = $data[0];
+        else    // if we havent found the new element go on searching
+        {
+            if( $val['children'] )
+                array_walk($val['children'],array(&$this,'_add'),$data);
+        }
+    }
 
 } // end of class
 ?>
