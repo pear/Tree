@@ -71,11 +71,13 @@
                     <file role="doc">Memory_DBsimple.php</file>
                     <file role="doc">Memory_DBnested.php</file>
                     <file role="doc">config.xml</file>
+                    <!--  well noone moved this dir for me yet :-( do u get no example 
                     <dir name="TreeEditor_Memory">
                         <file role="php">index.php</file>
                         <dir name="tmp">
                         </dir>
                     </dir>
+                    -->
                 </dir>
             </dir>
         </filelist>
