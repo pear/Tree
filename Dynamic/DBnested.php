@@ -305,7 +305,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $lName,$element['left'] );
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-            // the rollback shall be done by the method calling this one, since it is only private
+            // the rollback shall be done by the method calling this one, since it is only private we can do that
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
@@ -320,7 +320,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             // the rollback shall be done by the method calling this one, since it is only private
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
-# FIXXME commit
+# FIXXME commit - should that not also be done in the method calling this one? like when an error occurs?
         #$this->dbh->commit();
         return true;
     } // end of function
