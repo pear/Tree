@@ -205,7 +205,7 @@ print "<br>";
     /**
     *
     */
-    function add( $data , $parentId , $previousId=0 )
+    function add( $data , $parentId , $previousId=null )
     {
         if (!isset($data['id'])) {
             $data['id'] = $this->_id++;
@@ -233,13 +233,12 @@ print "<br>";
     function _add( &$val , $key , $data )
     {
         if ($val['id']==$data[1]) { // is the id of the current elment ($val) == to the parentId ($data[1])
-/*            if (isset($data[2])) {  // is there a previousId given?
-                foreach ($val['children'] as $aChild)
+            if (isset($data[2]) && $data[2]===0 ) {  
+                // if the previousId is 0 means, add it as the first member
+                $val['children'] = array_merge(array($data[0]),$val['children']);
             } else {
                 $val['children'][] = $data[0];
             }
-*/
-            $val['children'][] = $data[0];
         } else {        // if we havent found the new element go on searching
             if (isset($val['children'])) {
                 array_walk($val['children'],array(&$this,'_add'),$data);
