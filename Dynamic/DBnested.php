@@ -1,5 +1,5 @@
 <?php
-//
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
@@ -1120,16 +1120,15 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * i.e. there should only be one path /x/y/z
      * experimental: the name can be non unique if same names are in different levels
      *
-     * @version    2003/04/29
+     * @version    2003/05/11
      * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @author     Pierre-Alain Joye <paj@pearfr.org>
      * @param      string   $path       the path to search for
      * @param      integer  $startId    the id where to start the search
      * @param      string   $nodeName   the name of the key that contains
      *                                  the node name
      * @param      string   $seperator  the path seperator
      * @return     integer  the id of the searched element
-     *
      */
     function getIdByPath($path,$startId=0,$nodeName='name',$separator='/')
     // should this method be called getElementIdByPath ????
@@ -1164,89 +1163,60 @@ class Tree_Dynamic_DBnested extends Tree_Common
             // Not clean, we should call hasChildren, but I do not
             // want to call getELement again :). See TODO
             $startHasChild = ($rangeEnd-$rangeStart)>1?true:false;
+            $cwd = '/'.$this->getPathAsString($startId);
         } else {
+            $cwd = '/';
             $startHasChild = false;
         }
-
-        $elems = explode($separator,$path);
-        $cntElems=sizeof($elems);
-        if ($cntElems) {
-            $beginSlash=$beginSlash= false;
-            if ($cntElems==1 && empty($elems[0])) {
-                return $this->_throwError(
-                    'getIdByPath: Empty path not allowed' , __LINE__ );
-            }else {
-                for($i=1;$i<$cntElems-1;$i++){
-                    if(empty($elems[$i])){
-                        return $this->_throwError(
-                            "getIdByPath: Invalid path <$path>" , __LINE__ );
-                    }
-                }
-                // beginning with a slash
-                if(empty($elems[0])){
-                    $beginSlash = true;
-                    array_shift($elems);
-                    $cntElems--;
-                }
-                // ending with a slash
-                if (empty($elems[$cntElems-1])) {
-                    $endSlash = true;
-                    array_pop($elems);
-                    $cntElems--;
-                }
-                if (!$cntElems) {
-                    return $this->_throwError(
-                        "getIdByPath: Invalid path <$path>" , __LINE__ );
-                }
-                $cntElems = sizeof($elems);
-                if ($cntElems==1) {
-                    $query = "SELECT
-                            ".$this->_getColName('id')."
+        $t = $this->_preparePath($path, $cwd, $separator);
+        if (Tree::isError($t)) {
+            return $t;
+        }
+        list($elems, $sublevels) = $t;
+        $cntElems = sizeof($elems);
+        if ($cntElems==1) {
+            $query = "SELECT
+                    ".$this->_getColName('id')."
+                FROM
+                    ".$this->table."
+                WHERE
+                    ".$this->_getColName('name')."='".$elems[0]."'
+                ";
+            if ($startHasChild) {
+                $query  .= " AND (".
+                            $this->_getColName('left').">".$rangeStart.
+                            " AND ".
+                            $this->_getColName('right')."<".$rangeEnd.")";
+            }
+            $res = $this->dbh->getOne($query);
+            if (DB::isError($res)) {
+                return $this->_throwError($res->getMessage(),
+                            __LINE__);
+            }
+        } else {
+            $query = "SELECT
+                            ".$this->_getColName('id').",
+                            ".$this->_getColName('left').",
+                            ".$this->_getColName('right').",
+                            ".$this->_getColName('name')."
                         FROM
                             ".$this->table."
                         WHERE
-                            ".$this->_getColName('name')."='".$elems[0]."'
-                        ";
-                    if ($startHasChild) {
-                        $query  .= " AND (".
-                                    $this->_getColName('left').">".$rangeStart.
-                                    " AND ".
-                                    $this->_getColName('right')."<".$rangeEnd.")";
-                    }
-                    $res = $this->dbh->getOne($query);
-                    if (DB::isError($res)) {
-                        return $this->_throwError($res->getMessage(),
-                                    __LINE__);
-                    }
-                } else {
-                    $query = "SELECT
-                                    ".$this->_getColName('id').",
-                                    ".$this->_getColName('left').",
-                                    ".$this->_getColName('right').",
-                                    ".$this->_getColName('name')."
-                                FROM
-                                    ".$this->table."
-                                WHERE
-                                    ".$this->_getColName('name').
-                                    "='".$elems[$cntElems-1]."'";
-                    if ($startHasChild) {
-                        $query  .= " AND (".
-                                    $this->_getColName('left').">".$rangeStart.
-                                    " AND ".
-                                    $this->_getColName('right')."<".$rangeEnd.")";
-                    }
-                    $res = $this->dbh->getOne($query);
-                    if (DB::isError($res)) {
-                        return $this->_throwError($res->getMessage(),
-                                    __LINE__);
-                    }
-
-                }
-                return ($res?(int)$res:false);
+                            ".$this->_getColName('name').
+                            "='".$elems[$cntElems-1]."'";
+            if ($startHasChild) {
+                $query  .= " AND (".
+                            $this->_getColName('left').">".$rangeStart.
+                            " AND ".
+                            $this->_getColName('right')."<".$rangeEnd.")";
+            }
+            $res = $this->dbh->getOne($query);
+            if (DB::isError($res)) {
+                return $this->_throwError($res->getMessage(),
+                            __LINE__);
             }
         }
-        return $this->_throwError(
-            'getIdByPath: Empty path not allowed' , __LINE__ );
+        return ($res?(int)$res:false);
     }
 
     // }}}
