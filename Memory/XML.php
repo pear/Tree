@@ -18,7 +18,7 @@
 //
 //  $Id$
 
-require_once "XML/Parser.php";
+require_once 'XML/Parser.php';
 
 /**
  *   the XML interface for the tree class
@@ -62,6 +62,8 @@ class Tree_Memory_XML extends XML_Parser
      */
     var $_toLower = true;
 
+    // {{{ Tree_Memory_XML()
+
     /**
      *
      *
@@ -70,7 +72,7 @@ class Tree_Memory_XML extends XML_Parser
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @return     boolean     true on success
      */
-    function Tree_Memory_XML( $dsn , $options )
+    function Tree_Memory_XML($dsn, $options)
     {
         $handle = $dsn;
 
@@ -84,6 +86,9 @@ class Tree_Memory_XML extends XML_Parser
             return $this->raiseError("No filename passed.");
         }
     }
+
+    // }}}
+    // {{{ startHandler()
 
     /**
      *
@@ -103,16 +108,16 @@ class Tree_Memory_XML extends XML_Parser
                                         strtolower($element):$element;
         $this->data[$curId]['level'] = $this->level;
         $this->data[$curId]['attributes'] = $attribs;
-        if( $this->_toLower )
+        if($this->_toLower)
         {
             $this->data[$curId]['attributes'] = array();
-            foreach( $attribs as $key=>$value )
+            foreach($attribs as $key=>$value)
                 $this->data[$curId]['attributes'][strtolower($key)] = $value;
         }
 
         // is that a new child, or just a 'next' of a child?
         if (isset($this->data[$elementBeforeId]['level']) &&
-            $this->level == $this->data[$elementBeforeId]['level'] ) {
+            $this->level == $this->data[$elementBeforeId]['level']) {
             $this->data[$curId]['parentId'] =
                     $this->data[$elementBeforeId]['parentId'];
         } else {
@@ -129,6 +134,9 @@ class Tree_Memory_XML extends XML_Parser
         $this->level++;
     }
 
+    // }}}
+    // {{{ endHandler()
+
     /**
      *
      *
@@ -141,6 +149,9 @@ class Tree_Memory_XML extends XML_Parser
     {
         $this->level--;
     }
+
+    // }}}
+    // {{{ cdataHandler()
 
     /**
      *
@@ -157,11 +168,14 @@ class Tree_Memory_XML extends XML_Parser
 # ANSWER: if you call xml_parse($parser, "foo ", false) and then
 #         xml_parse($parser, "bar", true), callbacks are done once
 #         for each xml_parse() call.
-        if( !isset($this->data[ sizeof($this->data)-1 ]['cdata']) )
+        if(!isset($this->data[ sizeof($this->data)-1 ]['cdata']))
             $this->data[ sizeof($this->data)-1 ]['cdata'] = '';
 #print "cdata = '$cdata'\r\n";
         $this->data[ sizeof($this->data)-1 ]['cdata'].= $cdata;
     }
+
+    // }}}
+    // {{{ defaultHandler()
 
     /**
      *
@@ -177,8 +191,8 @@ class Tree_Memory_XML extends XML_Parser
         // not in use yet :-( is that ok??
     }
 
-
-
+    // }}}
+    // {{{ setup()
 
     /**
      * read the data from the xml file and prepare them so the tree
@@ -194,7 +208,10 @@ class Tree_Memory_XML extends XML_Parser
         $this->parse();
 
         return $this->data;
-    } // end of function
+    }
+
+    // }}}
+    // {{{ setupByRawData()
 
     /**
      * read the data from an xml string and prepare them so the tree
@@ -205,12 +222,15 @@ class Tree_Memory_XML extends XML_Parser
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @return     boolean     true on success
      */
-    function setupByRawData( $xmlString )
+    function setupByRawData($xmlString)
     {
-        $this->parseString( $xmlString , true );
+        $this->parseString($xmlString, true);
 
         return $this->data;
     }
+
+    // }}}
+    // {{{ add()
 
     /**
      * TO BE IMPLEMNTED
@@ -228,7 +248,7 @@ class Tree_Memory_XML extends XML_Parser
      * @return  mixed   either boolean false on failure or the id
      *                  of the inserted row
      */
-/*    function add( $newValues )
+/*    function add($newValues)
     {
         // add the data in the internal structure $this->data
         $this->data[sizeof($this->data)] = $newValues;
@@ -243,44 +263,52 @@ class Tree_Memory_XML extends XML_Parser
 #        // and regenerate the xml file
 #        $this->_writeFile();
 
-    } // end of function
+    }
 */
+
+    // }}}
+    // {{{ remove()
+
     /**
-    * TO BE IMPLEMNTED
-    * removes the given node
-    *
-    * @version  2001/10/09
-    * @access     public
-    * @author   Wolfram Kriesing <wolfram@kriesing.de>
-    * @param    mixed   $id   the id of the node to be removed
-    * @return   boolean true on success
-    */
-/*    function remove( $id )
+     * TO BE IMPLEMNTED
+     * removes the given node
+     *
+     * @version  2001/10/09
+     * @access     public
+     * @author   Wolfram Kriesing <wolfram@kriesing.de>
+     * @param    mixed   $id   the id of the node to be removed
+     * @return   boolean true on success
+     */
+/*    function remove($id)
     {
         // remove the data from this->data
         unset($this->data[$id]);
 
 # see comment in "add"-method
-    } // end of function
+    }
 */
+
+    // }}}
+    // {{{ move()
+
     /**
-    * TO BE IMPLEMNTED
-    * move an entry under a given parent or behind a given entry
-    *
-    * @version    2001/10/10
-    * @access     public
-    * @author     Wolfram Kriesing <wolfram@kriesing.de>
-    * @param      integer if prevId is given the element with the id idToMove shall be moved _behind_ element with id=prevId
-    *                     before would be easier, but then no element could be inserted at the end :-/
-    * @return     boolean     true for success
-    */
-/*    function move( $idToMove , $newParentId , $prevId=0 )
+     * TO BE IMPLEMNTED
+     * move an entry under a given parent or behind a given entry
+     *
+     * @version    2001/10/10
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @param      integer if prevId is given the element with the id idToMove shall be moved _behind_ element with id=prevId
+     *                     before would be easier, but then no element could be inserted at the end :-/
+     * @return     boolean     true for success
+     */
+/*    function move($idToMove, $newParentId, $prevId=0)
     {
         $this->data[$idToMove]['parentId'] = $newParentId;
         $this->data[$idToMove]['prevId'] = $prevId;
 
 # see comment in "add"-method
-    } // end of function
+    }
 */
 
 }

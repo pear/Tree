@@ -28,6 +28,8 @@
 */
 class Tree
 {
+    // {{{ setupMemory()
+
     /**
      * setup an object which works on trees that are temporarily saved in
      * memory dont use with huge trees, suggested is a maximum size of tree
@@ -56,14 +58,17 @@ class Tree
      * @param  mixed   the dsn, or filename, etc., empty i.e. for XML
      *                 if you use setupByRawData
      */
-    function &setupMemory( $type , $dsn='' , $options=array() )
+    function &setupMemory($type, $dsn='', $options=array())
     {
-        # if anyone knows a better name it would be great to change it.
-        # since "setupMemory" kind of reflects it but i think it's not obvious
-        # if you dont know what is meant
+        // if anyone knows a better name it would be great to change it.
+        // since "setupMemory" kind of reflects it but i think it's not obvious
+        // if you dont know what is meant
         include_once('Tree/Memory.php');
-        return new Tree_Memory( $type , $dsn , $options );
-    } // end of function
+        return new Tree_Memory($type, $dsn, $options);
+    }
+
+    // }}}
+    // {{{ setupDynamic()
 
     /**
      * setup an object that works on trees where each element(s) are read
@@ -83,15 +88,18 @@ class Tree
      *                   it would be the filename
      * @param    array   the options you want to set
      */
-    function &setupDynamic( $type , $dsn , $options=array() )
+    function &setupDynamic($type, $dsn, $options=array())
     {
-        # "dynamic" stands for retreiving a tree(chunk) dynamically when needed,
-        # better name would be great :-)
+        // "dynamic" stands for retreiving a tree(chunk) dynamically when needed,
+        // better name would be great :-)
         include_once("Tree/Dynamic/$type.php");
         $className = 'Tree_Dynamic_'.$type;
-        $obj = & new $className( $dsn , $options );
+        $obj = & new $className($dsn, $options);
         return $obj;
-    } // end of function
+    }
+
+    // }}}
+    // {{{ setup()
 
     /**
      * this is just a wrapper around the two setup methods above
@@ -121,7 +129,7 @@ class Tree
      *              'mysql://root@localhost/test',
      *              array('table'=>'nestedTree')
      *          );
-     * $tree = Tree::setup( 'Dynamic_XML' , '/path/to/some/xml/file.xml' );
+     * $tree = Tree::setup('Dynamic_XML', '/path/to/some/xml/file.xml');
      * </code>
      *
      * and those would be really cool to have one day:
@@ -136,12 +144,16 @@ class Tree
      *                  for XML it would be the filename
      * @param array     the options you want to set
      */
-    function setup( $type , $dsn='' , $options=array() )
+    function setup($type, $dsn='', $options=array())
     {
-        $type = explode( '_' , $type );
+        $type = explode('_', $type);
         $method = 'setup'.$type[0];
-        return Tree::$method( $type[1] , $dsn , $options );
+        return Tree::$method($type[1], $dsn, $options);
     }
+
+    // }}}
+    // {{{ isError()
+
     /**
       * Tell whether a result code from a DB method is an error
       *
@@ -157,5 +169,7 @@ class Tree
                 (get_class($value) == 'tree_error' ||
                  is_subclass_of($value, 'tree_error')));
     }
+
+    // }}}
 }
 ?>

@@ -18,7 +18,7 @@
 //
 //  $Id$
 
-require_once('Tree/Error.php');
+require_once 'Tree/Error.php';
 
 /**
  * EXPERIMENTAL
@@ -35,9 +35,11 @@ class Tree_Memory_Array
 
     /**
      * this is the internal id that will be assigned if no id is given
-     * it simply counts from 1, so we can check if( $id ) i am lazy :-)
+     * it simply counts from 1, so we can check if($id) i am lazy :-)
      */
     var $_id = 1;
+
+    // {{{ Tree_Memory_Array()
 
     /**
      * set up this object
@@ -48,11 +50,14 @@ class Tree_Memory_Array
      * @param      string  $dsn    the path on the filesystem
      * @param      array   $options  additional options you can set
      */
-    function Tree_Memory_Array( &$array , $options=array() )
+    function Tree_Memory_Array(&$array, $options=array())
     {
         $this->_array = &$array;
         $this->_options = $options; // not in use currently
-    } // end of function
+    }
+
+    // }}}
+    // {{{ setup()
 
     /**
      *
@@ -73,12 +78,15 @@ class Tree_Memory_Array
         return $this->data;
     }
 
+    // }}}
+    // {{{ _setup()
+
     /**
      * we modify the $this->_array in here, we also add the id
      * so methods like 'add' etc can find the elements they are searching for,
      * if you dont like your data to be modified dont pass them as reference!
      */
-    function _setup( &$array , $parentId=0 )
+    function _setup(&$array, $parentId=0)
     {
         foreach ($array as $nodeKey=>$aNode) {
             $newData = $aNode;
@@ -99,7 +107,7 @@ class Tree_Memory_Array
             $children = null;
             // remove the 'children' array, since this is only info for
             // this class
-            foreach ( $newData as $key=>$val ) {
+            foreach ($newData as $key=>$val) {
                 if ($key=='children') {
                     unset($newData[$key]);
                 }
@@ -110,11 +118,14 @@ class Tree_Memory_Array
                 if (!isset($array[$nodeKey]['children'])) {
                     $array[$nodeKey]['children'] = array();
                 }
-                $this->_setup( $array[$nodeKey]['children'] , $newData['id'] );
+                $this->_setup($array[$nodeKey]['children'], $newData['id']);
             }
         }
     }
 
+
+    // }}}
+    // {{{ setData()
 
     /**
      * this is mostly used by switchDataSource
@@ -136,6 +147,9 @@ class Tree_Memory_Array
         $this->_array = $this->_array['children'][0];
     }
 
+    // }}}
+    // {{{ _prepareResults()
+
     /**
      * prepare multiple results
      *
@@ -144,13 +158,16 @@ class Tree_Memory_Array
      * @version    2002/03/03
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function _prepareResults( $results )
+    function _prepareResults($results)
     {
         $newResults = array();
-        foreach( $results as $aResult )
+        foreach($results as $aResult)
             $newResults[] = $this->_prepareResult($aResult);
         return $newResults;
     }
+
+    // }}}
+    // {{{ _prepareResult()
 
     /**
      * map back the index names to get what is expected
@@ -159,18 +176,21 @@ class Tree_Memory_Array
      * @version    2002/03/03
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function _prepareResult( $result )
+    function _prepareResult($result)
     {
         $map = $this->getOption('columnNameMaps');
 
-        if( $map )
-        foreach( $map as $key=>$columnName )
+        if($map)
+        foreach($map as $key=>$columnName)
         {
             $result[$key] = $result[$columnName];
             unset($result[$columnName]);
         }
         return $result;
     }
+
+    // }}}
+    // {{{ add()
 
     /**
      * add a new item to the tree
@@ -180,7 +200,7 @@ class Tree_Memory_Array
      * @param  int     the ID of the parent node
      * @param  int     the ID of the previous node
      */
-    function add( $data , $parentId , $previousId=null )
+    function add($data, $parentId, $previousId=null)
     {
         if (!isset($data['id'])) {
             $data['id'] = ++$this->_id;
@@ -205,6 +225,9 @@ class Tree_Memory_Array
         return $data['id'];
     }
 
+    // }}}
+    // {{{ _add()
+
     /**
      * we need to add the node to the source array
      * for this we have this private method which loops through
@@ -218,11 +241,11 @@ class Tree_Memory_Array
      *                 parent ID under which to add the node,
      *                 the prvious ID
      */
-    function _add( &$val , $key , $data )
+    function _add(&$val, $key, $data)
     {
         // is the id of the current elment ($val) == to the parentId ($data[1])
         if ($val['id']==$data[1]) {
-            if (isset($data[2]) && $data[2]===0 ) {
+            if (isset($data[2]) && $data[2]===0) {
                 // if the previousId is 0 means, add it as the first member
                 $val['children'] = array_merge(array($data[0]),
                                                 $val['children']);
@@ -235,6 +258,9 @@ class Tree_Memory_Array
             }
         }
     }
+
+    // }}}
+    // {{{ update()
 
     /**
      * update an entry with the given id and set the data as given
@@ -258,6 +284,9 @@ class Tree_Memory_Array
         }
     }
 
+    // }}}
+    // {{{ _update()
+
     /**
      * update the element with the given id
      *
@@ -269,7 +298,7 @@ class Tree_Memory_Array
      *                  [1] are the new data we shall set
      * @return void
      */
-    function _update( &$val , $key , $data )
+    function _update(&$val, $key, $data)
     {
         // is the id of the current elment ($val) == to the parentId ($data[1])
         if ($val['id']==$data[0]) {
@@ -284,6 +313,9 @@ class Tree_Memory_Array
             }
         }
     }
+
+    // }}}
+    // {{{ remove()
 
     /**
      * remove an element from the tree
@@ -300,6 +332,9 @@ class Tree_Memory_Array
         }
     }
 
+    // }}}
+    // {{{ _remove()
+
     /**
      * remove the element with the given id
      * this will definitely remove all the children too
@@ -310,7 +345,7 @@ class Tree_Memory_Array
      * @param  int      the id of the element to be removed
      * @return void
      */
-    function _remove( &$val , $id )
+    function _remove(&$val, $id)
     {
         if (isset($val['children'])) {
             foreach ($val['children'] as $key=>$aVal) {
@@ -327,5 +362,6 @@ class Tree_Memory_Array
         }
     }
 
-} // end of class
+    // }}}
+}
 ?>

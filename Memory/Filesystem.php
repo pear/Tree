@@ -18,7 +18,7 @@
 //
 //  $Id$
 
-require_once('Tree/Error.php');
+require_once 'Tree/Error.php';
 
 /**
  * the Filesystem interface to the tree class
@@ -52,6 +52,8 @@ require_once('Tree/Error.php');
                         'columnNameMaps'=>array(),
                     );
 
+    // {{{ Tree_Memory_Filesystem()
+
     /**
      * set up this object
      *
@@ -61,12 +63,15 @@ require_once('Tree/Error.php');
      * @param      string  $dsn    the path on the filesystem
      * @param      array   $options  additional options you can set
      */
-    function Tree_Memory_Filesystem ($path , $options=array())
+    function Tree_Memory_Filesystem ($path, $options=array())
     {
         $this->_path = $path;
         // not in use currently
         $this->_options = $options;
-    } // end of function
+    }
+
+    // }}}
+    // {{{ setup()
 
     /**
      * retreive all the navigation data from the db and call build to build
@@ -83,34 +88,38 @@ require_once('Tree/Error.php');
         unset($this->data);
         if (is_dir($this->_path)) {
             $this->data[$this->_path] = array(
-                                        'id'=>$this->_path,
-                                        'name'=>$this->_path,
-                                        'parentId'=>0
-                                    );
-            $this->_setup($this->_path,$this->_path);
+                                          'id'       => $this->_path,
+                                          'name'     => $this->_path,
+                                          'parentId' => 0
+                                        );
+            $this->_setup($this->_path, $this->_path);
         }
         return $this->data;
     }
 
-    function _setup( $path , $parentId=0 )
+    // }}}
+    // {{{ _setup()
+
+    function _setup($path, $parentId=0)
     {
         if ($handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
-                if( $file != '.' && $file != '..' &&
-                    is_dir("$path/$file")) {
+                if($file != '.' && $file != '..'
+                    && is_dir("$path/$file")) {
                     $this->data[] = array(
-                                        'id'=>"$path/$file",
-                                        'name'=>$file,
-                                        'parentId'=>$parentId
+                                        'id'       => "$path/$file",
+                                        'name'     => $file,
+                                        'parentId' => $parentId
                                     );
-                    $this->_setup( "$path/$file" , "$path/$file" );
+                    $this->_setup("$path/$file", "$path/$file");
                 }
             }
             closedir($handle);
         }
-
     }
 
+    // }}}
+    // {{{ add()
 
     /**
      * this is tricky on a filesystem, since we are working with id's
@@ -118,46 +127,55 @@ require_once('Tree/Error.php');
      * a node under is the same as when the tree was last read.
      * but this might be tricky.
      */
-    function add( $newValues , $parent=0 , $prevId=0 )
+    function add($newValues, $parent=0, $prevId=0)
     {
-        if( !$parent ) {
+        if(!$parent) {
             $parent = $this->path;
         }
         # FIXXME do the mapping
-        if (!@mkdir( "$parent/{$newValues['name']}", 0700)) {
+        if (!@mkdir("$parent/{$newValues['name']}", 0700)) {
             return $this->_raiseError(TREE_ERROR_CANNOT_CREATE_FOLDER,
-                        $newValues['name'].' under '.$parent,
-                        __LINE__
-                    );
+                                      $newValues['name'].' under '.$parent,
+                                      __LINE__
+                                     );
         }
         return "$parent/{$newValues['name']}";
     }
 
+    // }}}
+    // {{{ remove()
+
     function remove($id)
     {
         if (!@rmdir($id)) {
-            return $this->_throwError('couldnt remove dir '.$id,__LINE__);
+            return $this->_throwError('couldnt remove dir '.$id, __LINE__);
         }
         return true;
     }
 
-    function copy ($srcId , $destId)
+    // }}}
+    // {{{ copy()
+
+    function copy($srcId, $destId)
     {
-        # if( !@copy( $srcId , $destId ) ) this would only be for files :-)
+        # if(!@copy($srcId, $destId)) this would only be for files :-)
         # FIXXME loop through the directory to copy the children too !!!
         $dest = $destId.'/'.preg_replace('/^.*\//','',$srcId);
         if (is_dir($dest)) {
             return $this->_throwError(
-                "couldnt copy, $destId already exists in $srcId ", __LINE__
+                    "couldnt copy, $destId already exists in $srcId ", __LINE__
                 );
         }
         if (!@mkdir($dest, 0700)) {
             return $this->_throwError(
-                    "couldnt copy dir from $srcId to $destId " , __LINE__
+                    "couldnt copy dir from $srcId to $destId ", __LINE__
                 );
         }
         return true;
     }
+
+    // }}}
+    // {{{ _prepareResults()
 
     /**
      * prepare multiple results
@@ -167,7 +185,7 @@ require_once('Tree/Error.php');
      * @version    2002/03/03
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function _prepareResults( $results )
+    function _prepareResults($results)
     {
         $newResults = array();
         foreach ($results as $aResult) {
@@ -175,6 +193,9 @@ require_once('Tree/Error.php');
         }
         return $newResults;
     }
+
+    // }}}
+    // {{{ _prepareResult()
 
     /**
      * map back the index names to get what is expected
@@ -194,5 +215,7 @@ require_once('Tree/Error.php');
         }
         return $result;
     }
-} // end of class
+
+    // }}}
+}
 ?>

@@ -1,9 +1,9 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-# i think this class should go somewhere in a common PEAR-place,
-# because a lot of classes use options, at least PEAR::DB does
-# but since it is not very fancy to crowd the PEAR-namespace
-# too much i dont know where to put it yet :-(
+// i think this class should go somewhere in a common PEAR-place,
+// because a lot of classes use options, at least PEAR::DB does
+// but since it is not very fancy to crowd the PEAR-namespace
+// too much i dont know where to put it yet :-(
 
 //
 // +----------------------------------------------------------------------+
@@ -43,6 +43,8 @@ class Tree_Options
 
     var $_forceSetOption = false;
 
+    // {{{ Tree_Options()
+
     /**
      * this constructor sets the options, since i normally need this and
      * in case the constructor doesnt need to do anymore i already have
@@ -55,15 +57,18 @@ class Tree_Options
      * @param  boolean if set to true options are also set
      *                 even if no key(s) was/were found in the options property
      */
-    function Tree_Options( $options=array() , $force=false )
+    function Tree_Options($options=array(), $force=false)
     {
         $this->_forceSetOption = $force;
         if (is_array($options) && sizeof($options)) {
             foreach ($options as $key=>$value) {
-                $this->setOption( $key , $value );
+                $this->setOption($key, $value);
             }
         }
     }
+
+    // }}}
+    // {{{ setOption()
 
     /**
      *
@@ -74,7 +79,7 @@ class Tree_Options
      * @param  boolean if set to true options are also set
      *                 even if no key(s) was/were found in the options property
      */
-    function setOption( $option , $value , $force=false )
+    function setOption($option, $value, $force=false)
     {
         // if the value is an array extract the keys
         // and apply only each value that is set
@@ -104,6 +109,9 @@ class Tree_Options
         return false;
     }
 
+    // }}}
+    // {{{ setOptions()
+
     /**
      * set a number of options which are simply given in an array
      *
@@ -112,14 +120,17 @@ class Tree_Options
      * @param  boolean if set to true options are also set even if no key(s)
      *                 was/were found in the options property
      */
-    function setOptions( $options , $force=false )
+    function setOptions($options, $force=false)
     {
         if (is_array($options) && sizeof($options)) {
             foreach ($options as $key=>$value) {
-                $this->setOption( $key , $value , $force );
+                $this->setOption($key, $value, $force);
             }
         }
     }
+
+    // }}}
+    // {{{ getOption()
 
     /**
      *
@@ -133,8 +144,8 @@ class Tree_Options
             is_array($this->options[$option])) {
             $args = func_get_args();
             $evalCode = "\$ret = \$this->options['".
-                        implode( "']['" , $args )."'];";
-            eval( $evalCode );
+                        implode("']['", $args) . "'];";
+            eval($evalCode);
             return $ret;
         }
 
@@ -143,6 +154,9 @@ class Tree_Options
         }
         return false;
     }
+
+    // }}}
+    // {{{ getOptions()
 
     /**
      * returns all the options
@@ -156,5 +170,7 @@ class Tree_Options
     {
         return $this->options;
     }
-} // end of class
+
+    // }}}
+}
 ?>

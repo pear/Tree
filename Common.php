@@ -17,7 +17,7 @@
 // +----------------------------------------------------------------------+
 //
 //  $Id$
-require_once('Tree/OptionsDB.php');
+require_once 'Tree/OptionsDB.php';
 
 /**
  * common tree class, implements common functionality
@@ -43,16 +43,21 @@ class Tree_Common extends Tree_OptionsDB
     var $options =  array();
 
 
+    // {{{ getChildId()
+
     /**
      * @version    2002/01/18
      * @access     public
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function getChildId( $id )
+    function getChildId($id)
     {
-        $child = $this->getChild( $id );
+        $child = $this->getChild($id);
         return $child['id'];
     }
+
+    // }}}
+    // {{{ getChildrenIds()
 
     /**
      * get the ids of the children of the given element
@@ -83,6 +88,9 @@ class Tree_Common extends Tree_OptionsDB
         return $childrenIds;
     }
 
+    // }}}
+    // {{{ getAllChildren()
+
     /**
      * gets all the children and grand children etc.
      *
@@ -100,10 +108,13 @@ class Tree_Common extends Tree_OptionsDB
     {
         $retChildren = false;
         if ($children = $this->hasChildren($id)) {
-            $retChildren = $this->_getAllChildren( $id );
+            $retChildren = $this->_getAllChildren($id);
         }
         return $retChildren;
     }
+
+    // }}}
+    // {{{ _getAllChildren()
 
     /**
      * this method gets all the children recursively
@@ -125,11 +136,14 @@ class Tree_Common extends Tree_OptionsDB
             foreach ($children as $key=>$aChild) {
                 $retChildren[] = &$children[$key];
                 $retChildren = array_merge($retChildren,
-                        $this->_getAllChildren( $aChild['id'] ));
+                        $this->_getAllChildren($aChild['id']));
             }
         }
         return $retChildren;
     }
+
+    // }}}
+    // {{{ getAllChildrenIds()
 
     /**
      * gets all the children-ids and grand children-ids
@@ -144,17 +158,20 @@ class Tree_Common extends Tree_OptionsDB
      *                  with id=$id,
      *                  or false if there are no children
      */
-    function getAllChildrenIds( $id )
+    function getAllChildrenIds($id)
     {
         $childrenIds = array();
-        if( $allChildren = $this->getAllChildren($id) )
+        if($allChildren = $this->getAllChildren($id))
         {
             $childrenIds = array();
-            foreach( $allChildren as $aNode )
+            foreach($allChildren as $aNode)
                 $childrenIds[] = $aNode['id'];
         }
         return $childrenIds;
     }
+
+    // }}}
+    // {{{ getParentId()
 
     /**
      * get the id of the parent for the given element
@@ -165,11 +182,14 @@ class Tree_Common extends Tree_OptionsDB
      *                  shall be retreived
      * @author Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function getParentId( $id )
+    function getParentId($id)
     {
-        $parent = $this->getParent( $id );
+        $parent = $this->getParent($id);
         return $parent['id'];
     }
+
+    // }}}
+    // {{{ getParents()
 
     /**
      * this gets all the preceeding nodes, the parent and it's parent and so on
@@ -181,15 +201,18 @@ class Tree_Common extends Tree_OptionsDB
      *                  be retreived
      * @return  array   of the parent nodes including the node with id $id
      */
-    function getParents( $id )
+    function getParents($id)
     {
         $path = $this->getPath($id);
         $parents = array();
-        if( sizeof($path) )
-            foreach( $path as $aNode )
+        if(sizeof($path))
+            foreach($path as $aNode)
                 $parents[] = $aNode;
         return $parents;
     }
+
+    // }}}
+    // {{{ getParentsIds()
 
     /**
      * get the ids of the parents and all it's parents and so on
@@ -204,59 +227,74 @@ class Tree_Common extends Tree_OptionsDB
      *
      * @return     array   of the ids
      */
-    function getParentsIds( $id )
+    function getParentsIds($id)
     {
         $parents = $this->getParents($id);
         $parentsIds = array();
-        if( sizeof($parents) )
-            foreach( $parents as $aNode )
+        if(sizeof($parents))
+            foreach($parents as $aNode)
                 $parentsIds[] = $aNode['id'];
         return $parentsIds;
     }
 
+    // }}}
+    // {{{ getNextId()
+
     /**
      * @version    2002/01/18
      * @access     public
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function getNextId( $id )
+    function getNextId($id)
     {
-        $next = $this->getNext( $id );
+        $next = $this->getNext($id);
         return $next['id'];
     }
 
+    // }}}
+    // {{{ getPreviousId()
+
     /**
      * @version    2002/01/18
      * @access     public
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function getPreviousId( $id )
+    function getPreviousId($id)
     {
-        $previous = $this->getPrevious( $id );
+        $previous = $this->getPrevious($id);
         return $previous['id'];
     }
 
-    /**
-     * @version    2002/01/18
-     * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     */
-    function getLeftId( $id )
-    {
-        $left = $this->getLeft( $id );
-        return $left['id'];
-    }
+    // }}}
+    // {{{ getLeftId()
 
     /**
      * @version    2002/01/18
      * @access     public
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function getRightId( $id )
+    function getLeftId($id)
     {
-        $right = $this->getRight( $id );
+        $left = $this->getLeft($id);
+        return $left['id'];
+    }
+
+    // }}}
+    // {{{ getRightId()
+
+    /**
+     * @version    2002/01/18
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     */
+    function getRightId($id)
+    {
+        $right = $this->getRight($id);
         return $right['id'];
     }
+
+    // }}}
+    // {{{ getFirstRootId()
 
     /**
      * @version    2002/04/16
@@ -269,6 +307,9 @@ class Tree_Common extends Tree_OptionsDB
         return $firstRoot['id'];
     }
 
+    // }}}
+    // {{{ getRootId()
+
     /**
      * @version    2002/04/16
      * @access     public
@@ -279,6 +320,9 @@ class Tree_Common extends Tree_OptionsDB
         $firstRoot = $this->getRoot();
         return $firstRoot['id'];
     }
+
+    // }}}
+    // {{{ getPathAsString()
 
     /**
      * returns the path as a string
@@ -324,14 +368,19 @@ class Tree_Common extends Tree_OptionsDB
         }
 
         $pathString = '';
-        if( sizeof($pathArray) )
+        if(sizeof($pathArray))
             $pathString = implode($seperator,$pathArray);
         return $pathString;
-    } // end of function
+    }
+
+    // }}}
+
 
     //
     //  abstract methods, those should be overwritten by the implementing class
     //
+
+    // {{{ getPath()
 
     /**
      * gets the path to the element given by its id
@@ -347,9 +396,11 @@ class Tree_Common extends Tree_OptionsDB
     function getPath($id)
     {
         return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                __FUNCTION__, __LINE__ );
-    } // end of function
+                __FUNCTION__, __LINE__);
+    }
 
+    // }}}
+    // {{{ _preparePath()
 
     /**
      * gets the path to the element given by its id
@@ -395,7 +446,7 @@ class Tree_Common extends Tree_OptionsDB
         foreach($elems as $val){
             if (trim($val)=='') {
                 return $this->_raiseError(TREE_ERROR_INVALID_PATH,
-                            __FUNCTION__, __LINE__ );
+                            __FUNCTION__, __LINE__);
             }
             if ($val=='..') {
                  if ($i==0) {
@@ -409,10 +460,13 @@ class Tree_Common extends Tree_OptionsDB
         }
         if(sizeof($_elems)<1){
             return $this->_raiseError(TREE_ERROR_EMPTY_PATH,
-                        __FUNCTION__, __LINE__ );
+                        __FUNCTION__, __LINE__);
         }
         return array($_elems, $sublevel);
     }
+
+    // }}}
+    // {{{ getLevel()
 
     /**
      * get the level, which is how far below the root the element
@@ -428,8 +482,11 @@ class Tree_Common extends Tree_OptionsDB
     function getLevel($id)
     {
         return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                        __FUNCTION__, __LINE__ );
-    } // end of function
+                        __FUNCTION__, __LINE__);
+    }
+
+    // }}}
+    // {{{ isChildOf()
 
     /**
      * returns if $childId is a child of $id
@@ -446,8 +503,11 @@ class Tree_Common extends Tree_OptionsDB
     function isChildOf($id, $childId, $checkAll = true)
     {
         return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                    __FUNCTION__, __LINE__ );
-    } // end of function
+                    __FUNCTION__, __LINE__);
+    }
+
+    // }}}
+    // {{{ getIdByPath()
 
     /**
      *
@@ -457,8 +517,11 @@ class Tree_Common extends Tree_OptionsDB
                         $nodeName = 'name', $seperator = '/')
     {
         return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
-                    __FUNCTION__, __LINE__ );
-    } // end of function
+                    __FUNCTION__, __LINE__);
+    }
+
+    // }}}
+    // {{{ getDepth()
 
     /**
      * return the maximum depth of the tree
@@ -471,11 +534,16 @@ class Tree_Common extends Tree_OptionsDB
     function getDepth()
     {
         return $this->_treeDepth;
-    } // end of function
+    }
+
+    // }}}
 
     //
     //  PRIVATE METHODS
     //
+
+    // {{{ _prepareResults()
+
     /**
      * prepare multiple results
      *
@@ -494,6 +562,9 @@ class Tree_Common extends Tree_OptionsDB
         }
         return $newResults;
     }
+
+    // }}}
+    // {{{ _prepareResult()
 
     /**
      * map back the index names to get what is expected
@@ -517,6 +588,9 @@ class Tree_Common extends Tree_OptionsDB
         return $result;
     }
 
+    // }}}
+    // {{{ _getColName()
+
     /**
      * this method retreives the real column name, as used in the DB
      * since the internal names are fixed, to be portable between different
@@ -538,6 +612,9 @@ class Tree_Common extends Tree_OptionsDB
         return $internalName;
     }
 
+    // }}}
+    // {{{ _raiseError()
+
     /**
      *
      *
@@ -553,8 +630,11 @@ class Tree_Common extends Tree_OptionsDB
     {
         include_once 'Tree/Error.php';
         return new Tree_Error(
-            $msg , $line, __FILE__, $mode, $this->dbh->last_query);
+            $msg, $line, __FILE__, $mode, $this->dbh->last_query);
     }
+
+    // }}}
+    // {{{ _throwError()
 
     /**
      *
@@ -574,8 +654,10 @@ class Tree_Common extends Tree_OptionsDB
             $mode = PEAR_ERROR_PRINT;
         }
         return new Tree_Error(
-            $msg , $line, __FILE__, $mode, $this->dbh->last_query);
+            $msg, $line, __FILE__, $mode, $this->dbh->last_query);
     }
+
+    // }}}
 }
 
 /*

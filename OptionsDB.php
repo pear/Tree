@@ -1,8 +1,10 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-# i think this class should go somewhere in a common PEAR-place,
-# but since it is not very fancy to crowd the PEAR-namespace too much
-# i dont know where to put it yet :-(
+
+// i think this class should go somewhere in a common PEAR-place,
+// but since it is not very fancy to crowd the PEAR-namespace too much
+// i dont know where to put it yet :-(
+
 //
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
@@ -22,7 +24,7 @@
 //
 //  $Id$
 
-require_once('Tree/Options.php');
+require_once 'Tree/Options.php';
 
 /**
  *   this class additionally retreives a DB connection and saves it
@@ -40,6 +42,9 @@ class Tree_OptionsDB extends Tree_Options
      */
     var $dbh;
 
+
+    // {{{ Tree_OptionsDB()
+
     /**
      *   this constructor sets the options, since i normally need this and
      *   in case the constructor doesnt need to do anymore i already have
@@ -52,18 +57,18 @@ class Tree_OptionsDB extends Tree_Options
      */
     function Tree_OptionsDB( $dsn , $options=array() )
     {
-        $res = $this->_connectDB( $dsn );
-        if( !PEAR::isError($res) )
-        {
+        $res = $this->_connectDB($dsn);
+        if(!PEAR::isError($res)) {
             $this->dbh->setFetchmode(DB_FETCHMODE_ASSOC);
-        }
-        else
-        {
+        } else {
             return $res;
         }
         // do options afterwards since it overrules
-        $this->Tree_Options( $options );
+        $this->Tree_Options($options);
     }
+
+    // }}}
+    // {{{ _connectDB()
 
     /**
      * Connect to database by using the given DSN string
@@ -73,37 +78,28 @@ class Tree_OptionsDB extends Tree_Options
      * @param  string DSN string
      * @return mixed  Object on error, otherwise bool
      */
-    function _connectDB( $dsn )
+    function _connectDB($dsn)
     {
         // only include the db if one really wants to connect
         require_once('DB.php');
 
-        if (is_string($dsn) || is_array($dsn) )
-        {
+        if(is_string($dsn) || is_array($dsn)) {
             // put the dsn parameters in an array
             // DB would be confused with an additional URL-queries,
             //like ?table=... so we do it before connecting to the DB
             if( is_string($dsn) )
-                $dsn = DB::parseDSN( $dsn );
+                $dsn = DB::parseDSN($dsn);
 
             $this->dbh = DB::Connect($dsn);
-        }
-        else
-        {
-            if(get_parent_class($dsn) == "db_common")
-            {
+        } else {
+            if(get_parent_class($dsn) == 'db_common') {
                 $this->dbh = $dsn;
-            }
-            else
-            {
-                if (is_object($dsn) && DB::isError($dsn))
-                {
+            } else {
+                if (is_object($dsn) && DB::isError($dsn)) {
                     return new DB_Error($dsn->code, PEAR_ERROR_DIE);
-                }
-                else
-                {
+                } else {
                     return new PEAR_Error(
-                                "The given dsn was not valid in file ".
+                                'The given dsn was not valid in file '.
                                 __FILE__ . " at line " . __LINE__,
                                 41,
                                 PEAR_ERROR_RETURN,
@@ -115,11 +111,12 @@ class Tree_OptionsDB extends Tree_Options
             }
         }
 
-        if (DB::isError($this->dbh))
+        if (DB::isError($this->dbh)) {
             return new DB_Error($this->dbh->code, PEAR_ERROR_DIE);
-
+        }
         return true;
     }
 
-} // end of class
+    // }}}
+}
 ?>

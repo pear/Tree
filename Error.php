@@ -48,19 +48,25 @@ class Tree_Error extends PEAR_Error
      */
     var $error_message_prefix = "Tree Error: ";
 
+    // {{{ Tree_Error()
+
     /**
      * @access     public
      * @version    2002/03/03
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
-    function Tree_Error( $msg, $line, $file,
+    function Tree_Error($msg, $line, $file,
                         $mode=null, $userinfo='no userinfo')
     {
-        $this->PEAR_Error(  sprintf("%s <br/>in %s [%d].", $msg, $file, $line),
-                            null , $mode , null, $userinfo );
+        $this->PEAR_Error(sprintf("%s <br/>in %s [%d].", $msg, $file, $line),
+                          null , $mode , null, $userinfo );
     }
 
-    function getMessage($id) {
+    // }}}
+    // {{{ getMessage()
+
+    function getMessage($id)
+    {
         $messages = array(
             TREE_ERROR_NOT_IMPLEMENTED    =>'',
             TREE_ERROR_INVALID_PATH       =>'',
@@ -75,5 +81,7 @@ class Tree_Error extends PEAR_Error
         return isset($messages[$id])?$messages[$id]:
                     $messages[TREE_ERROR_UNKNOW_ERROR];
     }
-} // end of class
+
+    // }}}
+}
 ?>
