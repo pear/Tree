@@ -364,9 +364,11 @@ class Tree_Dynamic_DBnested extends Tree_Common
             if( PEAR::isError($ret) )
                 $errors[] = $ret;
         }
-# FIXXME return a Tree_Error, not an array !!!!!
+# FIXXME the error in a nicer way, or even better let the throwError method do it!!!
         if( sizeof($errors) )
-            return $errors;
+        {
+            return $this->_throwError(serialize($errors),__LINE__);
+        }
         return true;
     }
 
