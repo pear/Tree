@@ -56,7 +56,7 @@ class Tree_Error extends PEAR_Error
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      */
     function Tree_Error($msg, $line, $file,
-                        $mode=null, $userinfo='no userinfo')
+                        $mode = null, $userinfo = 'no userinfo')
     {
         $this->PEAR_Error(sprintf("%s <br/>in %s [%d].", $msg, $file, $line),
                           null , $mode , null, $userinfo );
@@ -68,15 +68,15 @@ class Tree_Error extends PEAR_Error
     function getMessage($id)
     {
         $messages = array(
-            TREE_ERROR_NOT_IMPLEMENTED    =>'',
-            TREE_ERROR_INVALID_PATH       =>'',
-            TREE_ERROR_DB_ERROR           =>'',
-            TREE_ERROR_PARENT_ID_MISSED   =>'',
-            TREE_ERROR_MOVE_TO_CHILDREN   =>'',
-            TREE_ERROR_ELEMENT_NOT_FOUND  =>'',
-            TREE_ERROR_PATH_SEPARATOR_EMPTY =>'',
-            TREE_ERROR_INVALID_NODE_NAME  =>'',
-            TREE_ERROR_UNKNOW_ERROR       =>''
+            TREE_ERROR_NOT_IMPLEMENTED    => '',
+            TREE_ERROR_INVALID_PATH       => '',
+            TREE_ERROR_DB_ERROR           => '',
+            TREE_ERROR_PARENT_ID_MISSED   => '',
+            TREE_ERROR_MOVE_TO_CHILDREN   => '',
+            TREE_ERROR_ELEMENT_NOT_FOUND  => '',
+            TREE_ERROR_PATH_SEPARATOR_EMPTY => '',
+            TREE_ERROR_INVALID_NODE_NAME  => '',
+            TREE_ERROR_UNKNOW_ERROR       => ''
             );
         return isset($messages[$id])?$messages[$id]:
                     $messages[TREE_ERROR_UNKNOW_ERROR];

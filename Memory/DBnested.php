@@ -43,7 +43,7 @@ class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
      */
     function setup($res=null)
     {
-        if ($res==null) {
+        if ($res == null) {
             //
             $whereAddOn = '';
             if ($this->options['whereAddOn']) {

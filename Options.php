@@ -57,11 +57,11 @@ class Tree_Options
      * @param  boolean if set to true options are also set
      *                 even if no key(s) was/were found in the options property
      */
-    function Tree_Options($options=array(), $force=false)
+    function Tree_Options($options = array(), $force = false)
     {
         $this->_forceSetOption = $force;
         if (is_array($options) && sizeof($options)) {
-            foreach ($options as $key=>$value) {
+            foreach ($options as $key => $value) {
                 $this->setOption($key, $value);
             }
         }
@@ -79,15 +79,15 @@ class Tree_Options
      * @param  boolean if set to true options are also set
      *                 even if no key(s) was/were found in the options property
      */
-    function setOption($option, $value, $force=false)
+    function setOption($option, $value, $force = false)
     {
         // if the value is an array extract the keys
         // and apply only each value that is set
         if (is_array($value)) {
             // so we dont override existing options inside an array
             // if an option is an array
-            foreach ($value as $key=>$aValue) {
-                $this->setOption(array($option,$key),$aValue);
+            foreach ($value as $key => $aValue) {
+                $this->setOption(array($option, $key), $aValue);
             }
             return true;
         }
@@ -101,8 +101,8 @@ class Tree_Options
             $mainOption = $option;
         }
 
-        if ($this->_forceSetOption==true ||
-            $force==true || isset($this->options[$mainOption])) {
+        if ($this->_forceSetOption == true ||
+            $force == true || isset($this->options[$mainOption])) {
             eval($evalCode);
             return true;
         }
@@ -120,10 +120,10 @@ class Tree_Options
      * @param  boolean if set to true options are also set even if no key(s)
      *                 was/were found in the options property
      */
-    function setOptions($options, $force=false)
+    function setOptions($options, $force = false)
     {
         if (is_array($options) && sizeof($options)) {
-            foreach ($options as $key=>$value) {
+            foreach ($options as $key => $value) {
                 $this->setOption($key, $value, $force);
             }
         }

@@ -89,7 +89,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
      *                                to define the table it shall work on
      * @param array $options additional options you can set
      */
-    function Tree_Memory_DBsimple($dsn, $options=array())
+    function Tree_Memory_DBsimple($dsn, $options = array())
     {
         $this->Tree_OptionsDB($dsn, $options); // instanciate DB
         if (is_string($options)) {
@@ -221,9 +221,9 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     function remove($id)
     {
         // if the one to remove has children, get their id's to remove them too
-        if ($this->hasChildren($id))
+        if ($this->hasChildren($id)) {
             $id = $this->walk(array('_remove', $this), $id, 'array');
-
+        }
         $idColumnName = 'id';
         $map = $this->getOption('columnNameMaps');
         if (isset($map['id'])) { // if there are maps given

@@ -63,7 +63,7 @@ class Tree
         // if anyone knows a better name it would be great to change it.
         // since "setupMemory" kind of reflects it but i think it's not obvious
         // if you dont know what is meant
-        include_once('Tree/Memory.php');
+        include_once 'Tree/Memory.php';
         return new Tree_Memory($type, $dsn, $options);
     }
 
@@ -92,7 +92,7 @@ class Tree
     {
         // "dynamic" stands for retreiving a tree(chunk) dynamically when needed,
         // better name would be great :-)
-        include_once("Tree/Dynamic/$type.php");
+        include_once "Tree/Dynamic/$type.php";
         $className = 'Tree_Dynamic_'.$type;
         $obj = & new $className($dsn, $options);
         return $obj;
@@ -144,7 +144,7 @@ class Tree
      *                  for XML it would be the filename
      * @param array     the options you want to set
      */
-    function setup($type, $dsn='', $options=array())
+    function setup($type, $dsn = '', $options = array())
     {
         $type = explode('_', $type);
         $method = 'setup'.$type[0];
@@ -166,7 +166,7 @@ class Tree
     function isError($value)
     {
         return (is_object($value) &&
-                (get_class($value) == 'tree_error' ||
+                (is_a($value, 'tree_error') ||
                  is_subclass_of($value, 'tree_error')));
     }
 

@@ -55,10 +55,10 @@ class Tree_OptionsDB extends Tree_Options
      *   @author     Wolfram Kriesing <wolfram@kriesing.de>
      *   @param      boolean true if loggedIn
      */
-    function Tree_OptionsDB( $dsn , $options=array() )
+    function Tree_OptionsDB($dsn , $options = array())
     {
         $res = $this->_connectDB($dsn);
-        if(!PEAR::isError($res)) {
+        if (!PEAR::isError($res)) {
             $this->dbh->setFetchmode(DB_FETCHMODE_ASSOC);
         } else {
             return $res;
@@ -81,18 +81,18 @@ class Tree_OptionsDB extends Tree_Options
     function _connectDB($dsn)
     {
         // only include the db if one really wants to connect
-        require_once('DB.php');
+        require_once 'DB.php';
 
-        if(is_string($dsn) || is_array($dsn)) {
+        if (is_string($dsn) || is_array($dsn)) {
             // put the dsn parameters in an array
             // DB would be confused with an additional URL-queries,
             //like ?table=... so we do it before connecting to the DB
-            if( is_string($dsn) )
+            if (is_string($dsn)) {
                 $dsn = DB::parseDSN($dsn);
-
+            }
             $this->dbh = DB::Connect($dsn);
         } else {
-            if(get_parent_class($dsn) == 'db_common') {
+            if (get_parent_class($dsn) == 'db_common') {
                 $this->dbh = $dsn;
             } else {
                 if (is_object($dsn) && DB::isError($dsn)) {

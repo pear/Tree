@@ -85,7 +85,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
       */
     function __construct($dsn, $options=array())
     {
-        Tree_Dynamic_DBnested($dsn, $options);
+        $this->Tree_Dynamic_DBnested($dsn, $options);
     }
 
     // }}}
@@ -100,7 +100,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @param      string  the DSN for the DB connection
      * @return     void
      */
-    function Tree_Dynamic_DBnested($dsn, $options=array())
+    function Tree_Dynamic_DBnested($dsn, $options = array())
     {
         parent::Tree_OptionsDB($dsn, $options); // instanciate DB
         $this->table = $this->getOption('table');
@@ -158,7 +158,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         // from the array
         // FIXXME do the above described
         // if no parent and no prevId is given the root shall be added
-        if($parentId || $prevId) {
+        if ($parentId || $prevId) {
             if ($prevId) {
                 $element = $this->getElement($prevId);
                 // we also need the parent id of the element
@@ -192,7 +192,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         // inserting _one_ new element in the tree
         $newData = array();
         // quote the values, as needed for the insert
-        foreach ($newValues as $key=>$value) {
+        foreach ($newValues as $key => $value) {
             $newData[$this->_getColName($key)] = $this->dbh->quote($value);
         }
 
@@ -235,7 +235,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @param  int     the number of elements you plan to insert
      * @return mixed   either true on success or a Tree_Error on failure
      */
-    function _add($prevVisited, $numberOfElements=1)
+    function _add($prevVisited, $numberOfElements = 1)
     {
         $lName = $this->_getColName('left');
         $rName = $this->_getColName('right');
@@ -248,7 +248,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $this->_getWhereAddOn(),
                             $lName,
                             $prevVisited);
-        if(DB::isError($res = $this->dbh->query($query))) {
+        if (DB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
             return $this->_throwError($res->getMessage(), __LINE__);
         }
@@ -486,7 +486,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
         // add the left/right values in the new parent, to have the space
         // to move the new values in
-        $err=$this->_add($prevVisited, $numberOfElements);
+        $err = $this->_add($prevVisited, $numberOfElements);
         if (Tree::isError($err)) {
             // FIXXME rollback
             //$this->dbh->rollback();
@@ -559,7 +559,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         }
 
         // remove the part of the tree where the element(s) was/were before
-        if (Tree::isError($err=$this->_remove($element))) {
+        if (Tree::isError($err = $this->_remove($element))) {
             // FIXXME rollback
             //$this->dbh->rollback();
             return $err;
@@ -582,7 +582,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @param      array   the new values, the index is the col name
      * @return     mixed   either true or an Tree_Error
      */
-    function update($id,$newValues)
+    function update($id, $newValues)
     {
         // jsut to be sure nothing gets screwed up :-)
         unset($newValues[$this->_getColName('left')]);
@@ -591,7 +591,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
         // updating _one_ element in the tree
         $values = array();
-        foreach ($newValues as $key=>$value) {
+        foreach ($newValues as $key => $value) {
             $values[] = $this->_getColName($key).'='.$this->dbh->quote($value);
         }
         $query = sprintf(  'UPDATE %s SET %s WHERE%s %s=%s',
@@ -621,7 +621,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @param      integer the new previous ID, if given parent ID will be omitted
      * @return     boolean true on success
      */
-    function copy($id ,$parentId=0 ,$prevId=0)
+    function copy($id, $parentId = 0, $prevId = 0)
     {
         return $this->_throwError(
                 'copy-method is not implemented yet!' ,
@@ -651,7 +651,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         if (DB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
-        return !$res?false:$this->_prepareResult($res);
+        return !$res ? false : $this->_prepareResult($res);
     }
 
     // }}}
@@ -826,9 +826,9 @@ class Tree_Dynamic_DBnested extends Tree_Common
     function getRight($id)
     {
         $element = $this->getElement($id);
-        if(Tree::isError($element))
+        if (Tree::isError($element)) {
             return $element;
-
+        }
         $query = sprintf(  'SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
                             $this->table,
                             $this->_getWhereAddOn(),
@@ -894,10 +894,10 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @return     mixed   the array with the data of all children
      *                     or false, if there are none
      */
-    function getChildren($ids,$levels=1)
+    function getChildren($ids, $levels = 1)
     {
         $res = array();
-        for ($i=1 ; $i<$levels+1 ; $i++) {
+        for ($i = 1; $i < $levels + 1; $i++) {
             // if $ids is an array implode the values
             $getIds = is_array($ids) ? implode(',',$ids) : $ids;
 
@@ -1094,7 +1094,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         if (DB::isError($res=$this->dbh->getOne($query))) {
             return $this->_throwError($res->getMessage(),__LINE__);
         }
-        if(!$res) {
+        if (!$res) {
             return false;
         }
         return $this->_prepareResult($res);
@@ -1140,32 +1140,32 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @param      string   $seperator  the path seperator
      * @return     integer  the id of the searched element
      */
-    function getIdByPath($path, $startId=0, $nodeName='name', $separator='/')
+    function getIdByPath($path, $startId = 0, $nodeName = 'name', $separator = '/')
     // should this method be called getElementIdByPath ????
     // Yes, with an optionnal private paramater to get the whole node
     // in preference to only the id?
     {
-        if($separator=='') {
+        if ($separator == '') {
             return $this->_throwError(
                 'getIdByPath: Empty separator not allowed', __LINE__);
         }
-        if ($path==$separator) {
+        if ($path == $separator) {
             $root = $this->getRoot();
             if (Tree::isError($root)) {
                 return $root;
             }
             return $root['id'];
         }
-        if (!($colname=$this->_getColName($nodeName))){
+        if (!($colname=$this->_getColName($nodeName))) {
             return $this->_throwError(
                 'getIdByPath: Invalid node name', __LINE__);
         }
-        if ($startId!=0) {
+        if ($startId != 0) {
             // If the start node has no child, returns false
             // hasChildren calls getElement. Not very good right
             // now. See the TODO
             $startElem = $this->getElement($startId);
-            if (!is_array($startElem) || Tree::isError($startElem)){
+            if (!is_array($startElem) || Tree::isError($startElem)) {
                 return $startElem;
             }
             // No child? return
@@ -1196,7 +1196,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                 .$this->table
                 . ' WHERE '
                 .$colname;
-        if ($cntElems==1) {
+        if ($cntElems == 1) {
             $query .= "='".$elems[0]."'";
         } else {
             $query .= "='".$elems[$cntElems-1]."'";
@@ -1231,7 +1231,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      * @param      string  the current where clause
      * @return     string  the where clause we want to add to a query
      */
-    function _getWhereAddOn($addAfter=' AND ', $tableName='')
+    function _getWhereAddOn($addAfter = ' AND ', $tableName = '')
     {
         if ($where=$this->getOption('whereAddOn')) {
             return ' '.($tableName ? $tableName.'.' : '')." $where$addAfter ";
@@ -1266,7 +1266,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      *                                  be retreived
      * @return     array    sorted as listed in the tree
      */
-    function &getNode($startId=0, $depth=0)
+    function &getNode($startId = 0, $depth = 0)
     {
 //FIXXXME use getChildren()
         if ($startId) {

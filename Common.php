@@ -71,10 +71,10 @@ class Tree_Common extends Tree_OptionsDB
      * @return  mixed   an array of all the ids of the children of the element
      *                  with id=$id, or false if there are no children
      */
-    function getChildrenIds($id,$levels=1)
+    function getChildrenIds($id, $levels = 1)
     {
         // returns false if no children exist
-        if (!($children = $this->getChildren($id,$levels))) {
+        if (!($children = $this->getChildren($id, $levels))) {
             return array();
         }
         // return an empty array, if you want to know
@@ -133,7 +133,7 @@ class Tree_Common extends Tree_OptionsDB
     {
         $retChildren = array();
         if ($children = $this->getChildren($id)) {
-            foreach ($children as $key=>$aChild) {
+            foreach ($children as $key => $aChild) {
                 $retChildren[] = &$children[$key];
                 $retChildren = array_merge($retChildren,
                         $this->_getAllChildren($aChild['id']));
@@ -161,11 +161,11 @@ class Tree_Common extends Tree_OptionsDB
     function getAllChildrenIds($id)
     {
         $childrenIds = array();
-        if($allChildren = $this->getAllChildren($id))
-        {
+        if ($allChildren = $this->getAllChildren($id)) {
             $childrenIds = array();
-            foreach($allChildren as $aNode)
+            foreach ($allChildren as $aNode) {
                 $childrenIds[] = $aNode['id'];
+            }
         }
         return $childrenIds;
     }
@@ -205,9 +205,11 @@ class Tree_Common extends Tree_OptionsDB
     {
         $path = $this->getPath($id);
         $parents = array();
-        if(sizeof($path))
-            foreach($path as $aNode)
+        if (sizeof($path)) {
+            foreach($path as $aNode) {
                 $parents[] = $aNode;
+            }
+        }
         return $parents;
     }
 
@@ -231,9 +233,11 @@ class Tree_Common extends Tree_OptionsDB
     {
         $parents = $this->getParents($id);
         $parentsIds = array();
-        if(sizeof($parents))
-            foreach($parents as $aNode)
+        if (sizeof($parents)) {
+            foreach($parents as $aNode) {
                 $parentsIds[] = $aNode['id'];
+            }
+        }
         return $parentsIds;
     }
 
@@ -351,8 +355,8 @@ class Tree_Common extends Tree_OptionsDB
      * @return  array   this array contains all elements from the root
      *                  to the element given by the id
      */
-    function getPathAsString($id, $seperator='/',
-                                $offset=0, $length=0, $key='name')
+    function getPathAsString($id, $seperator = '/',
+                                $offset = 0, $length = 0, $key = 'name')
     {
         $path = $this->getPath($id);
         foreach ($path as $aNode) {
@@ -361,15 +365,16 @@ class Tree_Common extends Tree_OptionsDB
 
         if ($offset) {
             if ($length) {
-                $pathArray = array_slice($pathArray,$offset,$length);
+                $pathArray = array_slice($pathArray, $offset, $length);
             } else {
-                $pathArray = array_slice($pathArray,$offset);
+                $pathArray = array_slice($pathArray, $offset);
             }
         }
 
         $pathString = '';
-        if(sizeof($pathArray))
-            $pathString = implode($seperator,$pathArray);
+        if (sizeof($pathArray)) {
+            $pathString = implode($seperator, $pathArray);
+        }
         return $pathString;
     }
 
@@ -412,11 +417,11 @@ class Tree_Common extends Tree_OptionsDB
      * @return  array   this array contains the path elements and the sublevels
      *                  to substract if no $cwd has been given.
      */
-    function _preparePath($path, $cwd='/', $separator='/'){
-        $elems = explode($separator,$path);
-        $cntElems=sizeof($elems);
+    function _preparePath($path, $cwd = '/', $separator = '/'){
+        $elems = explode($separator, $path);
+        $cntElems = sizeof($elems);
         // beginning with a slash
-        if(empty($elems[0])){
+        if (empty($elems[0])) {
             $beginSlash = true;
             array_shift($elems);
             $cntElems--;
@@ -430,11 +435,11 @@ class Tree_Common extends Tree_OptionsDB
         // Get the real path, and the levels
         // to substract if required
         $down = 0;
-        while($elems[0]=='..'){
+        while ($elems[0] == '..') {
             array_shift($elems);
             $down++;
         }
-        if ($down>=0 && $cwd=='/') {
+        if ($down >= 0 && $cwd == '/') {
             $down = 0;
             $_elems = array();
             $sublevel = 0;
@@ -444,12 +449,12 @@ class Tree_Common extends Tree_OptionsDB
         }
         $i = 0;
         foreach($elems as $val){
-            if (trim($val)=='') {
+            if (trim($val) == '') {
                 return $this->_raiseError(TREE_ERROR_INVALID_PATH,
                             __FUNCTION__, __LINE__);
             }
-            if ($val=='..') {
-                 if ($i==0) {
+            if ($val == '..') {
+                 if ($i == 0) {
                     $down++;
                  } else {
                     $i--;
@@ -458,7 +463,7 @@ class Tree_Common extends Tree_OptionsDB
                 $_elems[$i++] = $val;
             }
         }
-        if(sizeof($_elems)<1){
+        if (sizeof($_elems) < 1){
             return $this->_raiseError(TREE_ERROR_EMPTY_PATH,
                         __FUNCTION__, __LINE__);
         }
@@ -513,7 +518,7 @@ class Tree_Common extends Tree_OptionsDB
      *
      *
      */
-    function getIdByPath($path, $startId=0,
+    function getIdByPath($path, $startId = 0,
                         $nodeName = 'name', $seperator = '/')
     {
         return $this->_raiseError(TREE_ERROR_NOT_IMPLEMENTED,
@@ -557,7 +562,7 @@ class Tree_Common extends Tree_OptionsDB
     function _prepareResults($results)
     {
         $newResults = array();
-        foreach ($results as $key=>$aResult) {
+        foreach ($results as $key => $aResult) {
             $newResults[$key] = $this->_prepareResult($aResult);
         }
         return $newResults;
@@ -626,7 +631,7 @@ class Tree_Common extends Tree_OptionsDB
      * @param      mixed   the error mode
      * @return     object  a Tree_Error
      */
-    function _raiseError($errorCode, $msg='', $line=0)
+    function _raiseError($errorCode, $msg = '', $line = 0)
     {
         include_once 'Tree/Error.php';
         return new Tree_Error(
@@ -647,10 +652,10 @@ class Tree_Common extends Tree_OptionsDB
      * @param      mixed   the error mode
      * @return     object  a Tree_Error
      */
-    function _throwError($msg, $line, $mode=null)
+    function _throwError($msg, $line, $mode = null)
     {
         include_once 'Tree/Error.php';
-        if ($mode===null && $this->debug>0) {
+        if ($mode === null && $this->debug > 0) {
             $mode = PEAR_ERROR_PRINT;
         }
         return new Tree_Error(

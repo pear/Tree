@@ -35,7 +35,7 @@ class Tree_Memory_XML extends XML_Parser
      * @var array   the first element has to be empty, so we can use
      *              the parentId=0 as "no parent"
      */
-    var $data = array(0=>NULL);
+    var $data = array(0 => null);
 
     /**
      * @var    integer $level
@@ -80,10 +80,10 @@ class Tree_Memory_XML extends XML_Parser
 
         if (@is_resource($handle)) {
             $this->setInput($handle);
-        } elseif ($handle != "") {
+        } elseif ($handle != '') {
             $this->setInputFile($handle);
         } else {
-            return $this->raiseError("No filename passed.");
+            return $this->raiseError('No filename passed.');
         }
     }
 
@@ -108,11 +108,11 @@ class Tree_Memory_XML extends XML_Parser
                                         strtolower($element):$element;
         $this->data[$curId]['level'] = $this->level;
         $this->data[$curId]['attributes'] = $attribs;
-        if($this->_toLower)
-        {
+        if ($this->_toLower) {
             $this->data[$curId]['attributes'] = array();
-            foreach($attribs as $key=>$value)
+            foreach($attribs as $key => $value) {
                 $this->data[$curId]['attributes'][strtolower($key)] = $value;
+            }
         }
 
         // is that a new child, or just a 'next' of a child?
@@ -123,7 +123,7 @@ class Tree_Memory_XML extends XML_Parser
         } else {
             // set stuff for the first child !!!
             // the root has no parent
-            if ($this->level>0) {
+            if ($this->level > 0) {
                 $parentId = $this->parentIdOnLevel[$this->level-1];
                 $this->data[$curId]['parentId'] = $parentId;
             } else {
@@ -168,8 +168,9 @@ class Tree_Memory_XML extends XML_Parser
 # ANSWER: if you call xml_parse($parser, "foo ", false) and then
 #         xml_parse($parser, "bar", true), callbacks are done once
 #         for each xml_parse() call.
-        if(!isset($this->data[ sizeof($this->data)-1 ]['cdata']))
+        if (!isset($this->data[ sizeof($this->data)-1 ]['cdata'])) {
             $this->data[ sizeof($this->data)-1 ]['cdata'] = '';
+        }
 #print "cdata = '$cdata'\r\n";
         $this->data[ sizeof($this->data)-1 ]['cdata'].= $cdata;
     }

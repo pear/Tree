@@ -173,11 +173,11 @@ class Tree_Memory extends Tree_Common
      *                            either an object/string
      * @param array   additional options you can set
      */
-    function Tree_Memory($type, $dsn='', $options=array())
+    function Tree_Memory($type, $dsn = '', $options = array())
     {
         // set the options for $this
         $this->Tree_Options($options);
-        include_once("Tree/Memory/$type.php");
+        include_once "Tree/Memory/$type.php";
         $className = 'Tree_Memory_'.$type;
         $this->dataSourceClass =& new $className($dsn, $options);
 
@@ -209,7 +209,7 @@ class Tree_Memory extends Tree_Common
      * @param   array   additional options you can set
      * @return  boolean true on success
      */
-    function switchDataSource($type, $dsn='', $options=array())
+    function switchDataSource($type, $dsn = '', $options = array())
     {
         $data = $this->getNode();
         //$this->Tree($dsn, $options);
@@ -254,10 +254,10 @@ class Tree_Memory extends Tree_Common
      *                  the tree data from a source
      * @return  true or Tree_Error
      */
-    function setup($data=null)
+    function setup($data = null)
     {
         if ($this->debug) {
-            $startTime = split(" ",microtime());
+            $startTime = split(' ',microtime());
             $startTime = $startTime[1]+$startTime[0];
         }
 
@@ -268,8 +268,8 @@ class Tree_Memory extends Tree_Common
         if ($this->debug) {
             $endTime = split(" ",microtime());
             $endTime = $endTime[1]+$endTime[0];
-            print " reading and preparing tree data took: ".
-                    ($endTime - $startTime)."<br>";
+            print ' reading and preparing tree data took: '.
+                    ($endTime - $startTime) . '<br>';
         }
 
         return $this->_setup($res);
@@ -292,7 +292,7 @@ class Tree_Memory extends Tree_Common
         // TODO sort by prevId (parentId,prevId $addQuery) too if it exists
         // in the table, or the root might be wrong TODO since the prevId
         // of the root should be 0
-        if(!$setupData) {
+        if (!$setupData) {
             return false;
         }
 
@@ -319,23 +319,24 @@ class Tree_Memory extends Tree_Common
         // this here :-)
         foreach ($this->children as $children) {
             $lastPrevId = 0;
-            if(sizeof($children))
-            foreach ($children as $key) {
-                if ($lastPrevId) {
-                    // remember the nextId too, so the build process can
-                    // be speed up
-                    $this->data[$lastPrevId]['nextId'] = $key;
-                    $this->data[$lastPrevId]['next'] =   &$this->data[$key];
+            if (sizeof($children)) {
+                foreach ($children as $key) {
+                    if ($lastPrevId) {
+                        // remember the nextId too, so the build process can
+                        // be speed up
+                        $this->data[$lastPrevId]['nextId'] = $key;
+                        $this->data[$lastPrevId]['next'] =   &$this->data[$key];
 
-                    $this->data[$key]['prevId'] = $lastPrevId;
-                    $this->data[$key]['previous'] = &$this->data[ $lastPrevId ];
+                        $this->data[$key]['prevId'] = $lastPrevId;
+                        $this->data[$key]['previous'] = &$this->data[ $lastPrevId ];
+                    }
+                    $lastPrevId = $key;
                 }
-                $lastPrevId = $key;
             }
         }
 
         if ($this->debug) {
-            $startTime = split(" ",microtime());
+            $startTime = split(' ',microtime());
             $startTime = $startTime[1]+$startTime[0];
         }
 
@@ -349,7 +350,7 @@ class Tree_Memory extends Tree_Common
             // build the entire recursive relations, so you have 'parentId',
             // 'childId', 'nextId', 'prevId' and the references 'child',
             // 'parent', 'next', 'previous' set in the property 'data'
-            foreach($this->data as $key=>$value) {
+            foreach($this->data as $key => $value) {
                 // most if checks in this foreach are for the following reason,
                 // if not stated otherwise:
                 // dont make an data[''] or data[0] since this was not read
@@ -367,7 +368,8 @@ class Tree_Memory extends Tree_Common
                 // was a child saved (in the above 'if')
                 // see comment above
                 if (isset($this->children[$key]) &&
-                    sizeof($this->children[$key])) {
+                    sizeof($this->children[$key])
+                ) {
                     // refer to the first child in the [child]
                     // and [childId] keys
                     $this->data[$key]['childId'] = $this->children[$key][0];
@@ -380,9 +382,9 @@ class Tree_Memory extends Tree_Common
         }
 
         if ($this->debug) {
-            $endTime = split(" ",microtime());
+            $endTime = split(' ',microtime());
             $endTime = $endTime[1]+$endTime[0];
-            print(" building took: ".($endTime - $startTime)." <br>");
+            print(' building took: ' . ($endTime - $startTime) . ' <br>');
         }
 
         // build the property 'structure'
@@ -391,7 +393,7 @@ class Tree_Memory extends Tree_Common
         $this->structure = array();
 
         if ($this->debug) {
-            $startTime = split(" ",microtime());
+            $startTime = split(' ',microtime());
             $startTime = $startTime[1]+$startTime[0];
         }
 
@@ -406,9 +408,9 @@ class Tree_Memory extends Tree_Common
         }
 
         if ($this->debug) {
-            $endTime = split(" ",microtime());
+            $endTime = split(' ',microtime());
             $endTime = $endTime[1]+$endTime[0];
-            print(" buildStructure took: ".($endTime - $startTime)." <br>");
+            print(' buildStructure took: ' . ($endTime - $startTime).' <br>');
         }
         return true;
     }
@@ -432,11 +434,11 @@ class Tree_Memory extends Tree_Common
      * @return  mixed   either boolean false on failure or the id
      *                  of the inserted row
      */
-    function add($newValues, $parentId=0, $prevId=0)
+    function add($newValues, $parentId = 0, $prevId = 0)
     {
         // see comments in 'move' and 'remove'
 
-        if (method_exists($this->dataSourceClass,'add')) {
+        if (method_exists($this->dataSourceClass, 'add')) {
             return $this->dataSourceClass->add($newValues, $parentId, $prevId);
         } else {
             return $this->_throwError('method not implemented yet.' ,
@@ -478,7 +480,7 @@ class Tree_Memory extends Tree_Common
         // if the prevId is in use we need to update the prevId of the element
         // after the one that is removed too, to have the prevId of the one
         // that is removed!!!
-        if (method_exists($this->dataSourceClass,'remove')) {
+        if (method_exists($this->dataSourceClass, 'remove')) {
             return $this->dataSourceClass->remove($id);
         } else {
             return $this->_throwError('method not implemented yet.', __LINE__);
@@ -540,7 +542,7 @@ class Tree_Memory extends Tree_Common
      *                  the beginning
      * @return     boolean     true for success
      */
-    function move($idsToMove, $newParentId, $newPrevId=0)
+    function move($idsToMove, $newParentId, $newPrevId = 0)
     {
         settype($idsToMove,'array');
         $errors = array();
@@ -575,7 +577,7 @@ class Tree_Memory extends Tree_Common
      *                  if it is 0 it will be put at the beginning
      * @return  mixed   true for success, Tree_Error on failure
      */
-    function _move($idToMove, $newParentId, $prevId=0)
+    function _move($idToMove, $newParentId, $prevId = 0)
     {
         // itself can not be a parent of itself
         if ($idToMove == $newParentId) {
@@ -586,16 +588,14 @@ class Tree_Memory extends Tree_Common
         // check if $newParentId is a child (or a child-child ...) of $idToMove
         // if so prevent moving, because that is not possible
         // does this element have children?
-        if($this->hasChildren($idToMove))
-        {
+        if ($this->hasChildren($idToMove)) {
             $allChildren = $this->getChildren($idToMove);
             // FIXXME what happens here we are changing $allChildren,
             // doesnt this change the property data too??? since getChildren
             // (might, not yet) return a reference use while since foreach
             // only works on a copy of the data to loop through, but we are
             // changing $allChildren in the loop
-            while (list(, $aChild) = each ($allChildren))
-            {
+            while (list(, $aChild) = each ($allChildren)) {
                 // remove the first element because if array_merge is called
                 // the array pointer seems to be
                 array_shift($allChildren);
@@ -606,9 +606,10 @@ class Tree_Memory extends Tree_Common
                                                 $aChild['children']
                                             );
                 }
-                if($newParentId == $aChild['id'])
+                if ($newParentId == $aChild['id']) {
                     // TODO PEAR-ize error
                     return TREE_ERROR_INVALID_PARENT;
+                }
             }
         }
 
@@ -616,7 +617,7 @@ class Tree_Memory extends Tree_Common
         // needs to know where the element should be moved to
         // and it has to change the prevId of the element that will be after it
         // so we may be simply call some method like 'update' too?
-        if (method_exists($this->dataSourceClass,'move')) {
+        if (method_exists($this->dataSourceClass, 'move')) {
             return $this->dataSourceClass->move($idToMove,
                                                 $newParentId,
                                                 $prevId
@@ -640,9 +641,9 @@ class Tree_Memory extends Tree_Common
      * @return     mixed   either boolean or
      *                     an error object if the method is not implemented
      */
-    function update($id ,$data)
+    function update($id, $data)
     {
-        if (method_exists($this->dataSourceClass,'update')) {
+        if (method_exists($this->dataSourceClass, 'update')) {
             return $this->dataSourceClass->update($id,$data);
         } else {
             return $this->_throwError(
@@ -732,7 +733,7 @@ class Tree_Memory extends Tree_Common
      * @return  mixed   this is all the return data collected from all
      *                  the walk-steps
      */
-    function walk($walkFunction, $id=0, $returnType='string')
+    function walk($walkFunction, $id = 0, $returnType = 'string')
     {
         // by default all of structure is used
         $useNode = $this->structure;
@@ -787,7 +788,7 @@ class Tree_Memory extends Tree_Common
     function _walk($walkFunction, &$curLevel, $returnType)
     {
         if (sizeof($curLevel)) {
-            foreach ($curLevel as $key=>$value) {
+            foreach ($curLevel as $key => $value) {
                 $ret = call_user_func($walkFunction, $this->data[$key]);
                 switch ($returnType) {
                 case 'array':
@@ -851,12 +852,12 @@ class Tree_Memory extends Tree_Common
      */
     function addNode($node)
     {
-        if(sizeof($node)) {
+        if (sizeof($node)) {
             foreach ($node as $aNode) {
                 $newNode = array();
                 // this should always have data, if not the passed
                 // structure has an error
-                foreach ($aNode as $name=>$value) {
+                foreach ($aNode as $name => $value) {
                     // collect the data that need to go in the DB
                     if (!is_array($value)) {
                         $newEntry[$name] = $value;
@@ -870,11 +871,11 @@ class Tree_Memory extends Tree_Common
                 $insertedId = $this->add($newEntry);
                 // if inserting suceeded, we have received the id
                 // under which we can insert the children
-                if($insertedId!= false) {
+                if ($insertedId!= false) {
                     // if there are children, set their parentId.
                     // So they kknow where they belong in the tree
-                    if(sizeof($newNode)) {
-                        foreach($newNode as $key=>$aNewNode) {
+                    if (sizeof($newNode)) {
+                        foreach($newNode as $key => $aNewNode) {
                             $newNode[$key]['parentId'] = $insertedId;
                         }
                     }
@@ -911,7 +912,7 @@ class Tree_Memory extends Tree_Common
         // FIXXME may its better to use a for(level) to count down,
         // since a while is always a little risky
         // until there are no more parents
-        while(@$this->data[$id]['parent']) {
+        while (@$this->data[$id]['parent']) {
             // curElement is already a reference, so save it in path
             $path[] = &$this->data[$id];
             // get the next parent id, for the while to retreive the parent's parent
@@ -953,18 +954,18 @@ class Tree_Memory extends Tree_Common
      * @param      int     the element ID
      *
      */
-    function &_getElement($id, $what='')
+    function &_getElement($id, $what = '')
     {
-        if ($what=='') {
+        if ($what == '') {
             return $this->_prepareResult($this->data[$id]);
         }
         $elementId = $this->_getElementId($id, $what);
-        if($elementId !== NULL) {
+        if ($elementId !== null) {
             return $this->_prepareResult($this->data[$elementId]);
         }
         // we should not return false, since that might be a value
         // of the element that is requested
-        return NULL;
+        return null;
     }
 
     // }}}
@@ -981,10 +982,10 @@ class Tree_Memory extends Tree_Common
      */
     function _getElementId($id, $what)
     {
-        if(isset($this->data[$id][$what]) && $this->data[$id][$what]) {
+        if (isset($this->data[$id][$what]) && $this->data[$id][$what]) {
             return $this->data[$id][$what]['id'];
         }
-        return NULL;
+        return null;
     }
 
     // }}}
@@ -1066,14 +1067,14 @@ class Tree_Memory extends Tree_Common
      * @return  integer the id of the searched element
      *
      */
-    function &getElementByPath($path,$startId=0,$nodeName='name',$seperator='/')
+    function &getElementByPath($path, $startId = 0, $nodeName = 'name', $seperator = '/')
     {
         $id = $this->getIdByPath($path,$startId);
         if ($id) {
             return $this->getElement($id);
         }
-        // return NULL since false might be interpreted as id 0
-        return NULL;
+        // return null since false might be interpreted as id 0
+        return null;
     }
 
     // }}}
@@ -1210,11 +1211,11 @@ class Tree_Memory extends Tree_Common
      * @return     integer the id of the searched element
      *
      */
-    function getIdByPath($path, $startId=0, $nodeName = 'name', $seperator = '/')
+    function getIdByPath($path, $startId = 0, $nodeName = 'name', $seperator = '/')
 // should this method be called getElementIdByPath ????
     {
         // if no start ID is given get the root
-        if ($startId==0) {
+        if ($startId == 0) {
             $startId = $this->getFirstRootId();
         } else {   // if a start id is given, get its first child to start searching there
             $startId = $this->getChildId($startId);
@@ -1223,7 +1224,7 @@ class Tree_Memory extends Tree_Common
             }
         }
 
-        if (strpos($path,$seperator)===0) {  // if a seperator is at the beginning strip it off
+        if (strpos($path,$seperator) === 0) {  // if a seperator is at the beginning strip it off
             $path = substr($path,strlen($seperator));
         }
         $nodes = explode($seperator,$path);
@@ -1235,7 +1236,7 @@ class Tree_Memory extends Tree_Common
                     $nodeFound = true;
                     // do only save the child if we are not already at the end of path
                     // because then we need curId to return it
-                    if ($key < (sizeof($nodes)-1)) {
+                    if ($key < (sizeof($nodes) - 1)) {
                         $curId = $this->getChildId($curId);
                     }
                     break;
@@ -1243,7 +1244,7 @@ class Tree_Memory extends Tree_Common
                 $curId = $this->getNextId($curId);
             } while($curId);
 
-            if ($nodeFound==false) {
+            if ($nodeFound == false) {
                 return false;
             }
         }
@@ -1374,7 +1375,7 @@ class Tree_Memory extends Tree_Common
     function hasChildren($id=0)
     {
         if (isset($this->data[$id]['children']) &&
-            sizeof($this->data[$id]['children'])>0) {
+            sizeof($this->data[$id]['children']) > 0) {
             return true;
         }
         return false;
@@ -1393,7 +1394,7 @@ class Tree_Memory extends Tree_Common
      * @param   integer the children of how many levels shall be returned
      * @return  boolean true if the node has children
      */
-    function getChildren($ids, $levels=1)
+    function getChildren($ids, $levels = 1)
     {
         //FIXXME $levels to be implemented
         $ret = array();
@@ -1423,7 +1424,7 @@ class Tree_Memory extends Tree_Common
      * @param   integer $id the id of the node to check for children
      * @return  boolean true if the node has children
      */
-    function isNode($id=0)
+    function isNode($id = 0)
     {
         return isset($this->data[$id]);
     }
@@ -1446,9 +1447,9 @@ class Tree_Memory extends Tree_Common
      *                  be dumped if you want to dump only a single element
      *                  pass it as an array using array($element).
      */
-    function varDump($node=0)
+    function varDump($node = 0)
     {
-        $dontDump = array('parent','child','children','next','previous');
+        $dontDump = array('parent', 'child', 'children', 'next', 'previous');
 
         // if $node is an array, we assume it is a collection of elements
         if (!is_array($node)) {
@@ -1458,7 +1459,7 @@ class Tree_Memory extends Tree_Common
         if (sizeof($node)) {
             print '<table border="1"><tr><th>name</th>';
             $keys = array();
-            foreach ($this->getRoot() as $key=>$x) {
+            foreach ($this->getRoot() as $key => $x) {
                 if (!is_array($x)) {
                     print "<th>$key</th>";
                     $keys[] = $key;
@@ -1469,7 +1470,7 @@ class Tree_Memory extends Tree_Common
             foreach ($nodes as $aNode) {
                 print '<tr><td nowrap="nowrap">';
                 $prefix = '';
-                for($i=0;$i<$aNode['level'];$i++) $prefix .= '- ';
+                for ($i = 0; $i < $aNode['level']; $i++) $prefix .= '- ';
                 print "$prefix {$aNode['name']}</td>";
                 foreach ($keys as $aKey) {
                     if (!is_array($key)) {
@@ -1501,7 +1502,7 @@ class Tree_Memory extends Tree_Common
      */
     function copy($srcId, $destId)
     {
-        if (method_exists($this->dataSourceClass,'copy')) {
+        if (method_exists($this->dataSourceClass, 'copy')) {
             return $this->dataSourceClass->copy($srcId, $destId);
         } else {
             return $this->_throwError('method not implemented yet.', __LINE__);

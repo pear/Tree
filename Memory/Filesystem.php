@@ -104,7 +104,7 @@ require_once 'Tree/Error.php';
     {
         if ($handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
-                if($file != '.' && $file != '..'
+                if ($file != '.' && $file != '..'
                     && is_dir("$path/$file")) {
                     $this->data[] = array(
                                         'id'       => "$path/$file",
@@ -127,9 +127,9 @@ require_once 'Tree/Error.php';
      * a node under is the same as when the tree was last read.
      * but this might be tricky.
      */
-    function add($newValues, $parent=0, $prevId=0)
+    function add($newValues, $parent = 0, $prevId = 0)
     {
-        if(!$parent) {
+        if (!$parent) {
             $parent = $this->path;
         }
         # FIXXME do the mapping
