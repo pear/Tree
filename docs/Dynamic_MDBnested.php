@@ -4,20 +4,20 @@
     //
 
 //ini_set('include_path',realpath(dirname(__FILE__).'/../../').':'.realpath(dirname(__FILE__).'/../../../includes').':'.ini_get('include_path'));
-ini_set('error_reporting', E_ALL);
+//ini_set('error_reporting',E_ALL);
 
     require_once 'Tree/Tree.php';
 
-#    $tree = Tree::setupDynamic('DBnested' , 'mysql://root@localhost/tree_test' , array('table' => 'nestedTree'));
+#    $tree = Tree::setupDynamic('MDBnested' , 'mysql://root@localhost/tree_test' , array('table' => 'nestedTree'));
 #   OR
-    $tree = Tree::setup('Dynamic_DBnested' , 'mysql://root@localhost/tree_test' , array('table' => 'nestedTree'));
+    $tree = Tree::setup('Dynamic_MDBnested' , 'mysql://root@localhost/tree_test' , array('table' => 'nestedTree'));
 
     $show[] = '$tree->getRoot()';
-    $show[] = '$tree->getElement(1)';
-    $show[] = '$tree->getChild(1)';
-    $show[] = '$tree->getPath(7)';
-    $show[] = '$tree->getPath(2)';
-    $show[] = '$tree->add(array("name"=>"c0") , 5 )';
+    $show[] = '$tree->getElement( 1 )';
+    $show[] = '$tree->getChild( 1 )';
+    $show[] = '$tree->getPath( 7 )';
+    $show[] = '$tree->getPath( 2 )';
+    $show[] = '$tree->add( array("name"=>"c0") , 5 )';
     $show[] = '$tree->remove( $res )';  // remove the last element that was added in the line before :-)
     $show[] = '$tree->getRight( 5 )';
     $show[] = '$tree->getLeft( 5 )';

@@ -10,16 +10,16 @@
     *   @param  array   $para   the result returned by some method, that will be dumped
     *   @param  string  $string the explaining string
     */
-    function dumpHelper( $para , $string='' )
+    function dumpHelper($para, $string = '')
     {
         global $tree;
 
-        print '<i><u><font color="#008000">'.$string.'</font></u></i><br>';
+        echo'<i><u><font color="#008000">' . $string . '</font></u></i><br>';
         // this method dumps to the screen, since print_r or var_dump dont
         // work too good here, because the inner array is recursive
         // well, it looks ugly but one can see what is meant :-)
         $tree->varDump($para);
-        print '<br>';
+        echo '<br>';
 
     }
 
@@ -27,28 +27,28 @@
     *   dumps the entire structure nicely
     *   @param  string  $string the explaining string
     */
-    function dumpAllNicely( $string='' )
+    function dumpAllNicely($string = '')
     {
         global $tree;
 
-        print '<i><u><font color="#008000">'.$string.'</font></u></i><br>';
+        echo '<i><u><font color="#008000">' . $string . '</font></u></i><br>';
         $all = $tree->getNode();   // get the entire structure sorted as the tree is, so we can simply foreach through it and show it
-        foreach( $all as $aElement )
-        {
-            for( $i=0 ; $i<$aElement['level'] ; $i++)
-                print '&nbsp; &nbsp; ';
-            print '<b>'.$aElement['name'].'</b> ===&gt; ';
+        foreach ($all as $aElement) {
+            for ($i = 0; $i < $aElement['level']; $i++) {
+                echo '&nbsp; &nbsp; ';
+            }
+            echo '<b>' . $aElement['name'] . '</b> ===&gt; ';
 
             // you can also show all the content, using this
             // $tree->varDump(array($aElement));
             // i just didnt, since it takes up more then the entire line, and its unreadable :-)
 
-            print 'attributes - ';
+            echo 'attributes - ';
             print_r($aElement['attributes']);
-            print '<br>';
+            echo '<br>';
 
         }
-        print '<br>';
+        echo '<br>';
 
     }
 
@@ -72,7 +72,7 @@
 
     */
 
-    require_once('Tree/Tree.php');
+    require_once 'Tree/Tree.php';
 
     // calling 'setupMemory' means to retreive a class, which works on trees,
     // that are temporarily stored in the memory, in an array
@@ -80,7 +80,7 @@
     // consider the resource usage and it's not to suggested to work
     // on huge trees (upto 1000 elements it should be ok, depending on your environment and requirements)
     // using 'setupMemory'
-    $tree = Tree::setupMemory(  'XML',          // use the XML class to read an xml file
+    $tree = Tree::setupMemory('XML',          // use the XML class to read an xml file
                                 'config.xml'    // the DSN
                              );
 
@@ -91,36 +91,36 @@
     // given methods
     $tree->setup();
 
-    dumpAllNicely( 'dump all after "$tree-&gt;setup"' );
+    dumpAllNicely('dump all after "$tree-&gt;setup"');
 
     // get the path of the last inserted element
-    print 'id='.$id = $tree->getIdByPath('simpletemplate/options/delimiter');
-    dumpHelper( $tree->getPath( $id ) , 'dump the path from "simpletemplate/options/delimiter"' );
+    echo 'id='.$id = $tree->getIdByPath('simpletemplate/options/delimiter');
+    dumpHelper( $tree->getPath( $id ) , 'dump the path from "simpletemplate/options/delimiter"');
 
     $id = $tree->getIdByPath('simpletemplate/options');
-    dumpHelper( array($tree->getParent($id)) , 'dump the parent of "simpletemplate/options"' );
+    dumpHelper(array($tree->getParent($id)) , 'dump the parent of "simpletemplate/options"');
     // you can also use:    $tree->data[$id]['parent']
 
     $id = $tree->getIdByPath('simpletemplate');
-    dumpHelper( array($tree->getChild($id)) , 'dump the child of "simpletemplate"' );
+    dumpHelper(array($tree->getChild($id)) , 'dump the child of "simpletemplate"');
     // you can also use:    $tree->data[$id]['child']
 
     $id = $tree->getIdByPath('simpletemplate/prefilter');
-    dumpHelper( $tree->getChildren($id) , 'dump the children of "simpletemplate/prefilter"' );
+    dumpHelper($tree->getChildren($id) , 'dump the children of "simpletemplate/prefilter"');
     // you can also use:    $tree->data[$id]['children']
 
     $id = $tree->getIdByPath('simpletemplate/options');
-    dumpHelper( array($tree->getNext($id)) , 'dump the "next" of "simpletemplate/options"' );
+    dumpHelper(array($tree->getNext($id)) , 'dump the "next" of "simpletemplate/options"');
     // you can also use:    $tree->data[$id]['next']
 
     $id = $tree->getIdByPath('simpletemplate/prefilter');
-    dumpHelper( array($tree->getPrevious($id)) , 'dump the "previous" of "simpletemplate/prefilter"' );
+    dumpHelper( array($tree->getPrevious($id)) , 'dump the "previous" of "simpletemplate/prefilter"');
     // you can also use:    $tree->data[$id]['previous']
 
 
     $id = $tree->getIdByPath('simpletemplate/preFilter');
     $element = $tree->data[$id]['child']['next']['next']; // refer to the third child of 'SimpleTemplate/preFilter/register'
-    dumpHelper( $element['id'] , 'demo of using the internal array, for referencing tree-nodes' );
+    dumpHelper($element['id'] , 'demo of using the internal array, for referencing tree-nodes');
 
 /*
 NOT IMPLEMENTED YET
@@ -139,6 +139,6 @@ NOT IMPLEMENTED YET
 
     $tree->setRemoveRecursively(true);
     $tree->remove(0);
-    print '<font color="red">ALL ELEMENTS HAVE BEEN REMOVED (uncomment this part to keep them in the DB after running this test script)</font>';
+    echo '<font color="red">ALL ELEMENTS HAVE BEEN REMOVED (uncomment this part to keep them in the DB after running this test script)</font>';
 */
 ?>
