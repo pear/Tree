@@ -51,6 +51,7 @@
                     <file role="php">DBnested.php</file>
                     <file role="php">XML.php</file>
                     <file role="php">Filesystem.php</file>
+                    <file role="php">Array.php</file>
                 </dir>
                 <dir name="Dynamic">
                     <file role="php">DBnested.php</file>
