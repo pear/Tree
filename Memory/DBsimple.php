@@ -30,8 +30,8 @@ require_once('Tree/Error.php');
 *   @package    Tree
 */
 class Tree_Memory_DBsimple extends Tree_OptionsDB
-# FIXXME should actually extend Tree_Common, to use the methods provided in there... but we need to connect
-# to the db here, so we extend optionsDB for now, may be use "aggregate" function to fix that
+// FIXXME should actually extend Tree_Common, to use the methods provided in there... but we need to connect
+// to the db here, so we extend optionsDB for now, may be use "aggregate" function to fix that
 {
 
     /**
@@ -67,7 +67,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     *   @access private
     *   @var    object  $dbh    the handle to the DB-object
     */
-#    var $dbh;
+//    var $dbh;
 
     /**
     *   set up this object
@@ -103,8 +103,8 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     */
     function setup()
     {
-# TODO sort by prevId (parentId,prevId $addQuery) too if it exists in the table, or the root might be wrong
-# TODO  since the prevId of the root should be 0
+// TODO sort by prevId (parentId,prevId $addQuery) too if it exists in the table, or the root might be wrong
+// TODO  since the prevId of the root should be 0
 
         //
         $whereAddOn = '';
@@ -135,17 +135,17 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         $query = sprintf(   "SELECT * FROM %s %s ORDER BY %s",
                             $this->table,
                             $whereAddOn,
-                            $orderBy); #,prevId !!!!
+                            $orderBy); //,prevId !!!!
         if( DB::isError( $res = $this->dbh->getAll( $query ) ) )
         {
-# FIXXME remove print use debug mode instead
+// FIXXME remove print use debug mode instead
             printf("ERROR - Tree::setup - %s - %s<br>",DB::errormessage($res),$query);
             return $this->_throwError($res->getMessage(),__LINE__);
         }
 
         // if the db-column names need to be mapped to different names
-# FIXXME somehow we should be able to do this in the query, but i dont know how to select
-# only those columns, use "as" on them and select the rest, without getting those columns again :-(
+// FIXXME somehow we should be able to do this in the query, but i dont know how to select
+// only those columns, use "as" on them and select the rest, without getting those columns again :-(
         if( $map )
         foreach( $res as $id=>$aResult )    // map each result
         {
@@ -177,8 +177,8 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     */
     function add( $newValues , $parentId=0 )
     {
-# FIXXME use $this->dbh->tableInfo to check which columns exist
-# so only data for which a column exist is inserted
+// FIXXME use $this->dbh->tableInfo to check which columns exist
+// so only data for which a column exist is inserted
         if( $parentId )
             $newValues['parentId'] = $parentId;
 
@@ -198,7 +198,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
                             implode( ',' , $newData ) );
         if( DB::isError( $res = $this->dbh->query( $query ) ) )
         {
-            # TODO raise PEAR error
+            // TODO raise PEAR error
             printf("ERROR - Tree::add - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
@@ -235,14 +235,14 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         }
 
         $query = "DELETE FROM {$this->table} $whereClause";
-#print("<br>".$query);
+//print("<br>".$query);
         if( DB::isError( $res = $this->dbh->query( $query ) ) )
         {
-# TODO raise PEAR error
+// TODO raise PEAR error
             printf("ERROR - Tree::remove - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
-# TODO if remove succeeded set prevId of the following element properly
+// TODO if remove succeeded set prevId of the following element properly
 
         return true;
     } // end of function
@@ -272,18 +272,18 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
             $idColumnName = $map['id'];
         if( isset($map['parentId']) )
             $parentIdColumnName = $map['parentId'];
-# FIXXME todo: previous stuff
+// FIXXME todo: previous stuff
 
         // set the parent in the DB
         $query = "UPDATE $this->table SET $parentIdColumnName=$newParentId WHERE $idColumnName=$idToMove";
-#print($query);
+//print($query);
         if( DB::isError( $res = $this->dbh->query( $query ) ) )
         {
-# TODO raise PEAR error
+// TODO raise PEAR error
             printf("ERROR - Tree::move - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
-# FIXXME update the prevId's of the elements where the element was moved away from and moved in
+// FIXXME update the prevId's of the elements where the element was moved away from and moved in
 
         return true;
     } // end of function
@@ -302,9 +302,9 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     function update( $id , $newData )
     {
 
-# FIXXME check $this->dbh->tableInfo to see if all the columns that shall be updated
-# really exist, this will also extract nextId etc. if given before writing it in the DB
-# in case they dont exist in the DB
+// FIXXME check $this->dbh->tableInfo to see if all the columns that shall be updated
+// really exist, this will also extract nextId etc. if given before writing it in the DB
+// in case they dont exist in the DB
         $setData = array();
         foreach( $newData as $key=>$value )       // quote the values, as needed for the insert
         {
@@ -319,7 +319,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
                         );
         if( DB::isError( $res=$this->dbh->query($query) ) )
         {
-# FIXXME raise PEAR error
+// FIXXME raise PEAR error
             printf("ERROR - Tree::update - %s - %s<br>",DB::errormessage($res),$query);
             return false;
         }
