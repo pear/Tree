@@ -127,6 +127,19 @@ class Tree extends PEAR
         return Tree::$method( $type[1] , $dsn , $options );
     }
 
-}
-
+}    /**
+      * Tell whether a result code from a DB method is an error
+      *
+      * @param int $value result code
+      *
+      * @return bool whether $value is an error
+      *
+      * @access public
+      */
+    function isError($value)
+    {
+        return (is_object($value) &&
+                (get_class($value) == 'tree_error' ||
+                 is_subclass_of($value, 'tree_error')));
+    }
 ?>
