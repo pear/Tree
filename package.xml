@@ -97,6 +97,17 @@
                         </dir>
                     </dir>
                 </dir>
+                <dir name="tests" role="test">
+                    <file role="test">UnitTest.php</file>
+                    <file role="test">getElement.php</file>
+                    <file role="test">getIdByPath.php</file>
+                    <file role="test">getLevel.php</file>
+                    <file role="test">getPath.php</file>
+                    <file role="test">index.php</file>
+                    <file role="test">move.php</file>
+                    <file role="test">remove.php</file>
+                    <file role="test">sql.php</file>
+                </dir>
             </dir>
 
             <deps>
