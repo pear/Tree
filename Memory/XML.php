@@ -75,7 +75,7 @@ class Tree_Memory_XML extends XML_Parser
         } elseif ($handle != "") {
             $this->setInputFile($handle);
         } else {
-            $this->raiseError("No filename passed.");
+            return $this->raiseError("No filename passed.");
         }
     }
 
@@ -144,6 +144,9 @@ class Tree_Memory_XML extends XML_Parser
     {
 # QUESTION: why is this method called multiple times for one element?
 # is every space a cdata ???
+# ANSWER: if you call xml_parse($parser, "foo ", false) and then
+#         xml_parse($parser, "bar", true), callbacks are done once
+#         for each xml_parse() call.
         if( !isset($this->data[ sizeof($this->data)-1 ]['cdata']) )
             $this->data[ sizeof($this->data)-1 ]['cdata'] = '';
         $this->data[ sizeof($this->data)-1 ]['cdata'].= $cdata;
