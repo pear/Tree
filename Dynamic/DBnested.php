@@ -30,14 +30,14 @@ require_once('Tree/Error.php');
 *   @package    Tree
 */
 class Tree_Dynamic_DBnested extends Tree_Common
-# FIXXME should actually extend Tree_Common, to use the methods provided in there... but we need to connect
-# to the db here, so we extend optionsDB for now, may be use "aggregate" function to fix that
+// FIXXME should actually extend Tree_Common, to use the methods provided in there... but we need to connect
+// to the db here, so we extend optionsDB for now, may be use "aggregate" function to fix that
 {
 
     var $debug = 0;
 
     var $options = array(
-# FIXXME to be implemented
+// FIXXME to be implemented
                             'whereAddOn'=>''    // add on for the where clause, this string is simply added behind the WHERE in the select
                                                 // so you better make sure its correct SQL :-), i.e. 'uid=3'
                                                 // this is needed i.e. when you are saving many trees in one db-table
@@ -56,11 +56,11 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             ,'order'    => ''   // needed for sorting the tree, currently only used in Memory_DBnested
                             );
 
-# the defined methods here are proposals for the implementation,
-# they are named the same, as the methods in the "Memory" branch, if possible
-# it would be cool to keep the same naming and if the same parameters would be possible too
-# then it would be even better, so one could easily change from any kind of
-# tree-implementation to another, without changing the source code, only the setupXXX would need to be changed
+// the defined methods here are proposals for the implementation,
+// they are named the same, as the methods in the "Memory" branch, if possible
+// it would be cool to keep the same naming and if the same parameters would be possible too
+// then it would be even better, so one could easily change from any kind of
+// tree-implementation to another, without changing the source code, only the setupXXX would need to be changed
 
     /**
     *
@@ -127,7 +127,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
         // check the DB-table if the columns which are given as keys
         // in the array $newValues do really exist, if not remove them from the array
-# FIXXME do the above described
+// FIXXME do the above described
 
         if( $parentId || $prevId )                  // if no parent and no prevId is given the root shall be added
         {
@@ -152,12 +152,12 @@ class Tree_Dynamic_DBnested extends Tree_Common
             // i.e. at: http://research.calacademy.org/taf/proceedings/ballew/sld034.htm
             $prevVisited = $prevId ? $element['right'] : $element['left'];
 
-# FIXXME start transaction here
+// FIXXME start transaction here
 
             if( PEAR::isError($err=$this->_add( $prevVisited , 1 )) )
             {
-    # FIXXME rollback
-                #$this->dbh->rollback();
+    // FIXXME rollback
+                //$this->dbh->rollback();
                 return $err;
             }
         }
@@ -184,10 +184,10 @@ class Tree_Dynamic_DBnested extends Tree_Common
                         );
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-# rollback
+// rollback
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
-# commit here
+// commit here
 
         return $nextId;
     } // end of function
@@ -221,7 +221,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $prevVisited );
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-# FIXXME rollback
+// FIXXME rollback
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
@@ -234,7 +234,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $prevVisited );
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-# FIXXME rollback
+// FIXXME rollback
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
         return true;
@@ -256,8 +256,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
         if( PEAR::isError($element) )
             return $element;
 
-# FIXXME start transaction
-        #$this->dbh->autoCommit(false);
+// FIXXME start transaction
+        //$this->dbh->autoCommit(false);
         $query = sprintf(   'DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
                             $this->table,
                             $this->_getWhereAddOn(),
@@ -265,15 +265,15 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $element['left'],$element['right']);
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+// FIXXME rollback
+            //$this->dbh->rollback();
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
         if( PEAR::isError($err=$this->_remove( $element )) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+// FIXXME rollback
+            //$this->dbh->rollback();
             return $err;
         }
         return true;
@@ -320,8 +320,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
             // the rollback shall be done by the method calling this one, since it is only private
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
-# FIXXME commit - should that not also be done in the method calling this one? like when an error occurs?
-        #$this->dbh->commit();
+// FIXXME commit - should that not also be done in the method calling this one? like when an error occurs?
+        //$this->dbh->commit();
         return true;
     } // end of function
 
@@ -364,7 +364,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
             if( PEAR::isError($ret) )
                 $errors[] = $ret;
         }
-# FIXXME the error in a nicer way, or even better let the throwError method do it!!!
+// FIXXME the error in a nicer way, or even better let the throwError method do it!!!
         if( sizeof($errors) )
         {
             return $this->_throwError(serialize($errors),__LINE__);
@@ -427,21 +427,21 @@ class Tree_Dynamic_DBnested extends Tree_Common
         $numberOfElements = ($element['right'] - $element['left']+1)/2;
         $prevVisited = $newPrevId ? $newPrevious['right'] : $newParent['left'];
 
-# FIXXME start transaction
+// FIXXME start transaction
 
         // add the left/right values in the new parent, to have the space to move the new values in
         if( PEAR::isError($err=$this->_add( $prevVisited , $numberOfElements )) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+// FIXXME rollback
+            //$this->dbh->rollback();
             return $err;
         }
 
         // update the parentId of the element with $idToMove
         if( PEAR::isError($err=$this->update( $idToMove , array('parentId'=>$newParentId) )) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+// FIXXME rollback
+            //$this->dbh->rollback();
             return $err;
         }
 
@@ -455,8 +455,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
         {
             if( PEAR::isError($temp = $this->getElement( $newPrevId )) )
             {
-# FIXXME rollback
-                #$this->dbh->rollback();
+// FIXXME rollback
+                //$this->dbh->rollback();
                 return $temp;
             }
             $calcWith = $temp['right'];
@@ -465,8 +465,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
         {
             if( PEAR::isError($temp = $this->getElement( $newParentId )) )
             {
-# FIXXME rollback
-                #$this->dbh->rollback();
+// FIXXME rollback
+                //$this->dbh->rollback();
                 return $temp;
             }
             $calcWith = $temp['left'];
@@ -492,20 +492,20 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $rName,$element['right']+1 );
         if( DB::isError( $res = $this->dbh->query($query) ) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+// FIXXME rollback
+            //$this->dbh->rollback();
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
         // remove the part of the tree where the element(s) was/were before
         if( PEAR::isError($err=$this->_remove( $element )) )
         {
-# FIXXME rollback
-            #$this->dbh->rollback();
+// FIXXME rollback
+            //$this->dbh->rollback();
             return $err;
         }
-# FIXXME commit all changes
-        #$this->dbh->commit();
+// FIXXME commit all changes
+        //$this->dbh->commit();
 
         return true;
     } // end of function
@@ -539,7 +539,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $this->_getColName('id'),
                             $id);
         if( DB::isError( $res=$this->dbh->query($query) ) ){
-# FIXXME raise PEAR error
+// FIXXME raise PEAR error
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
@@ -557,8 +557,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
     */
     function copy( $id , $parentId , $prevId )
     {
-        # get element tree
-        # $this->addTree
+        // get element tree
+        // $this->addTree
     } // end of function
 
 
