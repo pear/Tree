@@ -620,87 +620,14 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
 
 
+
+
+
+
     //
     //  PRIVATE METHODS
     //
 
-
-    /**
-    *   prepare multiple results
-    *
-    *   @see        _prepareResult()
-    *   @access     private
-    *   @version    2002/03/03
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
-    */
-    function _prepareResults( $results )
-    {
-        $newResults = array();
-        foreach( $results as $aResult )
-            $newResults[] = $this->_prepareResult($aResult);
-        return $newResults;
-    }
-
-    /**
-    *   map back the index names to get what is expected
-    *
-    *   @access     private
-    *   @version    2002/03/03
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
-    */
-    function _prepareResult( $result )
-    {
-        $map = $this->getOption('columnNameMaps');
-
-        if( $map )
-        foreach( $map as $key=>$columnName )
-        {
-            $result[$key] = $result[$columnName];
-            unset($result[$columnName]);
-        }
-        return $result;
-    }
-
-    /**
-    *
-    *
-    *   @access     private
-    *   @version    2002/03/02
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
-    */
-    function _throwError( $msg , $line , $mode=null )
-    {
-        if( $mode===null && $this->debug>0 )
-            $mode = PEAR_ERROR_PRINT;
-        return new Tree_Error( $msg , $line , __FILE__ , $mode , $this->dbh->last_query );
-    }
-
-    /**
-    *   this method retreives the real column name, as used in the DB
-    *   since the internal names are fixed, to be portable between different
-    *   DB-column namings, we map the internal name to the real column name here
-    *
-    *   @access     private
-    *   @version    2002/03/02
-    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
-    *   @return
-    */
-    function _getColName( $internalName )
-    {
-        if( $map = $this->getOption( 'columnNameMaps' ) )
-        {
-            if( isset($map[$internalName]) )
-                return $map[$internalName];
-        }
-        return $internalName;
-    }
 
     /**
     *
@@ -725,7 +652,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
 
 
-    // for playing ....
+    // for compatibility to Memory methods
     function getFirstRoot()
     {
         return $this->getRoot();
@@ -746,9 +673,6 @@ class Tree_Dynamic_DBnested extends Tree_Common
     function &getNode( $startId=0 , $depth=0 )
     {
     }
-
-
-
 
 }
 ?>
