@@ -65,16 +65,19 @@ class Tree_Memory_Array
     function setup()
     {
         unset($this->data);                         // unset the data to be sure to get the real data again, no old data
-        if( is_array($this->_array) )
-        {
+        if (is_array($this->_array)) {
             $this->data[0] = null;
             $theData = array(&$this->_array);
             $this->_setup($theData);
         }
-                              
-        return $this->data;
+
+/*foreach($this->data as $val){print "\r\n";
+foreach ($val as $k=>$v)
+    print "$k=>$v\r\n";
+}*/
+            return $this->data;
     }
-             
+
     /**
     *   we modify the $this->_array in here, we also add the id
     *   so methods like 'add' etc can find the elements they are searching for,
@@ -82,27 +85,24 @@ class Tree_Memory_Array
     */
     function _setup( &$array , $parentId=0 )
     {
-        foreach( $array as $nodeKey=>$aNode )
-        {
+        foreach ($array as $nodeKey=>$aNode) {
             $newData = $aNode;
-            if ( !isset($newData['id']) || !$newData['id'] ) {
-                $newData['id'] = $this->_id++;
-                $array[$nodeKey]['id'] = $newData['id'];
+            if (!isset($newData['id']) || !$newData['id']) {    // if the current element has no id, we generate one
+                $newData['id'] = $this->_id++;      // build a unique numeric id
+                $array[$nodeKey]['id'] = $newData['id'];    // set the id
             }
-
-            $newData['parentId'] = $parentId;
+//print "a node name=".$aNode['name'].'<br>';
+            $newData['parentId'] = $parentId;       // set the parent-id, since we only have a 'children' array
             $children = null;
-            foreach ( $newData as $key=>$val ) // remove the 'children' array, since this is only info for this class
-            {
-                if( $key=='children' )
-                {
+            foreach ( $newData as $key=>$val ) {    // remove the 'children' array, since this is only info for this class
+                if ($key=='children') {
                     unset($newData[$key]);
                 }
             }
 
-            $this->data[] = $newData;
-            if ( isset($aNode['children']) && $aNode['children'] ) {
-                if( !isset($array[$nodeKey]['children']) ) {
+            $this->data[$newData['id']] = $newData;
+            if (isset($aNode['children']) && $aNode['children']) {
+                if (!isset($array[$nodeKey]['children'])) {
                     $array[$nodeKey]['children'] = array();
                 }
                 $this->_setup( $array[$nodeKey]['children'] , $newData['id'] );
@@ -110,6 +110,38 @@ class Tree_Memory_Array
         }
     }
 
+
+    /**
+    *   this is mostly used by switchDataSource
+    *   this method put data gotten from getNode() in the $this->_array
+    *
+    */
+    function setData($data)
+    {
+/*
+        $root = array_shift($data);
+        unset($root['children']);
+        $this->_array = array('children'=> array($root));
+foreach ($this->_array['children'][0] as $key=>$val)
+    print "$key=>$val<br>";
+print "<br>";
+*/
+        $unsetKeys = array('childId','left','right');
+
+        foreach ( $data as $aNode ) {
+//print $aNode['id'].' : '.$aNode['name'].'  parentId='.$aNode['parentId'].' size='.sizeof($this->_array['children'][0]['children']).'<br>';
+            foreach ($aNode as $key=>$val) {
+                if (is_array($val) || in_array($key,$unsetKeys)) {
+                    unset($aNode[$key]);
+                }
+            }
+            $this->add($aNode,$aNode['parentId']);
+        }
+//foreach ($this->_array['children'][0]['children'] as $x){print "<br>";
+//foreach ($x as $key=>$val)
+//    print "$key=>$val<br>";}
+        $this->_array = $this->_array['children'][0];
+    }
 
     /**
     *
@@ -164,19 +196,30 @@ class Tree_Memory_Array
         }
         return $result;
     }
-                                       
+
     /**
     *
     */
     function add( $data , $parentId , $previousId=0 )
     {
-        $data['id'] = $this->_id++;
+        if (!isset($data['id'])) {
+            $data['id'] = $this->_id++;
+        } elseif(is_int($data['id'] && $data['id'] > $this->_id)) {
+            // update the $this->_id if the data['id'] has a higher number, since
+            // we dont want to overwrite anything. just in case
+            $this->_id = $data['id'];
+        }
         $data['parentId'] = $parentId;
-        $this->data[] = $data;
+        $this->data[$data['id']] = $data;
 
-        // add the element itself also in the source array, where we actually read the structure from
         //$path = $this->getPathById($parentId);
-        array_walk($this->_array['children'],array(&$this,'_add'),array($data,$parentId));
+
+        if (!isset($this->_array['children'])) {    // there might not be a root element yet
+            $data['parentId'] = 0;
+            $this->_array['children'][] = $data;
+        } else {
+            array_walk($this->_array['children'],array(&$this,'_add'),array($data,$parentId));
+        }
 
         //$this->_array
         return $data['id'];
@@ -185,12 +228,94 @@ class Tree_Memory_Array
     // this one was a real quicky !!!
     function _add( &$val , $key , $data )
     {
-        if( $val['id']==$data[1] )
+        if ($val['id']==$data[1]) { // is the id of the current elment ($val) == to the parentId ($data[1])
             $val['children'][] = $data[0];
-        else    // if we havent found the new element go on searching
-        {
-            if( $val['children'] )
+        } else {        // if we havent found the new element go on searching
+            if (isset($val['children'])) {
                 array_walk($val['children'],array(&$this,'_add'),$data);
+            }
+        }
+    }
+
+    /**
+    *   update an entry with the given id and set the data as given in the array $data
+    *
+    *   @param  int     the id of the element that shall be updated
+    *   @param  array   the data, [key]=>[value]
+    *   @return void
+    */
+    function update($id,$data)
+    {
+        if ($this->_array['id']==$id) {
+            foreach ($data as $key=>$newVal) {
+                $this->_array[$key] = $newVal;
+            }
+        } else {
+            array_walk($this->_array['children'],array(&$this,'_update'),array($id,$data));
+        }
+    }
+
+    /**
+    *   update the element with the given id
+    *
+    *   @param  array   a reference to an element inside $this->_array
+    *                   has to be a reference, so we can really modify the actual data
+    *   @param  int     not in use, but array_walk passes this param
+    *   @param  array   [0] is the id we are searching for
+    *                   [1] are the new data we shall set
+    *   @return void
+    */
+    function _update( &$val , $key , $data )
+    {
+//print $val['id'].'=='.$data[0].'<br>';
+        if ($val['id']==$data[0]) { // is the id of the current elment ($val) == to the parentId ($data[1])
+            foreach ($data[1] as $key=>$newVal) {
+//print "set ".$val['name']."  $key = $newVal<br>";
+                $val[$key] = $newVal;
+            }
+        } else {        // if we havent found the new element go on searching in the children
+            if (isset($val['children'])) {
+                array_walk($val['children'],array(&$this,'_update'),$data);
+            }
+        }
+    }
+
+    /**
+    *   remove an element from the tree
+    *   this removes all the children too
+    *
+    *   @param  int the id of the element to be removed
+    */
+    function remove($id)
+    {
+        $this->_remove($this->_array,$id);
+    }
+
+    /**
+    *   remove the element with the given id
+    *   this will definitely remove all the children too
+    *
+    *   @param  array   a reference to an element inside $this->_array
+    *                   has to be a reference, so we can really modify the actual data
+    *   @param  int     the id of the element to be removed
+    *   @return void
+    */
+    function _remove( &$val , $id )
+    {
+        if (isset($val['children'])) {
+            foreach ($val['children'] as $key=>$aVal) {
+//print $aVal['id'].'=='.$id."\r\n";
+                if ($aVal['id']==$id) {
+//print "remove ".$aVal['name']."\r\n";
+                    if (sizeof($val['children'])<2) {
+                        unset($val['children']);
+                    } else {
+                        unset($val['children'][$key]);
+                    }
+                } else {
+                    $this->_remove($val['children'][$key],$id);
+                }
+            }
         }
     }
 
