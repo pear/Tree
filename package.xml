@@ -31,7 +31,7 @@
     </maintainer>
   </maintainers>
     <release>
-        <version>0.2</version>
+        <version>0.2.1</version>
         <date>2002-10-28</date>
         <license>PHP License</license>
         <state>beta</state>
