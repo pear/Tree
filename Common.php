@@ -18,23 +18,25 @@
 //
 //  $Id$
 
-require_once('Tree/Options.php');
+require_once('Tree/OptionsDB.php');
 
 define("TREE_ERROR",                    -1);
 define("TREE_ERROR_INVALID_PARENT",     -2);
 define("TREE_ERROR_HAS_CHILDREN",       -3);
 
 /**
+*   common tree class, implements common functionality
 *
+*   this class extends Tree_OptionsDB so every class that extends this oe can
+*   connect to a db and set options
 *
 *   @access     public
 *   @author     Wolfram Kriesing <wolfram@kriesing.de>
 *   @version    2001/06/27
 *   @package    Tree
 */
-class Tree_Common extends Tree_Options
+class Tree_Common extends Tree_OptionsDB
 {
-# i assume every class needs some options to be set, hope that is ok
 
     /**
     *   @access public
