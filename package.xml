@@ -47,6 +47,10 @@ Properties for HTML_TreeMenu are i.e. the icon and some events (like 'onClick').
 the source from DB to Array you can change any data without worrying that they are written into
 the DB and modify your actual data in the DB.
 * Bring Memory/Array closer to be fully useable.
+* getPathAsString() takes two more parameters where you can determine from and offset
+* getChildrenIds() has a new optional parameter for determining the level
+* Add getDepth() to determine the maximum depth of the tree
+
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
