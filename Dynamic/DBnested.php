@@ -389,38 +389,30 @@ class Tree_Dynamic_DBnested extends Tree_Common
     function _move( $idToMove , $newParentId , $newPrevId=0 )
     {
         // do some integrity checks first
-        if( $newPrevId )
-        {
-            if( $newPrevId == $idToMove )           // dont let people move an element behind itself, tell it succeeded, since it already is there :-)
-            {
+        if ($newPrevId) {
+            if ($newPrevId==$idToMove) {            // dont let people move an element behind itself, tell it succeeded, since it already is there :-)
                 return true;
             }
-            if( PEAR::isError($newPrevious = $this->getElement( $newPrevId )) )
+            if (PEAR::isError($newPrevious=$this->getElement($newPrevId))) {
                 return $newPrevious;
+            }
             $newParentId = $newPrevious['parentId'];
-        }
-        else
-        {
-            if( $newParentId == 0 )
-            {
+        } else {
+            if ($newParentId==0) {
                 return $this->_throwError( 'no parent id given' , __LINE__ );
             }
-            if( $this->isChildOf( $idToMove , $newParentId ) )  // if the element shall be moved under one of its children, return false
-            {
+            if ($this->isChildOf($idToMove,$newParentId)) { // if the element shall be moved under one of its children, return false
                 return $this->_throwError( 'can not move an element under one of its children' , __LINE__ );
             }
-            if( $newParentId == $idToMove )         // dont do anything to let an element be moved under itself, which is bullshit
-            {
+            if ($newParentId==$idToMove) {          // dont do anything to let an element be moved under itself, which is bullshit
                 return true;
             }
-            if( PEAR::isError($newParent = $this->getElement( $newParentId )) ) // try to retreive the data of the parent element
-            {
+            if (PEAR::isError($newParent=$this->getElement($newParentId))) { // try to retreive the data of the parent element
                 return $newParent;
             }
         }
 
-        if( PEAR::isError($element=$this->getElement($idToMove)) )  // get the data of the element itself
-        {
+        if (PEAR::isError($element=$this->getElement($idToMove))) { // get the data of the element itself
             return $element;
         }
 
@@ -430,16 +422,14 @@ class Tree_Dynamic_DBnested extends Tree_Common
 // FIXXME start transaction
 
         // add the left/right values in the new parent, to have the space to move the new values in
-        if( PEAR::isError($err=$this->_add( $prevVisited , $numberOfElements )) )
-        {
+        if (PEAR::isError($err=$this->_add( $prevVisited , $numberOfElements ))) {
 // FIXXME rollback
             //$this->dbh->rollback();
             return $err;
         }
 
         // update the parentId of the element with $idToMove
-        if( PEAR::isError($err=$this->update( $idToMove , array('parentId'=>$newParentId) )) )
-        {
+        if (PEAR::isError($err=$this->update($idToMove,array('parentId'=>$newParentId)))) {
 // FIXXME rollback
             //$this->dbh->rollback();
             return $err;
@@ -451,20 +441,15 @@ class Tree_Dynamic_DBnested extends Tree_Common
         // if $newPrevId is given we need to get the right value, otherwise the left
         // since the left/right has changed, because we already updated it up there we need to
         // get them again, we have to do that anyway, to have the proper new left/right values
-        if( $newPrevId )
-        {
-            if( PEAR::isError($temp = $this->getElement( $newPrevId )) )
-            {
+        if ($newPrevId) {
+            if (PEAR::isError($temp = $this->getElement( $newPrevId ))) {
 // FIXXME rollback
                 //$this->dbh->rollback();
                 return $temp;
             }
             $calcWith = $temp['right'];
-        }
-        else
-        {
-            if( PEAR::isError($temp = $this->getElement( $newParentId )) )
-            {
+        } else {
+            if (PEAR::isError($temp=$this->getElement($newParentId))) {
 // FIXXME rollback
                 //$this->dbh->rollback();
                 return $temp;
@@ -473,8 +458,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
         }
 
         // get the element that shall be moved again, since the left and right might have changed by the add-call
-        if( PEAR::isError($element=$this->getElement($idToMove)) )
-        {
+        if (PEAR::isError($element=$this->getElement($idToMove))) {
             return $element;
         }
 
@@ -490,16 +474,14 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             $this->_getWhereAddOn(),
                             $lName,$element['left']-1,
                             $rName,$element['right']+1 );
-        if( DB::isError( $res = $this->dbh->query($query) ) )
-        {
+        if (DB::isError($res=$this->dbh->query($query))) {
 // FIXXME rollback
             //$this->dbh->rollback();
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
 
         // remove the part of the tree where the element(s) was/were before
-        if( PEAR::isError($err=$this->_remove( $element )) )
-        {
+        if (PEAR::isError($err=$this->_remove($element))) {
 // FIXXME rollback
             //$this->dbh->rollback();
             return $err;
@@ -519,26 +501,25 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param      array   the new values, the index is the col name
     *   @return     mixed   either true or an Tree_Error
     */
-    function update( $id , $newValues )
+    function update($id,$newValues)
     {
         // jsut to be sure nothing gets screwed up :-)
-        unset( $newValues[$this->_getColName('left')] );
-        unset( $newValues[$this->_getColName('right')] );
-        unset( $newValues[$this->_getColName('parentId')] );
+        unset($newValues[$this->_getColName('left')]);
+        unset($newValues[$this->_getColName('right')]);
+        unset($newValues[$this->_getColName('parentId')]);
 
         // updating _one_ element in the tree
         $values = array();
-        foreach( $newValues as $key=>$value )
+        foreach ($newValues as $key=>$value) {
             $values[] = $this->_getColName($key).'='.$this->dbh->quote($value);
-
-
+        }
         $query = sprintf(   'UPDATE %s SET %s WHERE%s %s=%s',
                             $this->table,
                             implode(',',$values),
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
                             $id);
-        if( DB::isError( $res=$this->dbh->query($query) ) ){
+        if (DB::isError( $res=$this->dbh->query($query))) {
 // FIXXME raise PEAR error
             return $this->_throwError( $res->getMessage() , __LINE__ );
         }
@@ -620,12 +601,13 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param
     *   @return     mixed   either the data of the requested element or an Tree_Error
     */
-    function getChild( $id )
+    function getChild($id)
     {
         // subqueries would be cool :-)
         $curElement = $this->getElement( $id );
-        if( PEAR::isError($curElement) )
+        if (PEAR::isError($curElement)) {
             return $curElement;
+        }
 
         $query = sprintf(   'SELECT * FROM %s WHERE%s %s=%s',
                             $this->table,
@@ -765,7 +747,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @return     mixed   the array with the data of all children
     *                       or false, if there are none
     */
-    function getChildren( $ids , $levels=1 )
+    function getChildren($ids,$levels=1)
     {
         $res = array();
         for( $i=1 ; $i<$levels+1 ; $i++ )
@@ -785,23 +767,20 @@ class Tree_Dynamic_DBnested extends Tree_Common
                                 // if no 'order'-option is given
                                 $this->getOption('order') ? $this->getOption('order') : $this->_getColName('left')
                                 );
-            if( DB::isError( $_res = $this->dbh->getAll($query) ) )
-            {
+            if (DB::isError($_res = $this->dbh->getAll($query))) {
                 return $this->_throwError( $_res->getMessage() , __LINE__ );
             }
             $_res = $this->_prepareResults( $_res );
 
             // we use the id as the index, to make the use easier esp. for multiple return-values
             $tempRes = array();
-            foreach( $_res as $aRes )
-            {
+            foreach ($_res as $aRes) {
                 $tempRes[$aRes[$this->_getColName('id')]] = $aRes;
             }
             $_res = $tempRes;
 
             //
-            if( $levels>1 )
-            {
+            if ($levels>1) {
                 $ids = array();
                 foreach( $_res as $aRes )
                     $ids[] = $aRes[$this->_getColName('id')];
@@ -809,8 +788,9 @@ class Tree_Dynamic_DBnested extends Tree_Common
             $res = array_merge($res,$_res);
 
             // quit the for-loop if there are no children in the current level
-            if( !sizeof($ids) )
+            if (!sizeof($ids)) {
                 break;
+            }
         }
         return $res;
     }
@@ -894,8 +874,8 @@ class Tree_Dynamic_DBnested extends Tree_Common
     {
         // check simply if the left and right of the child are within the
         // left and right of the parent, if so it definitly is a child :-)
-        $parent = $this->getElement( $id );
-        $child = $this->getElement( $childId );
+        $parent = $this->getElement($id);
+        $child = $this->getElement($childId);
 
         if( $parent['left'] < $child['left'] &&
             $parent['right'] > $child['right'] )
@@ -920,7 +900,20 @@ class Tree_Dynamic_DBnested extends Tree_Common
         return $this->_throwError( 'not implemented yet' , __LINE__ );
     }
 
-
+    /**
+    *   Tells if the node with the given ID has children.
+    *
+    *   @version    2003/03/04
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer the ID of a node
+    *   @return     boolean if the node with the given id has children
+    */
+    function hasChildren($id)
+    {
+        $element = $this->getElement($id);
+        return $element['right']-$element['left']>1;    // if the diff between left and right>1 then there are children
+    }
 
 
     //
