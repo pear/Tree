@@ -18,7 +18,7 @@
 //
 //  $Id$
 
-require_once('Tree/OptionsDB.php');
+require_once('Tree/Common.php');
 require_once('Tree/Error.php');
 
 /**
@@ -29,7 +29,7 @@ require_once('Tree/Error.php');
 *   @access     public
 *   @package    Tree
 */
-class Tree_Dynamic_DBnested extends Tree_OptionsDB
+class Tree_Dynamic_DBnested extends Tree_Common
 # FIXXME should actually extend Tree_Common, to use the methods provided in there... but we need to connect
 # to the db here, so we extend optionsDB for now, may be use "aggregate" function to fix that
 {
@@ -39,7 +39,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     var $options = array(
 # FIXXME to be implemented
                             'whereAddOn'=>''    // add on for the where clause, this string is simply added behind the WHERE in the select
-                                                // so you better make sure its correct SQL :-), i.e. 'WHERE uid=3'
+                                                // so you better make sure its correct SQL :-), i.e. 'uid=3'
                                                 // this is needed i.e. when you are saving many trees in one db-table
                             ,'table'     =>''   //
                             // since the internal names are fixed, to be portable between different
@@ -51,6 +51,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                                                  'left'          =>  'l'            // since mysql at least doesnt support 'left' ...
                                                 ,'right'         =>  'r'            // ...as a column name we set default to the first letter only
                                                 //'name'          =>  'nodeName'  //
+                                                ,'parentId'       =>  'parent'    // parent id
                                                 )
 
                             );
@@ -444,32 +445,53 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     }
 
     /**
-    *
+    *   get the parent of the element with the given id
     *
     *   @access     public
-    *   @version    2002/??/??
-    *   @author     ??
+    *   @version    2002/04/15
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
     *   @return     mixed   the array with the data of the parent element
     *                       or false, if there is no parent, if the element is the root
     */
     function getParent( $id )
     {
+        $query = sprintf(   'SELECT p.* FROM %s p,%s e WHERE e.%s=p.%s AND e.%s=%s',
+                            $this->table,$this->table,
+                            $this->_getColName('parentId'),
+                            $this->_getColName('id'),
+                            $this->_getColName('id'),
+                            $id);
+        if( DB::isError( $res = $this->dbh->getRow($query) ) )
+        {
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+        return $this->_prepareResult( $res );
     }
 
     /**
-    *
+    *   get the children of the given element
     *
     *   @access     public
-    *   @version    2002/??/??
-    *   @author     ??
+    *   @version    2002/04/15
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
     *   @return     mixed   the array with the data of all children
     *                       or false, if there are none
     */
     function getChildren( $id )
     {
-        // ??? no idea what the query should look like :-(
+        $query = sprintf(   'SELECT c.* FROM %s c,%s e WHERE e.%s=c.%s AND e.%s=%s',
+                            $this->table,$this->table,
+                            $this->_getColName('id'),
+                            $this->_getColName('parentId'),
+                            $this->_getColName('id'),
+                            $id);
+        if( DB::isError( $res = $this->dbh->getAll($query) ) )
+        {
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+        return $this->_prepareResults( $res );
     }
 
     /**
@@ -477,14 +499,29 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     *   if there is none return false
     *
     *   @access     public
-    *   @version    2002/??/??
-    *   @author     ??
+    *   @version    2002/04/15
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
     *   @return     mixed   the array with the data of the next element
     *                       or false, if there is no next
     */
     function getNext( $id )
     {
+        $query = sprintf(   'SELECT n.* FROM %s n,%s e WHERE e.%s=n.%s-1 AND e.%s=n.%s AND e.%s=%s',
+                            $this->table,$this->table,
+                            $this->_getColName('right'),
+                            $this->_getColName('left'),
+                            $this->_getColName('parentId'),
+                            $this->_getColName('parentId'),
+                            $this->_getColName('id'),
+                            $id);
+        if( DB::isError( $res = $this->dbh->getRow($query) ) )
+        {
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+        if( !$res )
+            return false;
+        return $this->_prepareResult( $res );
     }
 
     /**
@@ -492,19 +529,42 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     *   if there is none return false
     *
     *   @access     public
-    *   @version    2002/??/??
-    *   @author     ??
+    *   @version    2002/04/15
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param
     *   @return     mixed   the array with the data of the previous element
     *                       or false, if there is no previous
     */
     function getPrevious( $id )
     {
+        $query = sprintf(   'SELECT p.* FROM %s p,%s e WHERE e.%s=p.%s+1 AND e.%s=p.%s AND e.%s=%s',
+                            $this->table,$this->table,
+                            $this->_getColName('left'),
+                            $this->_getColName('right'),
+                            $this->_getColName('parentId'),
+                            $this->_getColName('parentId'),
+                            $this->_getColName('id'),
+                            $id);
+        if( DB::isError( $res = $this->dbh->getRow($query) ) )
+        {
+            return $this->_throwError( $res->getMessage() , __LINE__ );
+        }
+        if( !$res )
+            return false;
+        return $this->_prepareResult( $res );
     }
 
+
+
+    //
+    //  PRIVATE METHODS
+    //
+
+
     /**
+    *   prepare multiple results
     *
-    *
+    *   @see        _prepareResult()
     *   @access     private
     *   @version    2002/03/03
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -520,7 +580,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     }
 
     /**
-    *
+    *   map back the index names to get what is expected
     *
     *   @access     private
     *   @version    2002/03/03
@@ -577,6 +637,32 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         }
         return $internalName;
     }
+
+
+    // for playing ....
+    function getFirstRoot()
+    {
+        return $this->getRoot();
+    }
+    /**
+    *   gets the tree under the given element in one array, sorted
+    *   so you can go through the elements from begin to end and list them
+    *   as they are in the tree, where every child (until the deepest) is retreived
+    *
+    *   @see        &_getNode()
+    *   @access     public
+    *   @version    2001/12/17
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer $startId    the id where to start walking
+    *   @param      integer $depth      this number says how deep into the structure the elements shall be retreived
+    *   @return     array   sorted as listed in the tree
+    */
+    function &getNode( $startId=0 , $depth=0 )
+    {
+    }
+
+
+
 
 }
 ?>
