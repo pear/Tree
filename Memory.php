@@ -162,7 +162,7 @@ class Tree_Memory extends Tree_Common
         $className = 'Tree_Memory_'.$type;
         $this->dataSourceClass =& new $className( $dsn , $options );
         // copy the options to be able to get them via getOption(s)
-#FIXXME this is not really cool, maybe overwrite the *Option* methods!!!
+//FIXXME this is not really cool, maybe overwrite the *Option* methods!!!
         $this->options = $this->dataSourceClass->options;
 
     } // end of function
@@ -198,9 +198,9 @@ class Tree_Memory extends Tree_Common
     */
     function setupByRawData( $string )
     {
-#  expects
-#   for XML an XML-String,
-#   for DB-a result set, may be or an array, dont know here - not implemented yet
+//  expects
+//   for XML an XML-String,
+//   for DB-a result set, may be or an array, dont know here - not implemented yet
         $res = $this->dataSourceClass->setupByRawData( $string );
         return $this->_setup( $res );
     }
@@ -246,8 +246,8 @@ class Tree_Memory extends Tree_Common
     */
     function _setup( $setupData )
     {
-# TODO sort by prevId (parentId,prevId $addQuery) too if it exists in the table, or the root might be wrong
-# TODO  since the prevId of the root should be 0
+// TODO sort by prevId (parentId,prevId $addQuery) too if it exists in the table, or the root might be wrong
+// TODO  since the prevId of the root should be 0
         if( !$setupData )
             return false;
 
@@ -287,7 +287,7 @@ class Tree_Memory extends Tree_Common
             }
         }
 
-#print_r($this->children);
+//print_r($this->children);
 
         if( $this->debug )
         {
@@ -405,7 +405,7 @@ class Tree_Memory extends Tree_Common
         {
             if( isset( $this->data[$id]['child'] )  )
             {
-# TODO raise PEAR warning
+// TODO raise PEAR warning
                 return $this->_throwError("Element with id=$id has children, cant be removed. Set 'setRemoveRecursively' to true to allow this.",__LINE__);
             }
         }
@@ -471,7 +471,7 @@ class Tree_Memory extends Tree_Common
             if( PEAR::isError($ret) )
                 $errors[] = $ret;
         }
-# FIXXME return a Tree_Error, not an array !!!!!
+// FIXXME return a Tree_Error, not an array !!!!!
         if( sizeof($errors) )
             return $errors;
         return true;
@@ -494,18 +494,18 @@ class Tree_Memory extends Tree_Common
     function _move( $idToMove , $newParentId , $prevId=0 )
     {
         if( $idToMove == $newParentId )             // itself can not be a parent of itself
-# TODO PEAR-ize error
+// TODO PEAR-ize error
             return TREE_ERROR_INVALID_PARENT;
 
         // check if $newParentId is a child (or a child-child ...) of $idToMove
         // if so prevent moving, because that is not possible
-#        if( @$this->data[$idToMove]['children'] )     // does this element have children?
+//        if( @$this->data[$idToMove]['children'] )     // does this element have children?
         if( $this->hasChildren($idToMove) )     // does this element have children?
         {
-#            $allChildren = $this->data[$idToMove]['children'];
+//            $allChildren = $this->data[$idToMove]['children'];
             $allChildren = $this->getChildren($idToMove);
-# FIXXME what happens here we are changing $allChildren, doesnt this change the
-# property data too??? since getChildren (might, not yet) return a reference
+// FIXXME what happens here we are changing $allChildren, doesnt this change the
+// property data too??? since getChildren (might, not yet) return a reference
             while (list(, $aChild) = each ($allChildren))   // use while since foreach only works on a copy of the data to loop through, but we are changing $allChildren in the loop
             {
                 array_shift( $allChildren );        // remove the first element because if array_merge is called the array pointer seems to be
@@ -515,7 +515,7 @@ class Tree_Memory extends Tree_Common
                     $allChildren = array_merge( $allChildren , $aChild['children'] );
                 }
                 if( $newParentId == $aChild['id'] )
-# TODO PEAR-ize error
+// TODO PEAR-ize error
                     return TREE_ERROR_INVALID_PARENT;
             }
         }
@@ -762,8 +762,8 @@ class Tree_Memory extends Tree_Common
     {
         $path = array();                            // empty the path, to be clean
 
-# FIXXME may its better to use a for(level) to count down,
-# since a while is always a little risky
+// FIXXME may its better to use a for(level) to count down,
+// since a while is always a little risky
         while( @$this->data[$id]['parent'] )        // until there are no more parents
         {
             $path[] = &$this->data[$id];            // curElement is already a reference, so save it in path
@@ -872,8 +872,8 @@ class Tree_Memory extends Tree_Common
     */
     function getElementsContent( $ids , $fieldName )
     {
-# i dont know if this method is not just overloading the file, since it only serves my lazyness
-# is this effective here? i can also loop in the calling code!?
+// i dont know if this method is not just overloading the file, since it only serves my lazyness
+// is this effective here? i can also loop in the calling code!?
         $fields = array();
         if(is_array($ids) && sizeof($ids))
         foreach( $ids as $aId )
@@ -1033,7 +1033,7 @@ class Tree_Memory extends Tree_Common
     *
     */
     function getIdByPath( $path , $startId=0 , $nodeName='name' , $seperator='/' )
-# should this method be called getElementIdByPath ????
+// should this method be called getElementIdByPath ????
     {
         // if no start ID is given get the root
         if( $startId==0 )
@@ -1056,7 +1056,7 @@ class Tree_Memory extends Tree_Common
             $nodeFound = false;
             do
             {
-#print "search $aNodeName, in ".$this->data[$curId][$nodeName]."<br>";
+//print "search $aNodeName, in ".$this->data[$curId][$nodeName]."<br>";
                 if( $this->data[$curId][$nodeName] == $aNodeName )
                 {
                     $nodeFound = true;
@@ -1067,19 +1067,20 @@ class Tree_Memory extends Tree_Common
                     break;
                 }
                 $curId = $this->getNextId($curId);
-#print "curId = $curId<br>";
+//print "curId = $curId<br>";
             }
             while( $curId );
 
             if( $nodeFound==false )
             {
-#print 'NOT FOUND<br>';
+//print 'NOT FOUND<br><br>';
                 return false;
             }
         }
+//print '<br>';
 
         return $curId;
-# FIXXME to be implemented
+// FIXXME to be implemented
     } // end of function
 
     /**
@@ -1142,7 +1143,7 @@ class Tree_Memory extends Tree_Common
         }
 
         $this->_getNodeMaxLevel = $depth ? ($depth + $level) : 0 ;
-#!!!        $this->_getNodeCurParent = $this->data['parent']['id'];
+//!!!        $this->_getNodeCurParent = $this->data['parent']['id'];
 
         // if the tree is empty dont walk through it
         if( !sizeof($this->data) )
@@ -1281,7 +1282,7 @@ class Tree_Memory extends Tree_Common
 
 
 
-    #### TODO's ###
+    //### TODO's ###
 
     /**
     *   NOT IMPLEMENTED YET
