@@ -336,7 +336,44 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *       $tree->move( x , 0 , y );   // ommit the second parameter by setting it to 0
     *       to move the element (or entire tree) with the id x
     *       behind the element with the id y
+    *   or
+    *       $tree->move( array(x1,x2,x3) , ...
+    *       the first parameter can also be an array of elements that shall be moved
+    *       the second and third para can be as described above
+    *   If you are using the Memory_DBnested then this method would be invain,
+    *   since Memory.php already does the looping through multiple elements, but if
+    *   Dynamic_DBnested is used we need to do the looping here
     *
+    *   @version    2002/06/08
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      integer     the id(s) of the element(s) that shall be moved
+    *   @param      integer     the id of the element which will be the new parent
+    *   @param      integer     if prevId is given the element with the id idToMove
+    *                           shall be moved _behind_ the element with id=prevId
+    *                           if it is 0 it will be put at the beginning
+    *   @return     mixed       true for success, Tree_Error on failure
+    */
+    function move( $idsToMove , $newParentId , $newPrevId=0 )
+    {
+        settype($idsToMove,'array');
+        $errors = array();
+        foreach( $idsToMove as $idToMove )
+        {
+            $ret = $this->_move( $idToMove , $newParentId , $newPrevId );
+            if( PEAR::isError($ret) )
+                $errors[] = $ret;
+        }
+# FIXXME return a Tree_Error, not an array !!!!!
+        if( sizeof($errors) )
+            return $errors;
+        return true;
+    }
+
+    /**
+    *   this method moves one tree element
+    *
+    *   @see        move()
     *   @version    2002/04/29
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -347,7 +384,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *                           if it is 0 it will be put at the beginning
     *   @return     mixed       true for success, Tree_Error on failure
     */
-    function move( $idToMove , $newParentId , $newPrevId=0 )
+    function _move( $idToMove , $newParentId , $newPrevId=0 )
     {
         // do some integrity checks first
         if( $newPrevId )
