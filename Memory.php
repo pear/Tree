@@ -955,13 +955,12 @@ class Tree_Memory extends Tree_Common
      */
     function &_getElement( $id , $what='' )
     {
-        if( $what=='' )
-        {
-            return $this->data[$id];
+        if ($what=='') {
+            return $this->_prepareResult($this->data[$id]);
         }
         $elementId = $this->_getElementId( $id , $what );
         if( $elementId !== NULL ) {
-            return $this->data[$elementId];
+            return $this->_prepareResult($this->data[$elementId]);
         }
         // we should not return false, since that might be a value
         // of the element that is requested
