@@ -2,8 +2,8 @@
     //
     //  $Id$
     //
-//ini_set('include_path',realpath(dirname(__FILE__).'/../../../').':'.realpath(dirname(__FILE__).'/../../../../includes').':'.ini_get('include_path'));
-//ini_set('error_reporting',E_ALL);
+ini_set('include_path',realpath(dirname(__FILE__).'/../../../').':'.realpath(dirname(__FILE__).'/../../../../includes').':'.ini_get('include_path'));
+ini_set('error_reporting',E_ALL);
 
     ##################################################
     #
@@ -26,7 +26,7 @@
     #
     require_once('Tree/Tree.php');
     $tree = Tree::setup( 'Dynamic_DBnested' , 'mysql://root@localhost/test' , array('table'=>'Tree_Nested') );
-
+    
     if( @$_REQUEST['action_add'] )
     {
         $methodCall = "tree->add( {$_REQUEST['newData']} , {$_REQUEST['parentId']} , {$_REQUEST['prevId']} )";
@@ -72,6 +72,7 @@
 
     $memTree->setup();
     $entireTree = $memTree->getNode();
+    $treeDepth = $memTree->getDepth();
 
     $tpl->compile('index.tpl');
     include($tpl->compiledTemplate);

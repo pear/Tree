@@ -1,7 +1,7 @@
 <html>
 <body>
 <!--
-    $Id: index.tpl,v 1.1 2003-01-30 17:18:24 cain Exp $
+    $Id: index.tpl,v 1.2 2003-02-25 12:14:30 cain Exp $
 -->
 
 <style>
@@ -148,7 +148,7 @@
     </tr>
 </table>
 
-the entire tree:<br><br>
+the entire tree (depth={$treeDepth}):<br><br>
 {foreach($entireTree as $aNode)}
     &nbsp;
     {%repeat $aNode['level']%}
