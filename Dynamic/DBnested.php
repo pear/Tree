@@ -349,7 +349,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                                 %s
                             SET %s=%s-$delta
                             WHERE
-                                %s %s < s
+                                %s %s < %s
                                 AND
                                 %s>%s",
                             $this->table,
@@ -669,7 +669,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function getElement( $id )
     {
-        $query = sprintf(   'SELECT * FROM %s WHERE%s %s=%s',
+        $query = sprintf(   'SELECT * FROM %s WHERE %s %s=%s',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
