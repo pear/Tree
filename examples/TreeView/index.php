@@ -16,15 +16,8 @@
         die();
     }
     require_once('SimpleTemplate/Filter/TagLib.php');
-    $options = array(   'templateDir'   => $_SERVER['DOCUMENT_ROOT'].'pear/Tree/examples/TreeView' ,
-                        'compileDir'    => $_SERVER['DOCUMENT_ROOT'].'pear/Tree/examples/TreeView/tmp',
-                        'forceCompile'  => true );
+    $options = array(   'templateDir'   => dirname(__FILE__) );
     $tpl = new SimpleTemplate_Engine($options);
-    $tagLib = new SimpleTemplate_Filter_TagLib($tpl->options);
-    $tpl->registerPrefilter(array(&$tagLib,'repeat'));
-    $tpl->registerPrefilter(array(&$tagLib,'block'));
-    $tplFilter = new SimpleTemplate_Filter_Basic($tpl->options);
-    $tpl->registerPrefilter(array(&$tplFilter,'addIfBeforeForeach'));
 
 
     ##################################################
@@ -58,7 +51,9 @@
         $result = $tree->move( $_REQUEST['move_id'] , $_REQUEST['move_newParentId'] , $_REQUEST['move_newPrevId'] );
     }
 
-
+    $methodFailed = false;
+    if( PEAR::isError($result) )
+        $methodFailed = true;
 
     if( !$fid )
         $fid = $tree->getRootId();
