@@ -95,12 +95,12 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     mixed   an array of all the children of the element with id=$id,
     *                       or false if there are no children
     */
-    function getChildrens( $id )
+    function getAllChildren( $id )
     {
         $retChildrens = false;
         if( $childrens = $this->hasChildren( $id ) )
         {
-            $retChildrens = $this->_getChildrens( $id );
+            $retChildrens = $this->_getAllChildren( $id );
         }
         return $retChildrens;
     }
@@ -108,7 +108,7 @@ class Tree_Common extends Tree_OptionsDB
     /**
     *   this method gets all the children recursively
     *
-    *   @see    getChildrens()
+    *   @see    getAllChildren()
     *   @version    2002/09/30
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -116,7 +116,7 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     mixed   an array of all the ids of the children of the element with id=$id,
     *                       or false if there are no children
     */
-    function &_getChildrens( $id )
+    function &_getAllChildren( $id )
     {
         $retChildrens = array();
         if( $children = $this->getChildren( $id ) )
@@ -124,7 +124,7 @@ class Tree_Common extends Tree_OptionsDB
             foreach( $children as $key=>$aChild )
             {
                 $retChildrens[] = &$children[$key];
-                //$retChildrens = array_merge($retChildrens,$this->_getChildrens( $aChild['id'] ));
+                //$retChildrens = array_merge($retChildrens,$this->_getAllChildren( $aChild['id'] ));
             }
         }
         return $retChildrens;
@@ -140,9 +140,9 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     mixed   an array of all the ids of the children of the element with id=$id,
     *                       or false if there are no children
     */
-    function getChildrensIds( $id )
+    function getAllChildrenIds( $id )
     {
-        if( $childrens = $this->getChildrens($id) )
+        if( $childrens = $this->getAllChildren($id) )
         {
             $childrensIds = array();
             foreach( $childrens as $aNode )
