@@ -18,7 +18,7 @@
 //
 //  $Id$
 
-require_once('Tree/Dynamic/DBnested.php');
+require_once 'Tree/Dynamic/DBnested.php';
 
 /**
 *
@@ -37,33 +37,33 @@ class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
     *   @version    2002/04/20
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      array   the result of a query which retreives (all) the tree data from a DB
     *   @return     array   the result
     */
-    function setup()
+    function setup($res=null)
     {
-        //
-        $whereAddOn = '';
-        if( $this->options['whereAddOn'] )
-        {
-            $whereAddOn = 'WHERE '.$this->getOption('whereAddOn');
-        }
+        if ($res==null) {
+            //
+            $whereAddOn = '';
+            if ($this->options['whereAddOn']) {
+                $whereAddOn = 'WHERE '.$this->getOption('whereAddOn');
+            }
 
-        //
-        $orderBy = 'left';
-        if( $order=$this->getOption('order') )
-        {
-            $orderBy = $order;
-        }
+            //
+            $orderBy = 'left';
+            if ($order=$this->getOption('order')) {
+                $orderBy = $order;
+            }
 
-        // build the query this way, that the root, which has no parent (parentId=0) is first
-        $query = sprintf(   'SELECT * FROM %s %s ORDER BY %s',
-                            $this->table,
-                            $whereAddOn,
-                            $this->_getColName($orderBy)  // sort by the left-column, so we have the data sorted as it is supposed to be :-)
-                            );
-        if( DB::isError( $res = $this->dbh->getAll( $query ) ) )
-        {
-            return $this->_throwError($res->getMessage(),__LINE__);
+            // build the query this way, that the root, which has no parent (parentId=0) is first
+            $query = sprintf(   'SELECT * FROM %s %s ORDER BY %s',
+                                $this->table,
+                                $whereAddOn,
+                                $this->_getColName($orderBy)  // sort by the left-column, so we have the data sorted as it is supposed to be :-)
+                                );
+            if (DB::isError( $res = $this->dbh->getAll($query))) {
+                return $this->_throwError($res->getMessage(),__LINE__);
+            }
         }
 
         return $this->_prepareResults( $res );
