@@ -306,7 +306,7 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     array   this array contains all elements from the root to the element given by the id
     *
     */
-    function getPathAsString( $id , $seperator='/' , $offset=0 , $length=0, $key='name' )
+    function getPathAsString($id, $seperator='/', $offset=0, $length=0, $key='name')
     {
         $path = $this->getPath($id);
         foreach ($path as $aNode) {
@@ -348,9 +348,9 @@ class Tree_Common extends Tree_OptionsDB
     *   @return     array   this array contains all elements from the root to the element given by the id
     *
     */
-    function getPath( $id )
+    function getPath($id)
     {
-        return $this->_throwError( 'not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
     } // end of function
 
     /**
@@ -363,9 +363,9 @@ class Tree_Common extends Tree_OptionsDB
     *   @param      mixed   $id     the id of the node to get the level for
     *
     */
-    function getLevel( $id )
+    function getLevel($id)
     {
-        return $this->_throwError( 'not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
     } // end of function
 
     /**
@@ -380,11 +380,20 @@ class Tree_Common extends Tree_OptionsDB
     *   @param      boolean if this is true the entire tree below is checked
     *   @return     boolean true if it is a child
     */
-    function isChildOf( $id , $childId , $checkAll=true )
+    function isChildOf($id, $childId, $checkAll = true)
     {
-        return $this->_throwError( 'not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
     } // end of function
 
+    /**
+    *
+    *
+    */
+    function getIdByPath($path, $startId=0, $nodeName = 'name', $seperator = '/')
+    {
+        return $this->_throwError( __FUNCTION__.' is not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+    } // end of function
+    
     /**
     *   return the maximum depth of the tree
     *
