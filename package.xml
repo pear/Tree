@@ -31,12 +31,12 @@
     </maintainer>
   </maintainers>
     <release>
-        <version>0.1</version>
-        <date>2002-08-13</date>
+        <version>0.1.1</version>
+        <date>2002-08-19</date>
         <license>PHP License</license>
         <state>beta</state>
         <notes>
-            Initial snapshot release
+            enable retreiving of all parents (the actual parent and it's parents etc.)
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
