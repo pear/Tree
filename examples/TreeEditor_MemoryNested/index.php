@@ -48,6 +48,10 @@
         $session->use = 'DB';
     if( $_REQUEST['use_Filesystem'] )
         $session->use = 'Filesystem';
+    if( $_REQUEST['use_XML'] )
+        $session->use = 'XML';
+    if( $_REQUEST['use_Array'] )
+        $session->use = 'Array';
 
     ##################################################
     #
@@ -62,12 +66,40 @@
         $options = array( 'table' => TABLE_TREE , 'order' =>  'name');
         $tree = new treeClass( 'DBnested' , DB_DSN , $options );
     }
-    else
+    if( $session->use == 'Filesystem' )
     {
         # to let it work on the filesystem :-)
         $options = array( 'order' =>  'name');
         $tree = new treeClass( 'Filesystem' , dirname(__FILE__).'/tmp' , $options );
     }
+    if( $session->use == 'XML' )
+    {
+        $tree = new treeClass( 'XML' , dirname(__FILE__).'/config.xml' );
+    }
+    if( $session->use == 'Array' )
+    {
+        // the actual data for the tree, they have to have the given structure
+        $arrayData = array( 'name'=>'Root',
+                            'children'=>array(
+                                array('name'=>'dir1'),
+                                array('name'=>'dir2',
+                                    'children'=>array(
+                                        array('name'=>'dir2_1'),
+                                        array('name'=>'dir2_2'),
+                                        )
+                                    ),
+                                array('name'=>'dir3')
+                            )
+                           );
+
+        // any on an array
+        $options = array( 'order' =>  'name');
+        $tree = new treeClass( 'Array' , $arrayData , $options );
+    }
+
+
+
+
 
     if( PEAR::isError($res=$tree->setup()) )
     {

@@ -56,6 +56,10 @@
     <input type="submit" value="DB" name="use_DB">
     &nbsp;
     <input type="submit" value="Filesystem" name="use_Filesystem">
+    &nbsp;
+    <input type="submit" value="XML" name="use_XML">
+    &nbsp;
+    <input type="submit" value="Array" name="use_Array">
 
     <br><br>
 
