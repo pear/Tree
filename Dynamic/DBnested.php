@@ -59,7 +59,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                             // ...as a column name we set default to the first
                             //letter only
                             'right'     =>  'r',
-                            //'name'          =>  'nodeName'
+                            'name'      =>  'nodeName'
                             // parent id
                             'parentId'  =>  'parent'
                         ),
@@ -1146,6 +1146,10 @@ class Tree_Dynamic_DBnested extends Tree_Common
             }
             return $root['id'];
         }
+        if( !($colname=$this->_getColName($nodeName)) ){
+            return $this->_throwError(
+                'getIdByPath: Invalid node name' , __LINE__ );
+        }
         if ($startId!=0) {
             // If the start node has no child, returns false
             // hasChildren calls getElement. Not very good right
@@ -1180,7 +1184,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
                 FROM
                     ".$this->table."
                 WHERE
-                    ".$this->_getColName('name')."='".$elems[0]."'
+                    ".$colname."='".$elems[0]."'
                 ";
             if ($startHasChild) {
                 $query  .= " AND (".
@@ -1196,13 +1200,11 @@ class Tree_Dynamic_DBnested extends Tree_Common
         } else {
             $query = "SELECT
                             ".$this->_getColName('id').",
-                            ".$this->_getColName('left').",
-                            ".$this->_getColName('right').",
                             ".$this->_getColName('name')."
                         FROM
                             ".$this->table."
                         WHERE
-                            ".$this->_getColName('name').
+                            ".$colname.
                             "='".$elems[$cntElems-1]."'";
             if ($startHasChild) {
                 $query  .= " AND (".
