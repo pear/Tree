@@ -31,12 +31,12 @@
     </maintainer>
   </maintainers>
     <release>
-        <version>0.2.4</version>
-        <date>2003-03-17</date>
+        <version>0.2.5</version>
+        <date>2003-??-??</date>
         <license>PHP License</license>
         <state>beta</state>
         <notes>
-* bugfix in Memory_Array::add method, which made the last element being added in a bogus way
+* added parameter to getPathAsString(), which takes the key you want to have in the path
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
@@ -97,6 +97,15 @@
     </release>
 
     <changelog>
+        <release>
+            <version>0.2.4</version>
+            <date>2003-03-17</date>
+            <license>PHP License</license>
+            <state>beta</state>
+            <notes>
+    * bugfix in Memory_Array::add method, which made the last element being added in a bogus way
+            </notes>
+        </release>
         <release>
             <version>0.2.3</version>
             <date>2003-03-10</date>

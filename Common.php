@@ -299,14 +299,18 @@ class Tree_Common extends Tree_OptionsDB
     *                       sequence will stop that many elements from the end of the
     *                       array. If it is omitted, then the sequence will have everything
     *                       from offset up until the end of the array.
+    *   @param      string  you can tell the key the path shall be used to be constructed with
+    *                       i.e. giving 'name' (=default) would use the value of the
+    *                       $element['name'] for the node-name
+    *                       thanks to Michael Johnson
     *   @return     array   this array contains all elements from the root to the element given by the id
     *
     */
-    function getPathAsString( $id , $seperator='/' , $offset=0 , $length=0 )
+    function getPathAsString( $id , $seperator='/' , $offset=0 , $length=0, $key='name' )
     {
         $path = $this->getPath($id);
         foreach ($path as $aNode) {
-            $pathArray[] = $aNode['name'];
+            $pathArray[] = $aNode[$key];
         }
 
         if ($offset) {
