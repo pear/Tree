@@ -383,6 +383,18 @@ class Tree_Common extends Tree_OptionsDB
         return $this->_throwError( 'not implemented, at least not overwritten the abstract declaration' , __LINE__ );
     } // end of function
 
+    /**
+    *   return the maximum depth of the tree
+    *
+    *   @version    2003/02/25
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     int     the depth of the tree
+    */
+    function getDepth()
+    {
+        return $this->_treeDepth;
+    } // end of function
 
 
 

@@ -908,7 +908,19 @@ class Tree_Dynamic_DBnested extends Tree_Common
         return false;
     } // end of function
 
-
+    /**
+    *   return the maximum depth of the tree
+    *
+    *   @version    2003/02/25
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @return     int     the depth of the tree
+    */
+    function getDepth()
+    {
+// FIXXXME TODO!!!    
+        return $this->_throwError( 'not implemented yet' , __LINE__ );
+    }
 
 
 
