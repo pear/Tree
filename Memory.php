@@ -788,6 +788,41 @@ class Tree_Memory extends Tree_Common
     }
 
     /**
+    *
+    *
+    *   @version    2002/02/06
+    *   @access     private
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *
+    */
+    function getElementContent( $id , $fieldName )
+    {
+        return $this->data[$id][$fieldName];
+    }
+
+    /**
+    *
+    *
+    *   @version    2002/02/06
+    *   @access     private
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *
+    */
+    function getElementsContent( $ids , $fieldName )
+    {
+# i dont know if this method is not just overloading the file, since it only serves my lazyness
+# is this effective here? i can also loop in the calling code!?
+        $fields = array();
+        if(is_array($ids) && sizeof($ids))
+        foreach( $ids as $aId )
+            $fields[] = $this->getElementContent( $aId , $fieldName );
+
+        return $fields;
+    }
+
+    /**
     *   gets an element given by it's path as a reference
     *
     *   @version    2002/01/21
@@ -805,7 +840,7 @@ class Tree_Memory extends Tree_Common
         $id = $this->getIdByPath( $path , $startId );
         if( $id )
             return $this->getElement( $id );
-        return NULL;
+        return NULL;                                // return NULL since false might be interpreted as id 0
     }
 
     /**
@@ -1084,7 +1119,7 @@ class Tree_Memory extends Tree_Common
     {
         if( $this->hasChildren( $id ) )
             return $this->data[$id]['children'];
-        return false;
+        return array();
     } // end of function
 
     /**
