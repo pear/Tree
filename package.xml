@@ -57,7 +57,6 @@
                 <file role="php">Memory.php</file>
                 <file role="php">OptionsDB.php</file>
                 <file role="php">OptionsMDB.php</file>
-                <file role="php">Error.php</file>
                 <dir name="Memory">
                     <file role="php">DBsimple.php</file>
                     <file role="php">DBnested.php</file>
