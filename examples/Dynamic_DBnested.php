@@ -1,0 +1,27 @@
+<?php
+
+    require_once('Tree/Tree.php');
+
+#    $tree = Tree::setupDynamic( 'DBnested' , 'mysql://root@localhost/test' , array('table'=>'nestedTree') );
+#   OR
+    $tree = Tree::setup( 'Dynamic_DBnested' , 'mysql://root@localhost/test' , array('table'=>'nestedTree') );
+
+    $show[] = '$tree->getRoot()';
+    $show[] = '$tree->getElement( 1 )';
+    $show[] = '$tree->getChild( 1 )';
+    $show[] = '$tree->getPath( 7 )';
+    $show[] = '$tree->add( array("name"=>"c0") , 5 )';
+    $show[] = '$tree->remove( $res )';  // remove the last element that was added in the line before :-)
+    $show[] = '$tree->getRight( 5 )';
+    $show[] = '$tree->getLeft( 5 )';
+
+
+    foreach( $show as $aRes )
+    {
+        print("<b>$aRes</b><br>");
+        eval("\$res=".$aRes.';');
+        print_r($res);
+        print('<br><br>');
+    }
+
+?>
