@@ -85,11 +85,40 @@ class Tree extends PEAR
 # "dynamic" stands for retreiving a tree(chunk) dynamically when needed,
 # better name would be great :-)
     {
-        require_once('Tree/Dynamic.php');
+        require_once("Tree/Dynamic/$type.php");
 
-        return new Tree_Dynamic( $type , $dsn , $options );
+        $className = 'Tree_Dynamic_'.$type;
+        $obj = & new $className( $dsn , $options );
+        return $obj;
     } // end of function
 
+    /**
+    *   this is just a wrapper around the two setup methods above
+    *   some example calls:
+    *   $tree = Tree::setup( 'Dynamic_DBnested' , 'mysql://root@localhost/test' , array('table'=>'nestedTree') );
+    *   $tree = Tree::setup( 'Memory_DBsimple' , 'mysql://root@localhost/test' , array('table'=>'simpleTree') );
+    *   $tree = Tree::setup( 'Memory_XML' , '/path/to/some/xml/file.xml' );
+    *
+    *   you can call the following too, but the functions/classes are not implemented yet
+    *   or not finished
+    *   $tree = Tree::setup( 'Memory_DBnested' , 'mysql://root@localhost/test' , array('table'=>'nestedTree') );
+    *   $tree = Tree::setup( 'Dynamic_XML' , '/path/to/some/xml/file.xml' );
+    *
+    *   and those would be really cool to have one day:
+    *   LDAP, Filesystem, WSDL, ...
+    *
+    *   @access     private
+    *   @version    2002/03/07
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function setup( $type , $dsn , $options=array() )
+    {
+        $type = explode( '_' , $type );
+        $method = 'setup'.$type[0];
+        return Tree::$method( $type[1] , $dsn , $options );
+    }
 
 }
 
