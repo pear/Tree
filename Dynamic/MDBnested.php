@@ -18,17 +18,17 @@
 //
 //  $Id$
 
-require_once 'Tree/OptionsDB.php';
+require_once 'Tree/OptionsMDB.php';
 
 /**
- * This class implements methods to work on a tree saved using the nested
- * tree model.
- * explaination: http://research.calacademy.org/taf/proceedings/ballew/index.htm
- *
- * @access     public
- * @package    Tree
- */
-class Tree_Dynamic_DBnested extends Tree_OptionsDB
+* This class implements methods to work on a tree saved using the nested
+* tree model.
+* explaination: http://research.calacademy.org/taf/proceedings/ballew/index.htm
+*
+* @access     public
+* @package    Tree
+*/
+class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
 {
 
     // {{{ properties
@@ -75,7 +75,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
       *
       * @access     public
       * @version    2002/03/02
-      * @author     Wolfram Kriesing <wolfram@kriesing.de>
       * @param      string  the DSN for the DB connection
       * @return     void
       */
@@ -96,9 +95,9 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      * @param      string  the DSN for the DB connection
      * @return     void
      */
-    function Tree_Dynamic_DBnested($dsn, $options = array())
+    function Tree_Dynamic_MDBnested($dsn, $options = array())
     {
-        parent::Tree_OptionsDB($dsn, $options); // instanciate DB
+        parent::Tree_OptionsMDB($dsn, $options); // instanciate DB
         $this->table = $this->getOption('table');
     }
 
@@ -133,7 +132,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      * This method does not yet check if there is already a root element saved!
      *
      * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param   array   $newValues  this array contains the values that shall
      *                              be inserted in the db-table
      * @param   integer $parentId   the id of the element which shall be
@@ -141,7 +139,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      * @param   integer $prevId     the id of the element which shall preceed
      *                              the one to be inserted use either
      *                              'parentId' or 'prevId'.
-     * @return     integer the ID of the element that had been inserted
+     * @return   integer the ID of the element that had been inserted
      */
     function add($newValues, $parentId = 0, $prevId = 0)
     {
@@ -178,7 +176,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             $prevVisited = $prevId ? $element['right'] : $element['left'];
 
             // FIXXME start transaction here
-            if (Tree::isError($err = $this->_add($prevVisited, 1))) {
+            if (Tree::isError($err=$this->_add($prevVisited, 1))) {
                 // FIXXME rollback
                 //$this->dbh->rollback();
                 return $err;
@@ -188,8 +186,11 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         // inserting _one_ new element in the tree
         $newData = array();
         // quote the values, as needed for the insert
-        foreach ($newValues as $key => $value) {
-            $newData[$this->_getColName($key)] = $this->dbh->quote($value);
+        foreach ($newValues as $key=>$value) {
+
+            ///////////FIX ME: Add proper quote handling
+
+            $newData[$this->_getColName($key)] = $this->dbh->getTextValue($value);
         }
 
         // set the proper right and left values
@@ -199,13 +200,13 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         // use sequences to create a new id in the db-table
         $nextId = $this->dbh->nextId($this->table);
         $query = sprintf('INSERT INTO %s (%s,%s) VALUES (%s,%s)',
-                            $this->table ,
+                            $this->table,
                             $this->_getColName('id'),
                             implode(',', array_keys($newData)) ,
-                            $nextId,
+                            $this->dbh->getIntegerValue($nextId),
                             implode(',', $newData)
                         );
-        if (DB::isError($res = $this->dbh->query($query))) {
+        if (MDB::isError($res = $this->dbh->query($query))) {
             // rollback
             return $this->_throwError($res->getMessage(), __LINE__);
         }
@@ -245,7 +246,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $lName,
                             $prevVisited);
-        if (DB::isError($res = $this->dbh->query($query))) {
+        if (MDB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
             return $this->_throwError($res->getMessage(), __LINE__);
         }
@@ -257,7 +258,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $rName,
                             $prevVisited);
-        if (DB::isError($res = $this->dbh->query($query))) {
+        if (MDB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
             return $this->_throwError($res->getMessage(), __LINE__);
         }
@@ -273,7 +274,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      * if a node shall be removed that has children
      *
      * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param      integer $id the id of the element to be removed
      * @return     boolean returns either true or throws an error
      */
@@ -286,12 +286,12 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
 
         // FIXXME start transaction
         //$this->dbh->autoCommit(false);
-        $query = sprintf('DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
+        $query = sprintf(  'DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),
                             $element['left'],$element['right']);
-        if (DB::isError($res = $this->dbh->query($query))) {
+        if (MDB::isError($res = $this->dbh->query($query))) {
             // FIXXME rollback
             //$this->dbh->rollback();
             return $this->_throwError($res->getMessage(), __LINE__);
@@ -315,7 +315,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      *
      * @see        getElement()
      * @access     private
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param      array   the entire element returned by "getElement"
      * @return     boolean returns either true or throws an error
      */
@@ -333,11 +332,11 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                                 %s=%s-$delta
                             WHERE%s %s>%s",
                             $this->table,
-                            $lName,$lName,
-                            $rName,$rName,
+                            $lName, $lName,
+                            $rName, $rName,
                             $this->_getWhereAddOn(),
-                            $lName,$element['left']);
-        if (DB::isError($res = $this->dbh->query($query))) {
+                            $lName, $element['left']);
+        if (MDB::isError($res = $this->dbh->query($query))) {
             // the rollback shall be done by the method calling this one
             // since it is only private we can do that
             return $this->_throwError($res->getMessage(), __LINE__);
@@ -351,11 +350,11 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                                 AND
                                 %s>%s",
                             $this->table,
-                            $rName,$rName,
+                            $rName, $rName,
                             $this->_getWhereAddOn(),
-                            $lName,$element['left'],
-                            $rName,$element['right']);
-        if (DB::isError($res = $this->dbh->query($query))) {
+                            $lName, $element['left'],
+                            $rName, $element['right']);
+        if (MDB::isError($res = $this->dbh->query($query))) {
             // the rollback shall be done by the method calling this one
             // since it is only private
             return $this->_throwError($res->getMessage(), __LINE__);
@@ -393,7 +392,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      *
      * @version    2002/06/08
      * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param      integer  the id(s) of the element(s) that shall be moved
      * @param      integer  the id of the element which will be the new parent
      * @param      integer  if prevId is given the element with the id idToMove
@@ -403,7 +401,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      */
     function move($idsToMove, $newParentId, $newPrevId = 0)
     {
-        settype($idsToMove, 'array');
+        settype($idsToMove,'array');
         $errors = array();
         foreach ($idsToMove as $idToMove) {
             $ret = $this->_move($idToMove, $newParentId, $newPrevId);
@@ -428,7 +426,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      * @see     move()
      * @version 2002/04/29
      * @access  public
-     * @author  Wolfram Kriesing <wolfram@kriesing.de>
      * @param   integer the id of the element that shall be moved
      * @param   integer the id of the element which will be the new parent
      * @param   integer if prevId is given the element with the id idToMove
@@ -445,7 +442,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             if ($newPrevId == $idToMove) {
                 return true;
             }
-            if (Tree::isError($newPrevious = $this->getElement($newPrevId))) {
+            if (Tree::isError($newPrevious=$this->getElement($newPrevId))) {
                 return $newPrevious;
             }
             $newParentId = $newPrevious['parentId'];
@@ -463,7 +460,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             }
             // dont do anything to let an element be moved under itself
             // which is bullshit
-            if ($newParentId == $idToMove) {
+            if ($newParentId==$idToMove) {
                 return true;
             }
             // try to retreive the data of the parent element
@@ -483,7 +480,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
 
         // add the left/right values in the new parent, to have the space
         // to move the new values in
-        $err = $this->_add($prevVisited, $numberOfElements);
+        $err=$this->_add($prevVisited, $numberOfElements);
         if (Tree::isError($err)) {
             // FIXXME rollback
             //$this->dbh->rollback();
@@ -491,7 +488,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         }
 
         // update the parentId of the element with $idToMove
-        $err = $this->update($idToMove,array('parentId' => $newParentId));
+        $err = $this->update($idToMove, array('parentId' => $newParentId));
         if (Tree::isError($err)) {
             // FIXXME rollback
             //$this->dbh->rollback();
@@ -513,7 +510,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             }
             $calcWith = $temp['right'];
         } else {
-            if (Tree::isError($temp=$this->getElement($newParentId))) {
+            if (Tree::isError($temp = $this->getElement($newParentId))) {
                 // FIXXME rollback
                 //$this->dbh->rollback();
                 return $temp;
@@ -544,19 +541,19 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                                 AND
                                 %s < %s",
                             $this->table,
-                            $rName,$rName,
-                            $lName,$lName,
+                            $rName, $rName,
+                            $lName, $lName,
                             $this->_getWhereAddOn(),
-                            $lName,$element['left']-1,
-                            $rName,$element['right']+1);
-        if (DB::isError($res=$this->dbh->query($query))) {
+                            $lName, $element['left']-1,
+                            $rName, $element['right']+1);
+        if (MDB::isError($res=$this->dbh->query($query))) {
             // FIXXME rollback
             //$this->dbh->rollback();
             return $this->_throwError($res->getMessage(), __LINE__);
         }
 
         // remove the part of the tree where the element(s) was/were before
-        if (Tree::isError($err = $this->_remove($element))) {
+        if (Tree::isError($err=$this->_remove($element))) {
             // FIXXME rollback
             //$this->dbh->rollback();
             return $err;
@@ -574,7 +571,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      * update the tree element given by $id with the values in $newValues
      *
      * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param      int     the id of the element to update
      * @param      array   the new values, the index is the col name
      * @return     mixed   either true or an Tree_Error
@@ -588,8 +584,13 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
 
         // updating _one_ element in the tree
         $values = array();
-        foreach ($newValues as $key => $value) {
-            $values[] = $this->_getColName($key).'='.$this->dbh->quote($value);
+        foreach ($newValues as $key=>$value) {
+
+
+            ///////////FIX ME: Add proper quote handling
+
+
+            $values[] = $this->_getColName($key).'='.$this->dbh->getTextValue($value);
         }
         $query = sprintf('UPDATE %s SET %s WHERE%s %s=%s',
                             $this->table,
@@ -597,7 +598,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
                             $id);
-        if (DB::isError($res=$this->dbh->query($query))) {
+        if (MDB::isError($res=$this->dbh->query($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
 
@@ -612,7 +613,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      *
      *
      * @access     public
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param      integer the ID of the node that shall be copied
      * @param      integer the new parent ID
      * @param      integer the new previous ID, if given parent ID will be omitted
@@ -621,9 +621,9 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     function copy($id, $parentId = 0, $prevId = 0)
     {
         return $this->_throwError(
-                'copy-method is not implemented yet!' ,
-                __LINE__
-           );
+                        'copy-method is not implemented yet!' ,
+                        __LINE__
+                        );
         // get element tree
         // $this->addTree
     }
@@ -645,7 +645,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->table,
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'));
-        if (DB::isError($res = $this->dbh->getRow($query))) {
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return !$res ? false : $this->_prepareResult($res);
@@ -672,8 +672,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
                             $id);
-        $res = $this->dbh->getRow($query);
-        if (DB::isError($res)) {
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         if (!$res) {
@@ -691,7 +690,6 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      *
      * @access     public
      * @version    2002/03/02
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @param      integer  the ID of the element for which the children
      *                      shall be returned
      * @return     mixed   either the data of the requested element or an Tree_Error
@@ -709,7 +707,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),
                             $curElement['left']+1);
-        if (DB::isError($res = $this->dbh->getRow($query))) {
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return $this->_prepareResult($res);
@@ -723,18 +721,15 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      * to the root. The returned array is sorted to start at root
      * for simply walking through and retreiving the path
      *
-     * @access     public
-     * @version    2002/03/02
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     * @param      integer  the ID of the element for which the path shall be
-     *                      returned
-     * @return     mixed    either the data of the requested elements
+     * @access public
+     * @param integer the ID of the element for which the path shall be returned
+     * @return mixed  either the data of the requested elements
      *                      or an Tree_Error
      */
     function getPath($id)
     {
         $res = $this->dbh->getAll($this->_getPathQuery($id));
-        if (DB::isError($res)) {
+        if (MDB::isError($res)) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return $this->_prepareResults($res);
@@ -755,9 +750,9 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             // set the additional where add on
                             $this->_getWhereAddOn(),
                             // render 'left<=curLeft'
-                            $this->_getColName('left'),$curElement['left'],
+                            $this->_getColName('left'),  $curElement['left'],
                             // render right>=curRight'
-                            $this->_getColName('right'),$curElement['right'],
+                            $this->_getColName('right'), $curElement['right'],
                             // set the order column
                             $this->_getColName('left'));
         return $query;
@@ -771,7 +766,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         $query = $this->_getPathQuery($id);
         // i know this is not really beautiful ...
         $query = preg_replace('/^select \* /i','SELECT COUNT(*) ',$query);
-        if (DB::isError($res = $this->dbh->getOne($query))) {
+        if (MDB::isError($res = $this->dbh->getOne($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return $res-1;
@@ -800,9 +795,9 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         $query = sprintf('SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
                             $this->table,
                             $this->_getWhereAddOn(),
-                            $this->_getColName('right'),$element['left']-1,
-                            $this->_getColName('left'),$element['left']-1);
-        if (DB::isError($res = $this->dbh->getRow($query))) {
+                            $this->_getColName('right'), $element['left'] - 1,
+                            $this->_getColName('left'),  $element['left'] - 1);
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return $this->_prepareResult($res);
@@ -824,15 +819,15 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     function getRight($id)
     {
         $element = $this->getElement($id);
-        if (Tree::isError($element)) {
+        if (Tree::isError($element))
             return $element;
-        }
+
         $query = sprintf('SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
                             $this->table,
                             $this->_getWhereAddOn(),
-                            $this->_getColName('left'),$element['right']+1,
-                            $this->_getColName('right'),$element['right']+1);
-        if (DB::isError($res = $this->dbh->getRow($query))) {
+                            $this->_getColName('left'),  $element['right'] + 1,
+                            $this->_getColName('right'), $element['right'] + 1);
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return $this->_prepareResult($res);
@@ -868,7 +863,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('id'),
                             $this->_getColName('id'),
                             $id);
-        if (DB::isError($res = $this->dbh->getRow($query))) {
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return $this->_prepareResult($res);
@@ -897,7 +892,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         $res = array();
         for ($i = 1; $i < $levels + 1; $i++) {
             // if $ids is an array implode the values
-            $getIds = is_array($ids) ? implode(',',$ids) : $ids;
+            $getIds = is_array($ids) ? implode(',', $ids) : $ids;
 
             $query = sprintf('SELECT
                                     c.*
@@ -922,7 +917,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                                     $this->getOption('order')
                                     : $this->_getColName('left')
                        );
-            if (DB::isError($_res = $this->dbh->getAll($query))) {
+            if (MDB::isError($_res = $this->dbh->getAll($query))) {
                 return $this->_throwError($_res->getMessage(), __LINE__);
             }
 
@@ -937,13 +932,13 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             }
             $_res = $tempRes;
 
-            if ($levels>1) {
+            if ($levels > 1) {
                 $ids = array();
-                foreach($_res as $aRes) {
+                foreach ($_res as $aRes) {
                     $ids[] = $aRes[$this->_getColName('id')];
                 }
             }
-            $res = array_merge($res,$_res);
+            $res = array_merge($res, $_res);
 
             // quit the for-loop if there are no children in the current level
             if (!sizeof($ids)) {
@@ -980,7 +975,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                                 e.%s=n.%s
                             AND
                                 e.%s=%s',
-                            $this->table,$this->table,
+                            $this->table, $this->table,
                             $this->_getWhereAddOn(' AND ', 'n'),
                             $this->_getColName('right'),
                             $this->_getColName('left'),
@@ -988,7 +983,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('parentId'),
                             $this->_getColName('id'),
                             $id);
-        if (DB::isError($res = $this->dbh->getRow($query))) {
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return !$res ? false : $this->_prepareResult($res);
@@ -1029,7 +1024,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('parentId'),
                             $this->_getColName('id'),
                             $id);
-        if (DB::isError($res = $this->dbh->getRow($query))) {
+        if (MDB::isError($res = $this->dbh->getRow($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         return !$res ? false : $this->_prepareResult($res);
@@ -1054,10 +1049,11 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
         // check simply if the left and right of the child are within the
         // left and right of the parent, if so it definitly is a child :-)
         $parent = $this->getElement($id);
-        $child = $this->getElement($childId);
+        $child  = $this->getElement($childId);
 
         if ($parent['left'] < $child['left']
-            && $parent['right'] > $child['right']) {
+            && $parent['right'] > $child['right'])
+        {
             return true;
         }
         return false;
@@ -1069,8 +1065,8 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     /**
      * return the maximum depth of the tree
      *
-     * @version 2003/02/25
-     * @access public
+     * @version    2003/02/25
+     * @access     public
      * @author "Denis Joloudov" <dan@aitart.ru>, Wolfram Kriesing <wolfram@kriesing.de>
      * @return integer the depth of the tree
      */
@@ -1089,7 +1085,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                             $this->_getColName('right'),$this->_getColName('left'),
                             $this->_getColName('right')
                             );
-        if (DB::isError($res = $this->dbh->getOne($query))) {
+        if (MDB::isError($res=$this->dbh->getOne($query))) {
             return $this->_throwError($res->getMessage(), __LINE__);
         }
         if (!$res) {
@@ -1113,7 +1109,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
     function hasChildren($id)
     {
         $element = $this->getElement($id);
-        // if the diff between left and right>1 then there are children
+        // if the diff between left and right > 1 then there are children
         return ($element['right'] - $element['left']) > 1;
     }
 
@@ -1170,8 +1166,8 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
             if (!is_array($startElem)) {
                 return null;
             }
-            $rangeStart  = $startElem['left'];
-            $rangeEnd  = $startElem['right'];
+            $rangeStart = $startElem['left'];
+            $rangeEnd   = $startElem['right'];
             // Not clean, we should call hasChildren, but I do not
             // want to call getELement again :). See TODO
             $startHasChild = ($rangeEnd-$rangeStart)>1?true:false;
@@ -1192,7 +1188,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                 .$this->_getColName('id')
                 .' FROM '
                 .$this->table
-                . ' WHERE '
+                .' WHERE '
                 .$colname;
         if ($cntElems == 1) {
             $query .= "='".$elems[0]."'";
@@ -1206,11 +1202,11 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
                         $this->_getColName('right').'<'.$rangeEnd.')';
         }
         $res = $this->dbh->getOne($query);
-        if (DB::isError($res)) {
+        if (MDB::isError($res)) {
             return $this->_throwError($res->getMessage(),
                         __LINE__);
         }
-        return ($res ? (int)$res : false);
+        return ($res?(int)$res:false);
     }
 
     // }}}
@@ -1231,7 +1227,7 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
      */
     function _getWhereAddOn($addAfter = ' AND ', $tableName = '')
     {
-        if ($where = $this->getOption('whereAddOn')) {
+        if ($where=$this->getOption('whereAddOn')) {
             return ' '.($tableName ? $tableName.'.' : '')." $where$addAfter ";
         }
         return '';
@@ -1279,10 +1275,10 @@ class Tree_Dynamic_DBnested extends Tree_OptionsDB
 }
 
 /*
- * Local Variables:
- * mode: php
- * tab-width: 4
- * c-basic-offset: 4
- * End:
- */
-?>
+* Local Variables:
+* mode: php
+* tab-width: 4
+* c-basic-offset: 4
+* End:
+*/
+?> 

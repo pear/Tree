@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2004 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -58,7 +58,7 @@ class Tree
      * @param  mixed   the dsn, or filename, etc., empty i.e. for XML
      *                 if you use setupByRawData
      */
-    function &setupMemory($type, $dsn='', $options=array())
+    function &setupMemory($type, $dsn = '', $options = array())
     {
         // if anyone knows a better name it would be great to change it.
         // since "setupMemory" kind of reflects it but i think it's not obvious
@@ -88,7 +88,7 @@ class Tree
      *                   it would be the filename
      * @param    array   the options you want to set
      */
-    function &setupDynamic($type, $dsn, $options=array())
+    function &setupDynamic($type, $dsn, $options = array())
     {
         // "dynamic" stands for retreiving a tree(chunk) dynamically when needed,
         // better name would be great :-)

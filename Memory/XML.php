@@ -100,7 +100,7 @@ class Tree_Memory_XML extends XML_Parser
      */
     function startHandler($parser, $element, $attribs)
     {
-        $elementBeforeId = sizeof($this->data)-1;
+        $elementBeforeId = sizeof($this->data) - 1;
         $curId = sizeof($this->data);
 
         $this->data[$curId]['id'] = $curId;

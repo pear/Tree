@@ -17,21 +17,26 @@
 // +----------------------------------------------------------------------+
 //
 //  $Id$
-require_once 'Tree/OptionsDB.php';
+
+require_once 'Tree/Tree.php';
 
 /**
  * common tree class, implements common functionality
  *
- * this class extends Tree_OptionsDB so every class that extends this one can
- * connect to a db and set options
  *
  * @access     public
  * @author     Wolfram Kriesing <wolfram@kriesing.de>
  * @version    2001/06/27
  * @package    Tree
  */
-class Tree_Common extends Tree_OptionsDB
+class Tree_Common
 {
+     /**
+     * @var array   you need to overwrite this array and give the keys/
+     *              that are allowed
+     */
+    var $_forceSetOption = false;
+
     /**
      * put proper value-keys are given in each class, depending
      * on the implementation only some options are needed or allowed,
@@ -584,10 +589,12 @@ class Tree_Common extends Tree_OptionsDB
     {
         $map = $this->getOption('columnNameMaps');
         if ($map) {
-            foreach ($map as $key=>$columnName) {
-                $temp = $result[$columnName];   // remember the value from the old name
-                unset($result[$columnName]);    // remove the old one
-                $result[$key] = $temp;          // save it in the mapped col-name
+            foreach ($map as $key => $columnName) {
+                if (isset($result[$columnName])) {
+                    $temp = $result[$columnName];   // remember the value from the old name
+                    unset($result[$columnName]);    // remove the old one
+                    $result[$key] = $temp;          // save it in the mapped col-name
+                }
             }
         }
         return $result;
@@ -597,7 +604,7 @@ class Tree_Common extends Tree_OptionsDB
     // {{{ _getColName()
 
     /**
-     * this method retreives the real column name, as used in the DB
+     * this method retrieves the real column name, as used in the DB
      * since the internal names are fixed, to be portable between different
      * DB-column namings, we map the internal name to the real column name here
      *
@@ -660,6 +667,169 @@ class Tree_Common extends Tree_OptionsDB
         }
         return new Tree_Error(
             $msg, $line, __FILE__, $mode, $this->dbh->last_query);
+    }
+
+    // }}}
+
+
+    /*******************************************************************************/
+    /************************ METHODS FROM Tree_Memory *****************************/
+    /*******************************************************************************/
+
+    /**
+     * returns if the given element has any children
+     *
+     * @version 2001/12/17
+     * @access  public
+     * @author  Wolfram Kriesing <wolfram@kriesing.de>
+     * @param   integer $id the id of the node to check for children
+     * @return  boolean true if the node has children
+     */
+    function hasChildren($id = 0)
+    {
+        if (isset($this->data[$id]['children']) &&
+            sizeof($this->data[$id]['children']) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
+    /*******************************************************************************/
+    /************************ METHODS FROM Tree_Options ****************************/
+    /*******************************************************************************/
+
+
+
+    // {{{ Tree_Options()
+
+    /**
+     * this constructor sets the options, since i normally need this and
+     * in case the constructor doesnt need to do anymore i already have
+     * it done :-)
+     *
+     * @version    02/01/08
+     * @access public
+     * @author Wolfram Kriesing <wolfram@kriesing.de>
+     * @param  array   the key-value pairs of the options that shall be set
+     * @param  boolean if set to true options are also set
+     *                 even if no key(s) was/were found in the options property
+     */
+    function Tree_Options($options=array(), $force=false)
+    {
+        $this->_forceSetOption = $force;
+        if (is_array($options) && sizeof($options)) {
+            foreach ($options as $key=>$value) {
+                $this->setOption($key, $value);
+            }
+        }
+    }
+
+    // }}}
+    // {{{ setOption()
+
+    /**
+     *
+     * @access public
+     * @author Stig S. Baaken
+     * @param  string  the option name
+     * @param  mixed   the value for this option
+     * @param  boolean if set to true options are also set
+     *                 even if no key(s) was/were found in the options property
+     */
+    function setOption($option, $value, $force = false)
+    {
+        // if the value is an array extract the keys
+        // and apply only each value that is set
+        if (is_array($value)) {
+            // so we dont override existing options inside an array
+            // if an option is an array
+            foreach ($value as $key=>$aValue) {
+                $this->setOption(array($option,$key),$aValue);
+            }
+            return true;
+        }
+
+        if (is_array($option)) {
+            $mainOption = $option[0];
+            $options = "['".implode("']['",$option)."']";
+            $evalCode = "\$this->options".$options." = \$value;";
+        } else {
+            $evalCode = "\$this->options[\$option] = \$value;";
+            $mainOption = $option;
+        }
+
+        if ($this->_forceSetOption == true ||
+            $force == true || isset($this->options[$mainOption])) {
+            eval($evalCode);
+            return true;
+        }
+        return false;
+    }
+
+    // }}}
+    // {{{ setOptions()
+
+    /**
+     * set a number of options which are simply given in an array
+     *
+     * @access public
+     * @param  array   the values to set
+     * @param  boolean if set to true options are also set even if no key(s)
+     *                 was/were found in the options property
+     */
+    function setOptions($options, $force = false)
+    {
+        if (is_array($options) && sizeof($options)) {
+            foreach ($options as $key => $value) {
+                $this->setOption($key, $value, $force);
+            }
+        }
+    }
+
+    // }}}
+    // {{{ getOption()
+
+    /**
+     *
+     * @access     public
+     * @author     copied from PEAR: DB/commmon.php
+     * @param      boolean true on success
+     */
+    function getOption($option)
+    {
+        if (func_num_args() > 1 &&
+            is_array($this->options[$option])) {
+            $args = func_get_args();
+            $evalCode = "\$ret = \$this->options['".
+                        implode("']['", $args) . "'];";
+            eval($evalCode);
+            return $ret;
+        }
+
+        if (isset($this->options[$option])) {
+            return $this->options[$option];
+        }
+        return false;
+    }
+
+    // }}}
+    // {{{ getOptions()
+
+    /**
+     * returns all the options
+     *
+     * @version    02/05/20
+     * @access     public
+     * @author     Wolfram Kriesing <wolfram@kriesing.de>
+     * @return     string      all options as an array
+     */
+    function getOptions()
+    {
+        return $this->options;
     }
 
     // }}}

@@ -18,16 +18,16 @@
 //
 //  $Id$
 
-require_once 'Tree/Dynamic/DBnested.php';
+require_once 'Tree/Dynamic/MDBnested.php';
 
 /**
- *
- *
- *   @access     public
- *   @author
- *   @package    Tree
- */
-class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
+*
+*
+*   @access     public
+*   @author
+*   @package    Tree
+*/
+class Tree_Memory_MDBnested extends Tree_Dynamic_MDBnested
 {
 
     /**
@@ -52,27 +52,27 @@ class Tree_Memory_DBnested extends Tree_Dynamic_DBnested
 
             //
             $orderBy = 'left';
-            if ($order = $this->getOption('order')) {
+            if ($order=$this->getOption('order')) {
                 $orderBy = $order;
             }
 
             // build the query this way, that the root, which has no parent
             // (parentId=0) is first
-            $query = sprintf('SELECT * FROM %s %s ORDER BY %s',
+            $query = sprintf(   'SELECT * FROM %s %s ORDER BY %s',
                                 $this->table,
                                 $whereAddOn,
                                 // sort by the left-column, so we have the data
                                 //sorted as it is supposed to be :-)
                                 $this->_getColName($orderBy)
                                 );
-            if (DB::isError($res = $this->dbh->getAll($query))) {
-                return $this->_throwError($res->getMessage(),__LINE__);
+            if (MDB::isError($res = $this->dbh->getAll($query))) {
+                return $this->_throwError($res->getMessage(), __LINE__);
             }
         }
 
-        return $this->_prepareResults( $res );
+        return $this->_prepareResults($res);
     }
 
 }
 
-?>
+?> 

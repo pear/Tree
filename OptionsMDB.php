@@ -1,11 +1,10 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-
 // i think this class should go somewhere in a common PEAR-place,
-// but since it is not very fancy to crowd the PEAR-namespace too much
-// i dont know where to put it yet :-(
+// because a lot of classes use options, at least PEAR::DB does
+// but since it is not very fancy to crowd the PEAR-namespace
+// too much i dont know where to put it yet :-(
 
-//
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
@@ -27,23 +26,22 @@
 require_once 'Tree/Common.php';
 
 /**
- *   this class additionally retreives a DB connection and saves it
- *   in the property "dbh"
- *
- *   @package  Tree
- *   @access   public
- *   @author   Wolfram Kriesing <wolfram@kriesing.de>
- *
- */
-class Tree_OptionsDB extends Tree_Common
+*   this class additionally retreives a DB connection and saves it
+*   in the property "dbh"
+*
+*   @package  Tree
+*   @access   public
+*   @author   Wolfram Kriesing <wolfram@kriesing.de>
+*
+*/
+class Tree_OptionsMDB extends Tree_Common
 {
     /**
      *   @var    object
      */
     var $dbh;
 
-
-    // {{{ Tree_OptionsDB()
+    // {{{ Tree_OptionsMDB()
 
     /**
      *   this constructor sets the options, since i normally need this and
@@ -55,11 +53,11 @@ class Tree_OptionsDB extends Tree_Common
      *   @author     Wolfram Kriesing <wolfram@kriesing.de>
      *   @param      boolean true if loggedIn
      */
-    function Tree_OptionsDB($dsn , $options = array())
+    function Tree_OptionsMDB($dsn, $options=array())
     {
         $res = $this->_connectDB($dsn);
         if (!PEAR::isError($res)) {
-            $this->dbh->setFetchmode(DB_FETCHMODE_ASSOC);
+            $this->dbh->setFetchmode(MDB_FETCHMODE_ASSOC);
         } else {
             return $res;
         }
@@ -81,26 +79,20 @@ class Tree_OptionsDB extends Tree_Common
     function _connectDB($dsn)
     {
         // only include the db if one really wants to connect
-        require_once 'DB.php';
+        require_once 'MDB.php';
 
         if (is_string($dsn) || is_array($dsn)) {
-            // put the dsn parameters in an array
-            // DB would be confused with an additional URL-queries,
-            //like ?table=... so we do it before connecting to the DB
-            if (is_string($dsn)) {
-                $dsn = DB::parseDSN($dsn);
-            }
-            $this->dbh = DB::Connect($dsn);
+            $this->dbh = MDB::Connect($dsn);
         } else {
-            if (get_parent_class($dsn) == 'db_common') {
+            if (get_parent_class($dsn) == 'mdb_common') {
                 $this->dbh = $dsn;
             } else {
-                if (is_object($dsn) && DB::isError($dsn)) {
-                    return new DB_Error($dsn->code, PEAR_ERROR_DIE);
+                if (is_object($dsn) && MDB::isError($dsn)) {
+                    return new MDB_Error($dsn->code, PEAR_ERROR_DIE);
                 } else {
                     return new PEAR_Error(
                                 'The given dsn was not valid in file '.
-                                __FILE__ . " at line " . __LINE__,
+                                __FILE__ . ' at line ' . __LINE__,
                                 41,
                                 PEAR_ERROR_RETURN,
                                 null,
@@ -111,12 +103,12 @@ class Tree_OptionsDB extends Tree_Common
             }
         }
 
-        if (DB::isError($this->dbh)) {
-            return new DB_Error($this->dbh->code, PEAR_ERROR_DIE);
+        if (MDB::isError($this->dbh)) {
+            return new MDB_Error($this->dbh->code, PEAR_ERROR_DIE);
         }
         return true;
     }
 
     // }}}
 }
-?>
+?> 

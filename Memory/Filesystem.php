@@ -48,8 +48,8 @@ require_once 'Tree/Error.php';
      * @var    array   saves the options passed to the constructor
      */
     var $options =  array(
-                        'order'     =>'',
-                        'columnNameMaps'=>array(),
+                        'order'     => '',
+                        'columnNameMaps' => array(),
                     );
 
     // {{{ Tree_Memory_Filesystem()
@@ -63,7 +63,7 @@ require_once 'Tree/Error.php';
      * @param      string  $dsn    the path on the filesystem
      * @param      array   $options  additional options you can set
      */
-    function Tree_Memory_Filesystem ($path, $options=array())
+    function Tree_Memory_Filesystem ($path, $options = array())
     {
         $this->_path = $path;
         // not in use currently
@@ -100,7 +100,7 @@ require_once 'Tree/Error.php';
     // }}}
     // {{{ _setup()
 
-    function _setup($path, $parentId=0)
+    function _setup($path, $parentId = 0)
     {
         if ($handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
@@ -208,7 +208,7 @@ require_once 'Tree/Error.php';
     {
         $map = $this->getOption('columnNameMaps');
         if ($map) {
-            foreach ($map as $key=>$columnName) {
+            foreach ($map as $key => $columnName) {
                 $result[$key] = $result[$columnName];
                 unset($result[$columnName]);
             }
