@@ -34,9 +34,9 @@
                 print '&nbsp; &nbsp; ';
             print '<b>'.$aElement['name'].'</b> ===&gt; ';
 
-            # you can also show all the content, using this
+            // you can also show all the content, using this
             // $tree->varDump(array($aElement));
-            # i just didnt, since it takes up more then the entire line, and its unreadable :-)
+            // i just didnt, since it takes up more then the entire line, and its unreadable :-)
 
             print 'attributes - ';
             print_r($aElement['attributes']);
@@ -57,7 +57,13 @@
         'setup', then you can work on the tree in whichever way
         you want, just have a look at the examples
         there are different ways to achieve things,
-        i will try to demonstrate (all of) them
+        i will try to demonstrate (all of) them     
+        
+        NOTE: for referening the XML-Nodes currently everything has to 
+        be lower case, 
+            SimpleTemplate/preFilter
+        should be                   
+            simpletemplate/prefilter
 
     */
 
@@ -83,31 +89,31 @@
     dumpAllNicely( 'dump all after "$tree-&gt;setup"' );
 
     // get the path of the last inserted element
-    $id = $tree->getIdByPath('SimpleTemplate/options/delimiter');
-    dumpHelper( $tree->getPath( $id ) , 'dump the path from "SimpleTemplate/options/delimiter"' );
+    print 'id='.$id = $tree->getIdByPath('simpletemplate/options/delimiter');
+    dumpHelper( $tree->getPath( $id ) , 'dump the path from "simpletemplate/options/delimiter"' );
 
-    $id = $tree->getIdByPath('SimpleTemplate/options');
-    dumpHelper( array($tree->getParent($id)) , 'dump the parent of "SimpleTemplate/options"' );
+    $id = $tree->getIdByPath('simpletemplate/options');
+    dumpHelper( array($tree->getParent($id)) , 'dump the parent of "simpletemplate/options"' );
     // you can also use:    $tree->data[$id]['parent']
 
-    $id = $tree->getIdByPath('SimpleTemplate');
-    dumpHelper( array($tree->getChild($id)) , 'dump the child of "SimpleTemplate"' );
+    $id = $tree->getIdByPath('simpletemplate');
+    dumpHelper( array($tree->getChild($id)) , 'dump the child of "simpletemplate"' );
     // you can also use:    $tree->data[$id]['child']
 
-    $id = $tree->getIdByPath('SimpleTemplate/preFilter');
-    dumpHelper( $tree->getChildren($id) , 'dump the children of "SimpleTemplate/preFilter"' );
+    $id = $tree->getIdByPath('simpletemplate/prefilter');
+    dumpHelper( $tree->getChildren($id) , 'dump the children of "simpletemplate/prefilter"' );
     // you can also use:    $tree->data[$id]['children']
 
-    $id = $tree->getIdByPath('SimpleTemplate/options');
-    dumpHelper( array($tree->getNext($id)) , 'dump the "next" of "SimpleTemplate/options"' );
+    $id = $tree->getIdByPath('simpletemplate/options');
+    dumpHelper( array($tree->getNext($id)) , 'dump the "next" of "simpletemplate/options"' );
     // you can also use:    $tree->data[$id]['next']
 
-    $id = $tree->getIdByPath('SimpleTemplate/preFilter');
-    dumpHelper( array($tree->getPrevious($id)) , 'dump the "previous" of "SimpleTemplate/preFilter"' );
+    $id = $tree->getIdByPath('simpletemplate/prefilter');
+    dumpHelper( array($tree->getPrevious($id)) , 'dump the "previous" of "simpletemplate/prefilter"' );
     // you can also use:    $tree->data[$id]['previous']
 
 
-    $id = $tree->getIdByPath('SimpleTemplate/preFilter');
+    $id = $tree->getIdByPath('simpletemplate/preFilter');
     $element = $tree->data[$id]['child']['next']['next']; // refer to the third child of 'SimpleTemplate/preFilter/register'
     dumpHelper( $element['id'] , 'demo of using the internal array, for referencing tree-nodes' );
 
