@@ -17,36 +17,37 @@
       <role>lead</role>
     </maintainer>
   </maintainers>
-  <release>
-    <license>PHP</license>
-    <state>snapshot</state>
-    <notes>
-     Initial snapshot release
-    </notes>
-    <filelist>
-      <dir name="/" baseinstalldir="/">
-	<file role="php">Tree.php</file>
-	<dir name="." baseinstalldir="Tree">
-	  <file role="php">Common.php</file>
-	  <file role="php">Memory.php</file>
-	  <file role="php">Options.php</file>
-	</dir>
-	<dir name="Memory" baseinstalldir="Tree/Memory">
-	  <file role="php">DBsimple.php</file>
-	  <file role="php">DBnested.php</file>
-	  <file role="php">XML.php</file>
-	</dir>
-	<dir name="Dynamic" baseinstalldir="Tree/Dynamic">
-	  <file role="php">DBnested.php</file>
-	</dir>
-	<dir name="examples" role="doc">
-	  <file role="doc">Dynamic_DBnested.sql</file>
-	  <file role="doc">Dynamic_DBnested.php</file>
-	  <file role="doc">Memory_XML.php</file>
-	  <file role="doc">Memory_DBsimple.php</file>
-	  <file role="doc">config.xml</file>
-	</dir>
-      </dir>
-    </filelist>
-  </release>
+    <release>
+        <license>PHP</license>
+        <state>snapshot</state>
+        <notes>
+            Initial snapshot release
+        </notes>
+        <filelist>
+            <dir name="/" baseinstalldir="Tree">
+                <file role="php">Tree.php</file>
+                <file role="php">Common.php</file>
+                <file role="php">Memory.php</file>
+                <file role="php">Options.php</file>
+                <file role="php">OptionsDB.php</file>
+                <file role="php">Error.php</file>
+                <dir name="Memory" baseinstalldir="Memory">
+                    <file role="php">DBsimple.php</file>
+                    <file role="php">DBnested.php</file>
+                    <file role="php">XML.php</file>
+                </dir>
+                <dir name="Dynamic" baseinstalldir="Dynamic">
+                    <file role="php">DBnested.php</file>
+                </dir>
+                <dir name="examples" role="doc">
+                    <file role="doc">Dynamic_DBnested.sql</file>
+                    <file role="doc">Dynamic_DBnested.php</file>
+                    <file role="doc">Memory_XML.php</file>
+                    <file role="doc">Memory_DBsimple.php</file>
+                    <file role="doc">Memory_DBnested.php</file>
+                    <file role="doc">config.xml</file>
+                </dir>
+            </dir>
+        </filelist>
+    </release>
 </package>
