@@ -90,6 +90,11 @@ foreach ($val as $k=>$v)
             if (!isset($newData['id']) || !$newData['id']) {    // if the current element has no id, we generate one
                 $newData['id'] = $this->_id++;      // build a unique numeric id
                 $array[$nodeKey]['id'] = $newData['id'];    // set the id
+            } else {
+                $idAsInt = (int)$newData['id'];
+                if ($idAsInt > $this->_id) {
+                    $this->_id = $idAsInt;
+                }
             }
 //print "a node name=".$aNode['name'].'<br>';
             $newData['parentId'] = $parentId;       // set the parent-id, since we only have a 'children' array
@@ -204,21 +209,20 @@ print "<br>";
     {
         if (!isset($data['id'])) {
             $data['id'] = $this->_id++;
-        } elseif(is_int($data['id'] && $data['id'] > $this->_id)) {
+        } elseif((int)$data['id'] > $this->_id) {
             // update the $this->_id if the data['id'] has a higher number, since
             // we dont want to overwrite anything. just in case
-            $this->_id = $data['id'];
+            $this->_id = (int)$data['id'];
         }
         $data['parentId'] = $parentId;
         $this->data[$data['id']] = $data;
 
         //$path = $this->getPathById($parentId);
-
         if (!isset($this->_array['children'])) {    // there might not be a root element yet
             $data['parentId'] = 0;
             $this->_array['children'][] = $data;
         } else {
-            array_walk($this->_array['children'],array(&$this,'_add'),array($data,$parentId));
+            array_walk($this->_array['children'],array(&$this,'_add'),array($data,$parentId,$previousId));
         }
 
         //$this->_array
@@ -229,6 +233,12 @@ print "<br>";
     function _add( &$val , $key , $data )
     {
         if ($val['id']==$data[1]) { // is the id of the current elment ($val) == to the parentId ($data[1])
+/*            if (isset($data[2])) {  // is there a previousId given?
+                foreach ($val['children'] as $aChild)
+            } else {
+                $val['children'][] = $data[0];
+            }
+*/
             $val['children'][] = $data[0];
         } else {        // if we havent found the new element go on searching
             if (isset($val['children'])) {
@@ -288,7 +298,9 @@ print "<br>";
     */
     function remove($id)
     {
-        $this->_remove($this->_array,$id);
+        if ($this->data[$id]) {                     // we only need to search for element that do exist :-) otherwise we save some processing time
+            $this->_remove($this->_array,$id);
+        }
     }
 
     /**
