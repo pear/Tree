@@ -555,8 +555,9 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param
     *   @return
     */
-    function copy( $id , $parentId , $prevId )
+    function copy( $id , $parentId=0 , $prevId=0 )
     {
+        return $this->_throwError( 'copy-method is not implemented yet!' , __LINE__ );
         // get element tree
         // $this->addTree
     } // end of function
@@ -739,7 +740,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     {
         $query = sprintf(   'SELECT p.* FROM %s p,%s e WHERE%s e.%s=p.%s AND e.%s=%s',
                             $this->table,$this->table,
-                            $this->_getWhereAddOn(),
+                            $this->_getWhereAddOn( ' AND ' , 'p' ),
                             $this->_getColName('parentId'),
                             $this->_getColName('id'),
                             $this->_getColName('id'),
@@ -753,31 +754,67 @@ class Tree_Dynamic_DBnested extends Tree_Common
 
     /**
     *   get the children of the given element
+    *   or if the parameter is an array, it gets the children of all
+    *   the elements given by their ids in the array
     *
     *   @access     public
     *   @version    2002/04/15
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      mixed   (1) int     the id of one element
+    *                       (2) array   an array of ids for which
+    *                                   the children will be returned
+    *   @param      integer the children of how many levels shall be returned
     *   @return     mixed   the array with the data of all children
     *                       or false, if there are none
     */
-    function getChildren( $id )
+    function getChildren( $ids , $levels=1 )
     {
-        $query = sprintf(   'SELECT c.* FROM %s c,%s e WHERE%s e.%s=c.%s AND e.%s=%s '.
-                            'ORDER BY c.%s',    // order by left, so we have it in the order as it is in the tree
-                            $this->table,$this->table,
-                            $this->_getWhereAddOn(),
-                            $this->_getColName('id'),
-                            $this->_getColName('parentId'),
-                            $this->_getColName('id'),
-                            $id,
-                            $this->_getColName('left')
-                            );
-        if( DB::isError( $res = $this->dbh->getAll($query) ) )
+        $res = array();
+        for( $i=1 ; $i<$levels+1 ; $i++ )
         {
-            return $this->_throwError( $res->getMessage() , __LINE__ );
+            // if $ids is an array implode the values
+            $getIds = is_array($ids) ? implode(',',$ids) : $ids;
+
+            $query = sprintf(   'SELECT c.* FROM %s c,%s e WHERE%s e.%s=c.%s AND e.%s IN (%s) '.
+                                'ORDER BY c.%s',
+                                $this->table,$this->table,
+                                $this->_getWhereAddOn( ' AND ' , 'c' ),
+                                $this->_getColName('id'),
+                                $this->_getColName('parentId'),
+                                $this->_getColName('id'),
+                                $getIds,
+                                // order by left, so we have it in the order as it is in the tree
+                                // if no 'order'-option is given
+                                $this->getOption('order') ? $this->getOption('order') : $this->_getColName('left')
+                                );
+            if( DB::isError( $_res = $this->dbh->getAll($query) ) )
+            {
+                return $this->_throwError( $_res->getMessage() , __LINE__ );
+            }
+            $_res = $this->_prepareResults( $_res );
+
+            // we use the id as the index, to make the use easier esp. for multiple return-values
+            $tempRes = array();
+            foreach( $_res as $aRes )
+            {
+                $tempRes[$aRes[$this->_getColName('id')]] = $aRes;
+            }
+            $_res = $tempRes;
+
+            //
+            if( $levels>1 )
+            {
+                $ids = array();
+                foreach( $_res as $aRes )
+                    $ids[] = $aRes[$this->_getColName('id')];
+            }
+            $res = array_merge($res,$_res);
+
+            // quit the for-loop if there are no children in the current level
+            if( !sizeof($ids) )
+                break;
         }
-        return $this->_prepareResults( $res );
+        return $res;
     }
 
     /**
@@ -796,7 +833,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     {
         $query = sprintf(   'SELECT n.* FROM %s n,%s e WHERE%s e.%s=n.%s-1 AND e.%s=n.%s AND e.%s=%s',
                             $this->table,$this->table,
-                            $this->_getWhereAddOn(),
+                            $this->_getWhereAddOn( ' AND ' , 'n' ),
                             $this->_getColName('right'),
                             $this->_getColName('left'),
                             $this->_getColName('parentId'),
@@ -828,7 +865,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
     {
         $query = sprintf(   'SELECT p.* FROM %s p,%s e WHERE%s e.%s=p.%s+1 AND e.%s=p.%s AND e.%s=%s',
                             $this->table,$this->table,
-                            $this->_getWhereAddOn(),
+                            $this->_getWhereAddOn( ' AND ' , 'p' ),
                             $this->_getColName('left'),
                             $this->_getColName('right'),
                             $this->_getColName('parentId'),
@@ -890,13 +927,11 @@ class Tree_Dynamic_DBnested extends Tree_Common
     *   @param      string  the current where clause
     *   @return
     */
-    function _getWhereAddOn( $single=false )
+    function _getWhereAddOn( $addAfter=' AND ' , $tableName='' )
     {
         if( $where=$this->getOption('whereAddOn') )
         {
-            if( $single==true )
-                return $where;
-            return " $where AND ";
+            return ' '.($tableName?$tableName.'.':'')." $where$addAfter ";
         }
         return '';
     }
