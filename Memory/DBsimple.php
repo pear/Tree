@@ -175,45 +175,27 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     *                                   the key for each element is the name of the column
     *   @return     mixed   either boolean false on failure or the id of the inserted row
     */
-    function add( $newValues )
+    function add( $newValues , $parentId=0 )
     {
-# FIXXME make this compatible to the DBnested::add, see parameters!!!
-        // do all the name mapping
-        $idColumnName = 'id';
-        $map = $this->getOption('columnNameMaps');
-        if( $map )                                  // if there are maps given
-        {
-            foreach( $map as $key=>$columnName )    // go thru all the maps
-            {
-                if( $newValues[$key] )              // if a value is given for the name to map
-                {
-                    $newValues[$columnName] = $newValues[$key]; // replace the old key-name with the column name
-                    unset($newValues[$key]);        // unset the old one since we dont need to write it in the db
-                }
-            }
-
-            if( $map['id'] )                        // find the id column name, to be able to write the sequence number in the proper row
-                $idColumnName = $map['id'];
-
-        }
-
 # FIXXME use $this->dbh->tableInfo to check which columns exist
 # so only data for which a column exist is inserted
+        if( $parentId )
+            $newValues['parentId'] = $parentId;
 
+        $newData = array();
         foreach( $newValues as $key=>$value )       // quote the values, as needed for the insert
         {
-            $newValues[$key] = $this->dbh->quote($value);
+            $newData[$this->_getColName($key)] = $this->dbh->quote($value);
         }
 
         // use sequences to create a new id in the db-table
         $nextId = $this->dbh->nextId($this->table);
         $query = sprintf("INSERT INTO %s (%s,%s) VALUES (%s,%s)",
                             $this->table ,
-                            $idColumnName,
-                            implode( "," , array_keys($newValues) ) ,
+                            $this->_getColName('id'),
+                            implode( ',' , array_keys($newData) ) ,
                             $nextId,
-                            implode( "," , $newValues ) );
-
+                            implode( ',' , $newData ) );
         if( DB::isError( $res = $this->dbh->query( $query ) ) )
         {
             # TODO raise PEAR error
@@ -317,40 +299,26 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     *                                   elements are the data to fill in the DB
     *   @return     boolean true for success
     */
-    function update( $newData )
+    function update( $id , $newData )
     {
 
 # FIXXME check $this->dbh->tableInfo to see if all the columns that shall be updated
 # really exist, this will also extract nextId etc. if given before writing it in the DB
 # in case they dont exist in the DB
-
-        if( !$newData['id'] ){
-# FIXXME raise PEAR error
-            printf('ERROR - tree::update no id given');
-            return false;
-        }
-
-        $id = $newData['id'];                       // get the id and remove it...
-        unset($newData['id']);                      // ...from the array, since we use it in the WHERE
-
-        $map = $this->getOption('columnNameMaps');
-
         $setData = array();
-        foreach( $newData as $key=>$aDate )
+        foreach( $newData as $key=>$value )       // quote the values, as needed for the insert
         {
-            if( $map[$key] )                        // was the column name mapped to a different name?
-                $setData[] = $map[$key].'='.$this->dbh->quote($aDate);    // if so map back :-)
-            else
-                $setData[] = "$key='$aDate'";
+            $setData[] = $this->_getColName($key).'='.$this->dbh->quote($value);
         }
 
         $query = sprintf(   'UPDATE %s SET %s WHERE %s=%s',
                             $this->table,
                             implode( ',' , $setData ),
-                            $map['id'] ? $map['id'] : 'id',
+                            $this->_getColName('id'),
                             $id
                         );
-        if( DB::isError( $res=$this->dbh->query($query) ) ){
+        if( DB::isError( $res=$this->dbh->query($query) ) )
+        {
 # FIXXME raise PEAR error
             printf("ERROR - tree::update - %s - %s<br>",DB::errormessage($res),$query);
             return false;
@@ -371,6 +339,69 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
     function _throwError( $msg , $line , $mode=null )
     {
         return new Tree_Error( $msg , $line , __FILE__ , $mode , $this->db->last_query );
+    }
+
+
+
+    /**
+    *   prepare multiple results
+    *
+    *   @see        _prepareResult()
+    *   @access     private
+    *   @version    2002/03/03
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _prepareResults( $results )
+    {
+        $newResults = array();
+        foreach( $results as $aResult )
+            $newResults[] = $this->_prepareResult($aResult);
+        return $newResults;
+    }
+
+    /**
+    *   map back the index names to get what is expected
+    *
+    *   @access     private
+    *   @version    2002/03/03
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _prepareResult( $result )
+    {
+        $map = $this->getOption('columnNameMaps');
+
+        if( $map )
+        foreach( $map as $key=>$columnName )
+        {
+            $result[$key] = $result[$columnName];
+            unset($result[$columnName]);
+        }
+        return $result;
+    }
+
+    /**
+    *   this method retreives the real column name, as used in the DB
+    *   since the internal names are fixed, to be portable between different
+    *   DB-column namings, we map the internal name to the real column name here
+    *
+    *   @access     private
+    *   @version    2002/03/02
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param
+    *   @return
+    */
+    function _getColName( $internalName )
+    {
+        if( $map = $this->getOption( 'columnNameMaps' ) )
+        {
+            if( isset($map[$internalName]) )
+                return $map[$internalName];
+        }
+        return $internalName;
     }
 
 
