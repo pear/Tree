@@ -332,7 +332,7 @@ class Tree_Memory_DBsimple extends Tree_OptionsDB
         foreach( $newData as $key=>$aDate )
         {
             if( $map[$key] )                        // was the column name mapped to a different name?
-                $setData[] = $map[$key]."='$aDate'";    // if so map back :-)
+                $setData[] = $map[$key].'='.$this->dbh->quote($aDate));    // if so map back :-)
             else
                 $setData[] = "$key='$aDate'";
         }
