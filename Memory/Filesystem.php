@@ -93,6 +93,7 @@ class Tree_Memory_Filesystem
     */
     function setup()
     {
+        unset($this->data);                         // unset the data to be sure to get the real data again, no old data
         if( is_dir($this->_path) )
         {
             $this->data[$this->_path] = array('id'=>$this->_path,'name'=>$this->_path,'parentId'=>0);
@@ -148,6 +149,7 @@ class Tree_Memory_Filesystem
     function copy(  $srcId , $destId  )
     {
         # if( !@copy( $srcId , $destId ) ) this would only be for files :-)
+# FIXXME loop through the directory to copy the children too !!!
 
         $dest = $destId.'/'.preg_replace('/^.*\//','',$srcId);
 
