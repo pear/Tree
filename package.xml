@@ -46,6 +46,8 @@
 * add method getLevel() to Tree_Common, so it is also available for Dynamic_*, thanks to Michael Johnson
 * Fixed bug #1976, bug #900, 
 * CS fixes
+* MDB support added (By Lorenzo)
+* Options.php removed, functionality merged with Common.php
 
 * add unit test, at least for all new/modified methods
         </notes>
@@ -54,25 +56,31 @@
                 <file role="php">Tree.php</file>
                 <file role="php">Common.php</file>
                 <file role="php">Memory.php</file>
-                <file role="php">Options.php</file>
                 <file role="php">OptionsDB.php</file>
+                <file role="php">OptionsMDB.php</file>
                 <file role="php">Error.php</file>
                 <dir name="Memory">
                     <file role="php">DBsimple.php</file>
                     <file role="php">DBnested.php</file>
+                    <file role="php">MDBsimple.php</file>
+                    <file role="php">MDBnested.php</file>
                     <file role="php">XML.php</file>
                     <file role="php">Filesystem.php</file>
                     <file role="php">Array.php</file>
                 </dir>
                 <dir name="Dynamic">
                     <file role="php">DBnested.php</file>
+                    <file role="php">MDBnested.php</file>
                 </dir>
                 <dir name="docs" role="doc">
                     <file role="doc">Dynamic_DBnested.sql</file>
                     <file role="doc">Dynamic_DBnested.php</file>
+                    <file role="doc">Dynamic_MDBnested.php</file>
                     <file role="doc">Memory_XML.php</file>
                     <file role="doc">Memory_DBsimple.php</file>
                     <file role="doc">Memory_DBnested.php</file>
+                    <file role="doc">Memory_MDBsimple.php</file>
+                    <file role="doc">Memory_MDBnested.php</file>
                     <file role="doc">config.xml</file>
                     <dir name="TreeEditor">
                         <file role="doc">index.php</file>
@@ -114,6 +122,7 @@
                 <dep type="php" rel="ge" optional="no" version="4.2.0" />
                 <dep type="pkg" rel="ge" version="1.3.3">PEAR</dep>
                 <dep type="pkg" rel="ge" version="1.6.8" optional="yes">DB</dep>
+                <dep type="pkg" rel="ge" version="1.3.0" optional="yes">MDB</dep>
                 <dep type="pkg" rel="ge" version="1.2.1" optional="yes">XML_Parser</dep>
             </deps>
 
