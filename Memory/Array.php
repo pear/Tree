@@ -85,15 +85,14 @@ class Tree_Memory_Array
         foreach( $array as $nodeKey=>$aNode )
         {
             $newData = $aNode;
-            if( !$newData['id'] )
-            {
+            if ( !isset($newData['id']) || !$newData['id'] ) {
                 $newData['id'] = $this->_id++;
                 $array[$nodeKey]['id'] = $newData['id'];
             }
 
             $newData['parentId'] = $parentId;
             $children = null;
-            foreach( $newData as $key=>$val ) // remove the 'children' array, since this is only info for this class
+            foreach ( $newData as $key=>$val ) // remove the 'children' array, since this is only info for this class
             {
                 if( $key=='children' )
                 {
@@ -102,8 +101,12 @@ class Tree_Memory_Array
             }
 
             $this->data[] = $newData;
-            if( $aNode['children'] )
+            if ( isset($aNode['children']) && $aNode['children'] ) {
+                if( !isset($array[$nodeKey]['children']) ) {
+                    $array[$nodeKey]['children'] = array();
+                }
                 $this->_setup( $array[$nodeKey]['children'] , $newData['id'] );
+            }
         }
     }
 
