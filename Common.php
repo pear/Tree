@@ -508,10 +508,11 @@ class Tree_Common extends Tree_OptionsDB
     {
         $map = $this->getOption('columnNameMaps');
         if ($map) {
+            $new = array();
 			foreach ($map as $key=>$columnName) {
 				$result[$key] = $result[$columnName];
-				unset($result[$columnName]);
 			}
+            return $new;
 		}
         return $result;
     }
