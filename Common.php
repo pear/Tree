@@ -292,14 +292,32 @@ class Tree_Common extends Tree_OptionsDB
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      mixed   $id     the id of the node to get the path for
+    *   @param      integer If offset is positive, the sequence will
+    *                       start at that offset in the array .  If
+    *                       offset is negative, the sequence will start that far from the end of the array .
+    *   @param      integer If length is given and is positive, then
+    *                       the sequence will have that many elements in it. If
+    *                       length is given and is negative then the
+    *                       sequence will stop that many elements from the end of the
+    *                       array. If it is omitted, then the sequence will have everything
+    *                       from offset up until the end of the array.
     *   @return     array   this array contains all elements from the root to the element given by the id
     *
     */
-    function getPathAsString( $id , $seperator='/' )
+    function getPathAsString( $id , $seperator='/' , $offset=0 , $length=0 )
     {
         $path = $this->getPath($id);
-        foreach( $path as $aNode )
+        foreach ($path as $aNode) {
             $pathArray[] = $aNode['name'];
+        }
+
+        if ($offset) {
+            if ($length) {
+                $pathArray = array_slice($pathArray,$offset,$length);
+            } else {
+                $pathArray = array_slice($pathArray,$offset);
+            }
+        }
 
         $pathString = '';
         if( sizeof($pathArray) )
