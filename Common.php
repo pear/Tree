@@ -491,7 +491,7 @@ class Tree_Common extends Tree_OptionsDB
         $newResults = array();
         foreach ($results as $key=>$aResult) {
             $newResults[$key] = $this->_prepareResult($aResult);
-		}
+        }
         return $newResults;
     }
 
@@ -508,12 +508,11 @@ class Tree_Common extends Tree_OptionsDB
     {
         $map = $this->getOption('columnNameMaps');
         if ($map) {
-            $new = array();
-			foreach ($map as $key=>$columnName) {
-				$result[$key] = $result[$columnName];
-			}
-            return $new;
-		}
+            foreach ($map as $key=>$columnName) {
+                $result[$key] = $result[$columnName];   // map the column name
+                unset($result[$columnName]);            // remove the old one
+            }
+        }
         return $result;
     }
 
@@ -533,7 +532,7 @@ class Tree_Common extends Tree_OptionsDB
         if ($map = $this->getOption('columnNameMaps')) {
             if (isset($map[$internalName])) {
                 return $map[$internalName];
-			}
+            }
         }
         return $internalName;
     }
@@ -572,7 +571,7 @@ class Tree_Common extends Tree_OptionsDB
         include_once 'Tree/Error.php';
         if ($mode===null && $this->debug>0) {
             $mode = PEAR_ERROR_PRINT;
-		}
+        }
         return new Tree_Error(
             $msg , $line, __FILE__, $mode, $this->dbh->last_query);
     }
