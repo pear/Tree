@@ -31,20 +31,12 @@
     </maintainer>
   </maintainers>
     <release>
-        <version>0.1.2</version>
-        <date>2002-09-30</date>
+        <version>0.2</version>
+        <date>2002-10-28</date>
         <license>PHP License</license>
         <state>beta</state>
         <notes>
-            - added example that can demonstrates the Tree-class optionally on
-              either a DB, FileSystem, Array or XML-File
-            - enhanced the returning of proper PEAR-errors
-            - experimental FileSystem-class that can be used to read a directory structure
-              and work on it using the known tree-methods
-            - experimental Array-class which allows the same on arrays
-            - check for existence of methods in the delegated-classes before calling them
-              return proper PEAR-error if they are not implemented yet
-            - implemented getChildrens method, for Memory-way
+            - change in API! getChildrens[Ids] became getAllChildren[Ids] (since that is proper english)
         </notes>
         <filelist>
             <dir name="/" baseinstalldir="Tree">
@@ -71,7 +63,7 @@
                     <file role="doc">Memory_DBsimple.php</file>
                     <file role="doc">Memory_DBnested.php</file>
                     <file role="doc">config.xml</file>
-                    <!--  well noone moved this dir for me yet :-( do u get no example 
+                    <!--  well noone moved this dir for me yet :-( so u get no example 
                     <dir name="TreeEditor_Memory">
                         <file role="php">index.php</file>
                         <dir name="tmp">
