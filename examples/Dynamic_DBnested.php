@@ -10,6 +10,7 @@
     $show[] = '$tree->getElement( 1 )';
     $show[] = '$tree->getChild( 1 )';
     $show[] = '$tree->getPath( 7 )';
+    $show[] = '$tree->getPath( 2 )';
     $show[] = '$tree->add( array("name"=>"c0") , 5 )';
     $show[] = '$tree->remove( $res )';  // remove the last element that was added in the line before :-)
     $show[] = '$tree->getRight( 5 )';
@@ -24,13 +25,22 @@
     $show[] = '$tree->getPrevious( 8 )';
     $show[] = '$tree->getPreviousId( 8 )';
 
+    $show[] = '$tree->move( 4,3 )';
+
 
     foreach( $show as $aRes )
     {
         print("<b>$aRes</b><br>");
         eval("\$res=".$aRes.';');
-        print_r($res);
+        if( $res == false )
+            print "false";
+        else
+            print_r($res);
+
         print('<br><br>');
     }
 
+
 ?>
+
+<a href="http://research.calacademy.org/taf/proceedings/ballew/sld029.htm">the tree structure visualisation</a>

@@ -92,12 +92,10 @@
     $parentId = $tree->add(array( 'name'=>'myElement'));
 
     // add an element under the new element we added
-    $id = $tree->add(array( 'parentId'=>$parentId,
-                            'name'=>'subElement'));
+    $id = $tree->add(array( 'name'=>'subElement') , $parentId );
 
     // add another element under the parent element we added
-    $id = $tree->add(array( 'parentId'=>$parentId,
-                            'name'=>'anotherSubElement'));
+    $id = $tree->add(array( 'name'=>'anotherSubElement') , $parentId );
 
     // call 'setup', to build the inner array, so we can work on the structure using the
     // given methods
@@ -108,7 +106,7 @@
     // get the path of the last inserted element
     dumpHelper( '$tree->getPath( '.$id.' )' , 'dump the path from "myElement/anotherSubElement"' );
 
-    $id = $tree->getIdByPath('myElement/subElement');
+    print "tree->getIdByPath('myElement/subElement')=".$id = $tree->getIdByPath('myElement/subElement');
     dumpHelper( '$tree->getParent('.$id.')' , 'dump the parent of "myElement/subElement"' , true );
     // you can also use:    $tree->data[$id]['parent']
 
