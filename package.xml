@@ -5,7 +5,7 @@
 <package version="1.0">
   <name>Tree</name>
   <summary>
-  Generic tree management, currently supports DB and XML input
+  Generic tree management, currently supports DB and XML as data sources
   </summary>
   <description>
   </description>
@@ -40,6 +40,8 @@
 	  <file role="php">DBnested.php</file>
 	</dir>
 	<dir name="examples" role="doc">
+	  <file role="doc">Dynamic_DBnested.sql</file>
+	  <file role="doc">Dynamic_DBnested.php</file>
 	  <file role="doc">Memory_XML.php</file>
 	  <file role="doc">Memory_DBsimple.php</file>
 	  <file role="doc">config.xml</file>
