@@ -199,9 +199,12 @@ class Tree_Common extends Tree_OptionsDB
 
 
 
-    #
-    #   abstract methods, those should be overwritten by the implementing class
-    #
+
+
+    //
+    //  abstract methods, those should be overwritten by the implementing class
+    //
+
 
     /**
     *   gets the path to the element given by its id
@@ -216,6 +219,7 @@ class Tree_Common extends Tree_OptionsDB
     */
     function getPath( $id )
     {
+        return $this->_throwError( 'not implemented, at least not overwritten the abstract declaration' , __LINE__ );
     } // end of function
 
     /**
@@ -230,6 +234,24 @@ class Tree_Common extends Tree_OptionsDB
     */
     function getLevel( $id )
     {
+        return $this->_throwError( 'not implemented, at least not overwritten the abstract declaration' , __LINE__ );
+    } // end of function
+
+    /**
+    *   returns if $childId is a child of $id
+    *
+    *   @abstract
+    *   @version    2002/04/29
+    *   @access     public
+    *   @author     Wolfram Kriesing <wolfram@kriesing.de>
+    *   @param      int     id of the element
+    *   @param      int     id of the element to check if it is a child
+    *   @param      boolean if this is true the entire tree below is checked
+    *   @return     boolean true if it is a child
+    */
+    function isChildOf( $id , $childId , $checkAll=true )
+    {
+        return $this->_throwError( 'not implemented, at least not overwritten the abstract declaration' , __LINE__ );
     } // end of function
 
 
@@ -318,9 +340,6 @@ class Tree_Common extends Tree_OptionsDB
             $mode = PEAR_ERROR_PRINT;
         return new Tree_Error( $msg , $line , __FILE__ , $mode , $this->dbh->last_query );
     }
-
-
-
 
 }
 ?>
