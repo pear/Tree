@@ -22,7 +22,6 @@ require_once('Tree/OptionsDB.php');
 
 define("TREE_ERROR",                    -1);
 define("TREE_ERROR_INVALID_PARENT",     -2);
-define("TREE_ERROR_HAS_CHILDREN",       -3);
 
 /**
 *   common tree class, implements common functionality
