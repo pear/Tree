@@ -163,7 +163,8 @@ class Tree_Memory extends Tree_Common
         $this->dataSourceClass =& new $className( $dsn , $options );
         // copy the options to be able to get them via getOption(s)
 //FIXXME this is not really cool, maybe overwrite the *Option* methods!!!
-        $this->options = $this->dataSourceClass->options;
+        if( isset($this->dataSourceClass->options) )
+            $this->options = $this->dataSourceClass->options;
 
     } // end of function
 
@@ -1194,19 +1195,34 @@ class Tree_Memory extends Tree_Common
     } // end of function
 
     /**
-    *   returns if the given element has any children
+    *   returns the children of the given ids
     *
     *   @version    2001/12/17
     *   @access     public
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
     *   @param      integer $id the id of the node to check for children
+    *   @param      integer the children of how many levels shall be returned
     *   @return     boolean true if the node has children
     */
-    function getChildren( $id=0 )
-    {
-        if( $this->hasChildren( $id ) )
-            return $this->data[$id]['children'];
-        return array();
+    function getChildren( $ids , $levels=1 )
+    {                                        
+//FIXXME $levels to be implemented    
+        $ret = array();
+        if( is_array($ids) )
+        {
+            foreach( $ids as $aId )
+            {
+                if( $this->hasChildren( $aId ) )
+                    $ret[$aId] = $this->data[$aId]['children'];
+            }
+
+        }
+        else
+        {
+            if( $this->hasChildren( $ids ) )
+                $ret = $this->data[$ids]['children'];
+        }
+        return $ret;
     } // end of function
 
     /**
