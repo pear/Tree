@@ -1249,6 +1249,7 @@ class Tree_Dynamic_DBnested extends Tree_Common
      */
     function &getNode( $startId=0 , $depth=0 )
     {
+//FIXXXME use getChildren()    
         if ($startId) {
             $startNode = $this->getElement($startId);
             if (Tree::isError($startNode)) {
