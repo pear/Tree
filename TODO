@@ -6,3 +6,8 @@ TODO
   of course not cached permanently only for the current script life time
 - about Cache, add a per "transaction" cache. That means, when the users call a complex 
   method (getIdByPath), cache the result during the read "transaction", lock?
+- setOption('columnNameMaps') doesnt work i.e. here
+    $tree->setOption('columnNameMaps',array('myComment'=>'comment'));
+    $tree->setOption('columnNameMaps',array('comment'=>'comment'));
+  because we dont have the column name as the array key, so we cant overwrite it :-(
+  this is really stupid
