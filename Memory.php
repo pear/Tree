@@ -788,11 +788,16 @@ class Tree_Memory extends Tree_Common
     *   @version    2002/02/06
     *   @access     private
     *   @author     Wolfram Kriesing <wolfram@kriesing.de>
-    *   @param
+    *   @param      mixed   either the id of an element or the path to the element
     *
     */
-    function getElementContent( $id , $fieldName )
+    function getElementContent( $idOrPath , $fieldName )
     {
+        if( is_string($idOrPath) )
+        {
+            $id = $this->getIdByPath($idOrPath);
+        }
+
         return $this->data[$id][$fieldName];
     }
 
