@@ -1,7 +1,5 @@
 <?php
-//
 //  $Id$
-//
 
 require_once 'UnitTest.php';
 
@@ -26,16 +24,10 @@ class tests_getPath extends UnitTest
 
     // do this for DBsimple
     
-    // do this for DynamicDBnested
-    function test_DynamicDBnested()
+    // do this for DynamicSQLnested
+    function test_DynamicSQLnested()
     {
-        $tree =& $this->getDynamicDBnested();
-        $this->_testPath($tree);
-    }
-
-    function test_DynamicMDBnested()
-    {
-        $tree =& $this->getDynamicMDBnested();
+        $tree =& $this->getDynamicSQLnested();
         $this->_testPath($tree);
     }
     
@@ -44,7 +36,7 @@ class tests_getPath extends UnitTest
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $id = 5;
         $path = $tree->getPath($id);
-        
+
         $this->assertEquals(3, sizeof($path));
         $this->assertEquals('Root', $path[0]['name']);
         $this->assertEquals('child 2', $path[1]['name']);

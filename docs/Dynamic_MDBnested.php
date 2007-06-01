@@ -1,51 +1,61 @@
 <?php
-    //
-    //  $Id$
-    //
+//  $Id$
 
-//ini_set('include_path',realpath(dirname(__FILE__).'/../../').':'.realpath(dirname(__FILE__).'/../../../includes').':'.ini_get('include_path'));
-//ini_set('error_reporting',E_ALL);
+// use nested_tree.sql to build the db table
 
-    require_once 'Tree/Tree.php';
+ini_set('error_reporting', E_ALL);
 
-#    $tree = Tree::setupDynamic('MDBnested' , 'mysql://root@localhost/tree_test' , array('table' => 'nestedTree'));
-#   OR
-    $tree = Tree::setup('Dynamic_MDBnested' , 'mysql://root@localhost/tree_test' , array('table' => 'nestedTree'));
+require_once 'Tree/Tree.php';
 
-    $show[] = '$tree->getRoot()';
-    $show[] = '$tree->getElement( 1 )';
-    $show[] = '$tree->getChild( 1 )';
-    $show[] = '$tree->getPath( 7 )';
-    $show[] = '$tree->getPath( 2 )';
-    $show[] = '$tree->add( array("name"=>"c0") , 5 )';
-    $show[] = '$tree->remove( $res )';  // remove the last element that was added in the line before :-)
-    $show[] = '$tree->getRight( 5 )';
-    $show[] = '$tree->getLeft( 5 )';
-    $show[] = '$tree->getChildren( 1 )';
-    $show[] = '$tree->getParent( 2 )';
-    $show[] = '$tree->getNext( 2 )';
-    $show[] = '$tree->getNext( 4 )';
-    $show[] = '$tree->getNext( 8 )';
-    $show[] = '$tree->getPrevious( 2 )';
-    $show[] = '$tree->getPrevious( 4 )';
-    $show[] = '$tree->getPrevious( 8 )';
-    $show[] = '$tree->getPreviousId( 8 )';
+$config = array(
+    'type' => 'Nested',
+    'storage' => array(
+        'name' => 'MDB',
+        'dsn' => 'mysql://root:hamstur@localhost/tree_test',
+        // 'connection' =>
+    ),
+    'options' => array(
+        'table' => 'nestedTree',
+        'order' =>  'id',
+        'fields' => array(),
+    ),
+);
 
-    $show[] = '$tree->move( 4,3 )';
+$tree =& Tree::factoryDynamic($config);
+
+$show[] = '$tree->getRoot()';
+$show[] = '$tree->getElement( 1 )';
+$show[] = '$tree->getChildren(1, true)';
+$show[] = '$tree->getPath( 7 )';
+$show[] = '$tree->getPath( 2 )';
+// $show[] = '$tree->add( array("name"=>"c0") , 5 )';
+// $show[] = '$tree->remove( $res )';  // remove the last element that was added in the line before :-)
+$show[] = '$tree->getRight( 5 )';
+$show[] = '$tree->getLeft( 5 )';
+$show[] = '$tree->getChildren( 1 )';
+$show[] = '$tree->getParent( 2 )';
+$show[] = '$tree->nextSibling( 2 )';
+$show[] = '$tree->nextSibling( 4 )';
+$show[] = '$tree->nextSibling( 8 )';
+$show[] = '$tree->previousSibling( 2 )';
+$show[] = '$tree->previousSibling( 4 )';
+$show[] = '$tree->previousSibling( 8 )';
+
+$show[] = '$tree->move( 4,3 )';
 
 
-    foreach($show as $aRes) {
-        echo "<b>$aRes</b><br>";
-        eval("\$res=".$aRes.';');
-        if ($res == false) {
-            print "false";
-        } else {
-            print_r($res);
-        }
-        echo '<br><br>';
+foreach ($show as $aRes) {
+    echo "<strong>$aRes</strong><br />";
+    eval("\$res=".$aRes.';');
+    if ($res == false) {
+        print "false";
+    } else {
+        echo '<pre>';
+        print_r($res);
+        echo '</pre>';
     }
-
-
+    echo '<br /><br />';
+}
 ?>
 
 <a href="http://research.calacademy.org/taf/proceedings/ballew/sld029.htm">the tree structure visualisation</a>

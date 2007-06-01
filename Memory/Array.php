@@ -3,12 +3,12 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2005 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
@@ -84,7 +84,7 @@ class Tree_Memory_Array
      * so methods like 'add' etc can find the elements they are searching for,
      * if you dont like your data to be modified dont pass them as reference!
      */
-    function _setup(&$array, $parentId = 0)
+    function _setup(&$array, $parent_id = 0)
     {
         foreach ($array as $nodeKey => $aNode) {
             $newData = $aNode;
@@ -101,7 +101,7 @@ class Tree_Memory_Array
                 }
             }
             // set the parent-id, since we only have a 'children' array
-            $newData['parentId'] = $parentId;
+            $newData['parent_id'] = $parent_id;
             $children = null;
             // remove the 'children' array, since this is only info for
             // this class
@@ -136,56 +136,13 @@ class Tree_Memory_Array
 
         foreach ($data as $aNode) {
             foreach ($aNode as $key => $val) {
-                if (is_array($val) || in_array($key,$unsetKeys)) {
+                if (is_array($val) || in_array($key, $unsetKeys)) {
                     unset($aNode[$key]);
                 }
             }
-            $this->add($aNode,$aNode['parentId']);
+            $this->add($aNode,$aNode['parent_id']);
         }
         $this->_array = $this->_array['children'][0];
-    }
-
-    // }}}
-    // {{{ _prepareResults()
-
-    /**
-     * prepare multiple results
-     *
-     * @see        _prepareResult()
-     * @access     private
-     * @version    2002/03/03
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     */
-    function _prepareResults($results)
-    {
-        $newResults = array();
-        foreach($results as $aResult) {
-            $newResults[] = $this->_prepareResult($aResult);
-        }
-        return $newResults;
-    }
-
-    // }}}
-    // {{{ _prepareResult()
-
-    /**
-     * map back the index names to get what is expected
-     *
-     * @access     private
-     * @version    2002/03/03
-     * @author     Wolfram Kriesing <wolfram@kriesing.de>
-     */
-    function _prepareResult($result)
-    {
-        $map = $this->getOption('columnNameMaps');
-
-        if ($map) {
-            foreach($map as $key => $columnName) {
-                $result[$key] = $result[$columnName];
-                unset($result[$columnName]);
-            }
-        }
-        return $result;
     }
 
     // }}}
@@ -199,7 +156,7 @@ class Tree_Memory_Array
      * @param  int     the ID of the parent node
      * @param  int     the ID of the previous node
      */
-    function add($data, $parentId, $previousId = null)
+    function add($data, $parent_id, $previousId = null)
     {
         if (!isset($data['id'])) {
             $data['id'] = ++$this->_id;
@@ -208,17 +165,17 @@ class Tree_Memory_Array
             // the $this->_id if the data['id'] has a higher number.
             $this->_id = (int)$data['id'];
         }
-        $data['parentId'] = $parentId;
+        $data['parent_id'] = $parent_id;
         $this->data[$data['id']] = $data;
 
         // there might not be a root element yet
         if (!isset($this->_array['children'])) {
-            $data['parentId'] = 0;
+            $data['parent_id'] = 0;
             $this->_array['children'][] = $data;
         } else {
             array_walk($this->_array['children'],
-                        array(&$this,'_add'),
-                        array($data,$parentId,$previousId)
+                        array(&$this, '_add'),
+                        array($data, $parent_id, $previousId)
                     );
         }
         return $data['id'];
@@ -242,7 +199,7 @@ class Tree_Memory_Array
      */
     function _add(&$val, $key, $data)
     {
-        // is the id of the current elment ($val) == to the parentId ($data[1])
+        // is the id of the current elment ($val) == to the parent_id ($data[1])
         if ($val['id'] == $data[1]) {
             if (isset($data[2]) && $data[2] === 0) {
                 // if the previousId is 0 means, add it as the first member
@@ -252,7 +209,7 @@ class Tree_Memory_Array
             }
         } else {        // if we havent found the new element go on searching
             if (isset($val['children'])) {
-                array_walk($val['children'],array(&$this,'_add'),$data);
+                array_walk($val['children'],array(&$this, '_add'), $data);
             }
         }
     }
@@ -268,16 +225,16 @@ class Tree_Memory_Array
      * @param  array   the data, [key]=>[value]
      * @return void
      */
-    function update($id,$data)
+    function update($id, $data)
     {
-        if ($this->_array['id']==$id) {
-            foreach ($data as $key=>$newVal) {
+        if ($this->_array['id'] == $id) {
+            foreach ($data as $key => $newVal) {
                 $this->_array[$key] = $newVal;
             }
         } else {
             array_walk($this->_array['children'],
-                        array(&$this,'_update'),
-                        array($id,$data)
+                        array(&$this, '_update'),
+                        array($id, $data)
                     );
         }
     }
@@ -298,7 +255,7 @@ class Tree_Memory_Array
      */
     function _update(&$val, $key, $data)
     {
-        // is the id of the current elment ($val) == to the parentId ($data[1])
+        // is the id of the current elment ($val) == to the parent_id ($data[1])
         if ($val['id'] == $data[0]) {
             foreach ($data[1] as $key => $newVal) {
                 $val[$key] = $newVal;
@@ -307,7 +264,7 @@ class Tree_Memory_Array
             // if we havent found the new element go on searching
             // in the children
             if (isset($val['children'])) {
-                array_walk($val['children'],array(&$this,'_update'), $data);
+                array_walk($val['children'],array(&$this, '_update'), $data);
             }
         }
     }
@@ -326,7 +283,7 @@ class Tree_Memory_Array
         // we only need to search for element that do exist :-)
         // otherwise we save some processing time
         if ($this->data[$id]) {
-            $this->_remove($this->_array,$id);
+            $this->_remove($this->_array, $id);
         }
     }
 
@@ -348,13 +305,13 @@ class Tree_Memory_Array
         if (isset($val['children'])) {
             foreach ($val['children'] as $key => $aVal) {
                 if ($aVal['id'] == $id) {
-                    if (sizeof($val['children']) < 2) {
+                    if (count($val['children']) < 2) {
                         unset($val['children']);
                     } else {
                         unset($val['children'][$key]);
                     }
                 } else {
-                    $this->_remove($val['children'][$key],$id);
+                    $this->_remove($val['children'][$key], $id);
                 }
             }
         }

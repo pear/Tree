@@ -1,12 +1,10 @@
 <?php
-//
 //  $Id$
-//
 
 require_once 'PHPUnit.php';
 require_once 'PHPUnit/GUI/HTML.php';
 
-define('DB_DSN',           'mysql://root@localhost/test');
+define('DB_DSN',           'mysql://root:hamstur@localhost/test');
 define('TABLE_TREENESTED', 'TreeNested');
 
 require_once 'Tree/Tree.php';

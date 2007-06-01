@@ -1,10 +1,7 @@
 <?php
-    //
-    //  $Id$
-    //
+//  $Id$
 
-//ini_set('include_path',realpath(dirname(__FILE__).'/../../').':'.realpath(dirname(__FILE__).'/../../../includes').':'.ini_get('include_path'));
-//ini_set('error_reporting',E_ALL);
+ini_set('error_reporting', E_ALL);
     /**
     *   this is a helper function, so i dont have to write so many prints :-)
     *   @param  array   $para   the result returned by some method, that will be dumped
@@ -14,12 +11,12 @@
     {
         global $tree;
 
-        echo'<i><u><font color="#008000">' . $string . '</font></u></i><br>';
+        echo'<i><u><span style="color: #008000;">' . $string . '</span></u></i><br />';
         // this method dumps to the screen, since print_r or var_dump dont
         // work too good here, because the inner array is recursive
         // well, it looks ugly but one can see what is meant :-)
         $tree->varDump($para);
-        echo '<br>';
+        echo '<br />';
 
     }
 
@@ -31,7 +28,7 @@
     {
         global $tree;
 
-        echo '<i><u><font color="#008000">' . $string . '</font></u></i><br>';
+        echo '<i><u><span style="color: #008000;">' . $string . '</span></u></i><br />';
         $all = $tree->getNode();   // get the entire structure sorted as the tree is, so we can simply foreach through it and show it
         foreach ($all as $aElement) {
             for ($i = 0; $i < $aElement['level']; $i++) {
@@ -45,10 +42,10 @@
 
             echo 'attributes - ';
             print_r($aElement['attributes']);
-            echo '<br>';
+            echo '<br />';
 
         }
-        echo '<br>';
+        echo '<br />';
 
     }
 
@@ -80,9 +77,17 @@
     // consider the resource usage and it's not to suggested to work
     // on huge trees (upto 1000 elements it should be ok, depending on your environment and requirements)
     // using 'setupMemory'
-    $tree = Tree::setupMemory('XML',          // use the XML class to read an xml file
-                                'config.xml'    // the DSN
-                             );
+    $config = array(
+        'type' => '',
+        'storage' => array(
+            'name' => 'XML',
+            'dsn' => 'config.xml',
+        ),
+        'options' => array(
+        ),
+    );
+
+    $tree =& Tree::factoryMemory($config);
 
     // methods 'add' 'remove' and so on are not implemented yet, you can only read the tree for now
     // and navigate inside of it
@@ -95,10 +100,10 @@
 
     // get the path of the last inserted element
     echo 'id='.$id = $tree->getIdByPath('simpletemplate/options/delimiter');
-    dumpHelper( $tree->getPath( $id ) , 'dump the path from "simpletemplate/options/delimiter"');
+    dumpHelper( $tree->getPath($id), 'dump the path from "simpletemplate/options/delimiter"');
 
     $id = $tree->getIdByPath('simpletemplate/options');
-    dumpHelper(array($tree->getParent($id)) , 'dump the parent of "simpletemplate/options"');
+    dumpHelper(array($tree->getParent($id)), 'dump the parent of "simpletemplate/options"');
     // you can also use:    $tree->data[$id]['parent']
 
     $id = $tree->getIdByPath('simpletemplate');
@@ -106,15 +111,15 @@
     // you can also use:    $tree->data[$id]['child']
 
     $id = $tree->getIdByPath('simpletemplate/prefilter');
-    dumpHelper($tree->getChildren($id) , 'dump the children of "simpletemplate/prefilter"');
+    dumpHelper($tree->getChildren($id), 'dump the children of "simpletemplate/prefilter"');
     // you can also use:    $tree->data[$id]['children']
 
     $id = $tree->getIdByPath('simpletemplate/options');
-    dumpHelper(array($tree->getNext($id)) , 'dump the "next" of "simpletemplate/options"');
+    dumpHelper(array($tree->getNext($id)), 'dump the "next" of "simpletemplate/options"');
     // you can also use:    $tree->data[$id]['next']
 
     $id = $tree->getIdByPath('simpletemplate/prefilter');
-    dumpHelper( array($tree->getPrevious($id)) , 'dump the "previous" of "simpletemplate/prefilter"');
+    dumpHelper(array($tree->getPrevious($id)), 'dump the "previous" of "simpletemplate/prefilter"');
     // you can also use:    $tree->data[$id]['previous']
 
 
@@ -123,18 +128,18 @@
     dumpHelper($element['id'] , 'demo of using the internal array, for referencing tree-nodes');
 
 /*
-NOT IMPLEMENTED YET
+ NOT IMPLEMENTED YET
 
     $id = $tree->getIdByPath('myElement/anotherSubElement');
-    $tree->move( $id , 0 );
+    $tree->move($id, 0);
     $tree->setup(); // rebuild the structure again, since we had changed it
-    dumpAllNicely( 'dump all, after "myElement/anotherSubElement" was moved under the root' );
+    dumpAllNicely('dump all, after "myElement/anotherSubElement" was moved under the root');
 
     $moveId = $tree->getIdByPath('myElement');
     $id = $tree->getIdByPath('anotherSubElement');
-    $tree->move( $moveId , $id );
+    $tree->move($moveId, $id);
     $tree->setup(); // rebuild the structure again, since we had changed it
-    dumpAllNicely( 'dump all, after "myElement" was moved under the "anotherSubElement"' );
+    dumpAllNicely('dump all, after "myElement" was moved under the "anotherSubElement"');
 
 
     $tree->setRemoveRecursively(true);

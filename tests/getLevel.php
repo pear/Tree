@@ -1,7 +1,5 @@
 <?php
-//
 //  $Id$
-//
 
 require_once 'UnitTest.php';
 
@@ -17,7 +15,7 @@ class tests_getLevel extends UnitTest
 
     function test_MemoryMDBnested()
     {
-        $tree = $this->getMemoryMDBnested();        
+        $tree = $this->getMemoryMDBnested();
         $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $this->assertEquals(2, $tree->getLevel($id));
     }
@@ -28,18 +26,10 @@ class tests_getLevel extends UnitTest
 
     // do this for DBsimple
     
-    // do this for DynamicDBnested
-    function test_DynamicDBnested()
+    // do this for DynamicSQLnested
+    function test_DynamicSQLnested()
     {
-        $tree =& $this->getDynamicDBnested();
-//        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
-        $id = 5;
-        $this->assertEquals(2, $tree->getLevel($id));
-    }
-
-    function test_DynamicMDBnested()
-    {
-        $tree =& $this->getDynamicMDBnested();
+        $tree =& $this->getDynamicSQLnested();
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $id = 5;
         $this->assertEquals(2, $tree->getLevel($id));

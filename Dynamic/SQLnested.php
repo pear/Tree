@@ -3,12 +3,12 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2004 The PHP Group                                |
+// | Copyright (c) 1997-2005 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
@@ -18,7 +18,7 @@
 //
 //  $Id$
 
-require_once 'Tree/OptionsMDB.php';
+require_once 'Tree/Tree.php';
 
 /**
 * This class implements methods to work on a tree saved using the nested
@@ -28,39 +28,8 @@ require_once 'Tree/OptionsMDB.php';
 * @access     public
 * @package    Tree
 */
-class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
+class Tree_Dynamic_SQLnested extends Tree
 {
-
-    // {{{ properties
-    var $debug = 0;
-
-    var $options = array(
-        // FIXXME to be implemented
-        // add on for the where clause, this string is simply added
-        // behind the WHERE in the select so you better make sure
-        // its correct SQL :-), i.e. 'uid=3'
-        // this is needed i.e. when you are saving many trees in one db-table
-        'whereAddOn'=>'',
-        'table'     =>'',
-        // since the internal names are fixed, to be portable between different
-        // DB tables with different column namings, we map the internal name
-        // to the real column name using this array here, if it stays empty
-        // the internal names are used, which are:
-        // id, left, right
-        'columnNameMaps'=>array(
-                            // since mysql at least doesnt support 'left' ...
-                            'left'      =>  'l',
-                            // ...as a column name we set default to the first
-                            //letter only
-                            'right'     =>  'r',
-                            // parent id
-                            'parentId'  =>  'parent'
-                       ),
-        // needed for sorting the tree, currently only used in Memory_DBnested
-        'order'    => ''
-       );
-
-    // }}}
     // {{{ __construct()
 
     // the defined methods here are proposals for the implementation,
@@ -78,9 +47,9 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
       * @param      string  the DSN for the DB connection
       * @return     void
       */
-    function __construct($dsn, $options = array())
+    function __construct($config)
     {
-        $this->Tree_Dynamic_DBnested($dsn, $options);
+        $this->Tree_Dynamic_SQLnested($config);
     }
 
     // }}}
@@ -95,10 +64,10 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      * @param      string  the DSN for the DB connection
      * @return     void
      */
-    function Tree_Dynamic_MDBnested($dsn, $options = array())
+    function Tree_Dynamic_SQLnested($config)
     {
-        parent::Tree_OptionsMDB($dsn, $options); // instanciate DB
-        $this->table = $this->getOption('table');
+        $this->conf = Tree::arrayMergeClobber($this->conf, $config['options']);
+        $this->init($config);
     }
 
     // }}}
@@ -108,7 +77,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      * add a new element to the tree
      * there are three ways to use this method
      * Method 1:
-     * Give only the $parentId and the $newValues will be inserted
+     * Give only the $parent_id and the $newValues will be inserted
      * as the first child of this parent
      * <code>
      * // insert a new element under the parent with the ID=7
@@ -116,9 +85,9 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      * </code>
      *
      * Method 2:
-     * Give the $prevId ($parentId will be dismissed) and the new element
+     * Give the $prevId ($parent_id will be dismissed) and the new element
      * will be inserted in the tree after the element with the ID=$prevId
-     * the parentId is not necessary because the prevId defines exactly where
+     * the parent_id is not necessary because the prevId defines exactly where
      * the new element has to be place in the tree, and the parent is
      * the same as for the element with the ID=$prevId
      * <code>
@@ -127,24 +96,24 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      * </code>
      *
      * Method 3:
-     * neither $parentId nor prevId is given, then the root element will be
+     * neither $parent_id nor prevId is given, then the root element will be
      * inserted. This requires that programmer is responsible to confirm this.
      * This method does not yet check if there is already a root element saved!
      *
      * @access     public
      * @param   array   $newValues  this array contains the values that shall
      *                              be inserted in the db-table
-     * @param   integer $parentId   the id of the element which shall be
+     * @param   integer $parent_id   the id of the element which shall be
      *                              the parent of the new element
      * @param   integer $prevId     the id of the element which shall preceed
      *                              the one to be inserted use either
-     *                              'parentId' or 'prevId'.
+     *                              'parent_id' or 'prevId'.
      * @return   integer the ID of the element that had been inserted
      */
-    function add($newValues, $parentId = 0, $prevId = 0)
+    function add($newValues, $parent_id = 0, $prevId = 0)
     {
-        $lName = $this->_getColName('left');
-        $rName = $this->_getColName('right');
+        $left  = $this->_getColName('left');
+        $right = $this->_getColName('right');
         $prevVisited = 0;
 
         // check the DB-table if the columns which are given as keys
@@ -152,16 +121,18 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         // from the array
         // FIXXME do the above described
         // if no parent and no prevId is given the root shall be added
-        if ($parentId || $prevId) {
+        if ($parent_id || $prevId) {
             if ($prevId) {
                 $element = $this->getElement($prevId);
-                // we also need the parent id of the element
-                // to write it in the db
-                $parentId = $element['parentId'];
+                if (Tree::isError($element)) {
+                    return $element;
+                }
+                // we also need the parent id of the element to write it in the db
+                $parent_id = $element['parent_id'];
             } else {
-                $element = $this->getElement($parentId);
+                $element = $this->getElement($parent_id);
             }
-            $newValues['parentId'] = $parentId;
+            $newValues['parent_id'] = $parent_id;
 
             if (Tree::isError($element)) {
                 return $element;
@@ -169,7 +140,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
 
             // get the "visited"-value where to add the new element behind
             // if $prevId is given, we need to use the right-value
-            // if only the $parentId is given we need to use the left-value
+            // if only the $parent_id is given we need to use the left-value
             // look at it graphically, that made me understand it :-)
             // See:
             // http://research.calacademy.org/taf/proceedings/ballew/sld034.htm
@@ -178,7 +149,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
             // FIXXME start transaction here
             if (Tree::isError($err = $this->_add($prevVisited, 1))) {
                 // FIXXME rollback
-                //$this->dbh->rollback();
+                //$this->_storage->rollback();
                 return $err;
             }
         }
@@ -187,28 +158,27 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         $newData = array();
         // quote the values, as needed for the insert
         foreach ($newValues as $key => $value) {
-
-            ///////////FIX ME: Add proper quote handling
-
-            $newData[$this->_getColName($key)] = $this->dbh->getTextValue($value);
+            $type = $this->conf['fields'][$key]['type'];
+            $newData[$this->_getColName($key)] = $this->_storage->quote($value, $type);
         }
 
         // set the proper right and left values
-        $newData[$lName] = $prevVisited + 1;
-        $newData[$rName] = $prevVisited + 2;
+        $newData[$left] = $prevVisited + 1;
+        $newData[$right] = $prevVisited + 2;
 
         // use sequences to create a new id in the db-table
-        $nextId = $this->dbh->nextId($this->table);
-        $query = sprintf('INSERT INTO %s (%s,%s) VALUES (%s,%s)',
-                            $this->table,
+        $nextId = $this->_storage->nextId($this->conf['table']);
+        $query = sprintf('INSERT INTO %s (%s, %s) VALUES (%s, %s)',
+                            $this->conf['table'],
                             $this->_getColName('id'),
                             implode(',', array_keys($newData)) ,
-                            $this->dbh->getIntegerValue($nextId),
+                            $this->_storage->quote($nextId, 'integer'),
                             implode(',', $newData)
                         );
-        if (MDB::isError($res = $this->dbh->query($query))) {
+        $res = $this->_storage->query($query);
+        if (PEAR::isError($res)) {
             // rollback
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
         // commit here
 
@@ -221,7 +191,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     /**
      * this method only updates the left/right values of all the
      * elements that are affected by the insertion
-     * be sure to set the parentId of the element(s) you insert
+     * be sure to set the parent_id of the element(s) you insert
      *
      * @param  int     this parameter is not the ID!!!
      *                 it is the previous visit number, that means
@@ -234,33 +204,34 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      */
     function _add($prevVisited, $numberOfElements = 1)
     {
-        $lName = $this->_getColName('left');
-        $rName = $this->_getColName('right');
+        $left  = $this->_getColName('left');
+        $right = $this->_getColName('right');
 
         // update the elements which will be affected by the new insert
-        $query = sprintf('UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
-                            $this->table,
-                            $lName,
-                            $lName,
-                            $numberOfElements*2,
+        $query = sprintf('UPDATE %s SET %s = %s + %s WHERE%s %s > %s',
+                            $this->conf['table'],
+                            $left,
+                            $left,
+                            $numberOfElements * 2,
                             $this->_getWhereAddOn(),
-                            $lName,
+                            $left,
                             $prevVisited);
-        if (MDB::isError($res = $this->dbh->query($query))) {
+        if (PEAR::isError($res = $this->_storage->query($query))) {
             // FIXXME rollback
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
 
-        $query = sprintf('UPDATE %s SET %s=%s+%s WHERE%s %s>%s',
-                            $this->table,
-                            $rName,$rName,
-                            $numberOfElements*2,
+        $query = sprintf('UPDATE %s SET %s = %s + %s WHERE%s %s > %s',
+                            $this->conf['table'],
+                            $right, $right,
+                            $numberOfElements * 2,
                             $this->_getWhereAddOn(),
-                            $rName,
+                            $right,
                             $prevVisited);
-        if (MDB::isError($res = $this->dbh->query($query))) {
+        $res = $this->_storage->query($query);
+        if (PEAR::isError($res)) {
             // FIXXME rollback
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
         return true;
     }
@@ -285,21 +256,22 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         }
 
         // FIXXME start transaction
-        //$this->dbh->autoCommit(false);
-        $query = sprintf(  'DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
-                            $this->table,
+        //$this->_storage->autoCommit(false);
+        $query = sprintf('DELETE FROM %s WHERE%s %s BETWEEN %s AND %s',
+                            $this->conf['table'],
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),
-                            $element['left'],$element['right']);
-        if (MDB::isError($res = $this->dbh->query($query))) {
+                            $element['left'], $element['right']);
+        $res = $this->_storage->query($query);
+        if (PEAR::isError($res)) {
             // FIXXME rollback
-            //$this->dbh->rollback();
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            //$this->_storage->rollback();
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
 
         if (Tree::isError($err = $this->_remove($element))) {
             // FIXXME rollback
-            //$this->dbh->rollback();
+            //$this->_storage->rollback();
             return $err;
         }
         return true;
@@ -321,48 +293,50 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     function _remove($element)
     {
         $delta = $element['right'] - $element['left'] + 1;
-        $lName = $this->_getColName('left');
-        $rName = $this->_getColName('right');
+        $left  = $this->_getColName('left');
+        $right = $this->_getColName('right');
 
         // update the elements which will be affected by the remove
         $query = sprintf("UPDATE
                                 %s
                             SET
-                                %s=%s-$delta,
-                                %s=%s-$delta
-                            WHERE%s %s>%s",
-                            $this->table,
-                            $lName, $lName,
-                            $rName, $rName,
+                                %s = %s - $delta,
+                                %s = %s - $delta
+                            WHERE%s %s > %s",
+                            $this->conf['table'],
+                            $left, $left,
+                            $right, $right,
                             $this->_getWhereAddOn(),
-                            $lName, $element['left']);
-        if (MDB::isError($res = $this->dbh->query($query))) {
+                            $left, $element['left']);
+        $res = $this->_storage->query($query);
+        if (PEAR::isError($res)) {
             // the rollback shall be done by the method calling this one
             // since it is only private we can do that
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
 
         $query = sprintf("UPDATE
                                 %s
-                            SET %s=%s-$delta
+                            SET %s = %s - $delta
                             WHERE
                                 %s %s < %s
-                                AND
-                                %s>%s",
-                            $this->table,
-                            $rName, $rName,
+                              AND
+                                %s > %s",
+                            $this->conf['table'],
+                            $right, $right,
                             $this->_getWhereAddOn(),
-                            $lName, $element['left'],
-                            $rName, $element['right']);
-        if (MDB::isError($res = $this->dbh->query($query))) {
+                            $left, $element['left'],
+                            $right, $element['right']);
+        $res = $this->_storage->query($query);
+        if (PEAR::isError($res)) {
             // the rollback shall be done by the method calling this one
             // since it is only private
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
         // FIXXME commit:
         // should that not also be done in the method calling this one?
         // like when an error occurs?
-        //$this->dbh->commit();
+        //$this->_storage->commit();
         return true;
     }
 
@@ -371,7 +345,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
 
     /**
      * move an entry under a given parent or behind a given entry.
-     * If a newPrevId is given the newParentId is dismissed!
+     * If a newPrevId is given the newparent_id is dismissed!
      * call it either like this:
      *  $tree->move(x, y)
      *  to move the element (or entire tree) with the id x
@@ -399,20 +373,20 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      *                      if it is 0 it will be put at the beginning
      * @return     mixed    true for success, Tree_Error on failure
      */
-    function move($idsToMove, $newParentId, $newPrevId = 0)
+    function move($idsToMove, $newparent_id, $newPrevId = 0)
     {
-        settype($idsToMove,'array');
+        settype($idsToMove, 'array');
         $errors = array();
         foreach ($idsToMove as $idToMove) {
-            $ret = $this->_move($idToMove, $newParentId, $newPrevId);
+            $ret = $this->_move($idToMove, $newparent_id, $newPrevId);
             if (Tree::isError($ret)) {
                 $errors[] = $ret;
             }
         }
         // FIXXME the error in a nicer way, or even better
         // let the throwError method do it!!!
-        if (sizeof($errors)) {
-            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', serialize($errors));
+        if (count($errors)) {
+            return Tree::raiseError(TREE_ERROR_UNKOWN_ERROR, null, null, serialize($errors));
         }
         return true;
     }
@@ -433,7 +407,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      *                  if it is 0 it will be put at the beginning
      * @return  mixed    true for success, Tree_Error on failure
      */
-    function _move($idToMove, $newParentId, $newPrevId = 0)
+    function _move($idToMove, $newparent_id, $newPrevId = 0)
     {
         // do some integrity checks first
         if ($newPrevId) {
@@ -442,28 +416,27 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
             if ($newPrevId == $idToMove) {
                 return true;
             }
-            if (Tree::isError($newPrevious=$this->getElement($newPrevId))) {
+            if (Tree::isError($newPrevious = $this->getElement($newPrevId))) {
                 return $newPrevious;
             }
-            $newParentId = $newPrevious['parentId'];
+            $newparent_id = $newPrevious['parent_id'];
         } else {
-            if ($newParentId == 0) {
-                return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 'no parent id given');
+            if ($newparent_id == 0) {
+                return Tree::raiseError(TREE_ERROR_UNKOWN_ERROR, null, null, 'no parent id given');
             }
             // if the element shall be moved under one of its children
             // return false
-            if ($this->isChildOf($idToMove,$newParentId)) {
-                return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 
-                            'can not move an element under one of its children'
-                        );
+            if ($this->isChildOf($idToMove, $newparent_id)) {
+                return Tree::raiseError(TREE_ERROR_UNKOWN_ERROR, null, null,
+                            'can not move an element under one of its children');
             }
             // dont do anything to let an element be moved under itself
             // which is bullshit
-            if ($newParentId==$idToMove) {
+            if ($newparent_id == $idToMove) {
                 return true;
             }
             // try to retreive the data of the parent element
-            if (Tree::isError($newParent = $this->getElement($newParentId))) {
+            if (Tree::isError($newParent = $this->getElement($newparent_id))) {
                 return $newParent;
             }
         }
@@ -479,18 +452,18 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
 
         // add the left/right values in the new parent, to have the space
         // to move the new values in
-        $err=$this->_add($prevVisited, $numberOfElements);
+        $err = $this->_add($prevVisited, $numberOfElements);
         if (Tree::isError($err)) {
             // FIXXME rollback
-            //$this->dbh->rollback();
+            //$this->_storage->rollback();
             return $err;
         }
 
-        // update the parentId of the element with $idToMove
-        $err = $this->update($idToMove, array('parentId' => $newParentId));
+        // update the parent_id of the element with $idToMove
+        $err = $this->update($idToMove, array('parent_id' => $newparent_id));
         if (Tree::isError($err)) {
             // FIXXME rollback
-            //$this->dbh->rollback();
+            //$this->_storage->rollback();
             return $err;
         }
 
@@ -504,14 +477,14 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         if ($newPrevId) {
             if (Tree::isError($temp = $this->getElement($newPrevId))) {
                 // FIXXME rollback
-                //$this->dbh->rollback();
+                //$this->_storage->rollback();
                 return $temp;
             }
             $calcWith = $temp['right'];
         } else {
-            if (Tree::isError($temp = $this->getElement($newParentId))) {
+            if (Tree::isError($temp = $this->getElement($newparent_id))) {
                 // FIXXME rollback
-                //$this->dbh->rollback();
+                //$this->_storage->rollback();
                 return $temp;
             }
             $calcWith = $temp['left'];
@@ -524,41 +497,40 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         }
         // calc the offset that the element to move has
         // to the spot where it should go
-        $offset = $calcWith - $element['left'];
         // correct the offset by one, since it needs to go inbetween!
-        $offset++;
+        $offset = $calcWith - $element['left'] + 1;
 
-        $lName = $this->_getColName('left');
-        $rName = $this->_getColName('right');
+        $left = $this->_getColName('left');
+        $right = $this->_getColName('right');
         $query = sprintf("UPDATE
                                 %s
                             SET
-                                %s=%s+$offset,
-                                %s=%s+$offset
+                                %s = %s + $offset,
+                                %s = %s + $offset
                             WHERE
-                                %s %s>%s
+                                %s %s > %s
                                 AND
                                 %s < %s",
-                            $this->table,
-                            $rName, $rName,
-                            $lName, $lName,
+                            $this->conf['table'],
+                            $right, $right,
+                            $left, $left,
                             $this->_getWhereAddOn(),
-                            $lName, $element['left']-1,
-                            $rName, $element['right']+1);
-        if (MDB::isError($res = $this->dbh->query($query))) {
+                            $left, $element['left'] - 1,
+                            $right, $element['right'] + 1);
+        if (PEAR::isError($res = $this->_storage->query($query))) {
             // FIXXME rollback
-            //$this->dbh->rollback();
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            //$this->_storage->rollback();
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
 
         // remove the part of the tree where the element(s) was/were before
         if (Tree::isError($err = $this->_remove($element))) {
             // FIXXME rollback
-            //$this->dbh->rollback();
+            //$this->_storage->rollback();
             return $err;
         }
         // FIXXME commit all changes
-        //$this->dbh->commit();
+        //$this->_storage->commit();
 
         return true;
     }
@@ -579,26 +551,23 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         // just to be sure nothing gets screwed up :-)
         unset($newValues[$this->_getColName('left')]);
         unset($newValues[$this->_getColName('right')]);
-        unset($newValues[$this->_getColName('parentId')]);
+        unset($newValues[$this->_getColName('parent_id')]);
 
         // updating _one_ element in the tree
         $values = array();
-        foreach ($newValues as $key=>$value) {
-
-
-            ///////////FIX ME: Add proper quote handling
-
-
-            $values[] = $this->_getColName($key).'='.$this->dbh->getTextValue($value);
+        foreach ($newValues as $key => $value) {
+            $type = $this->conf['fields'][$key]['type'];
+            $values[] = $this->_getColName($key) . ' = ' . $this->_storage->quote($value, $type);
         }
-        $query = sprintf('UPDATE %s SET %s WHERE%s %s=%s',
-                            $this->table,
-                            implode(',',$values),
+        $query = sprintf('UPDATE %s SET %s WHERE%s %s = %s',
+                            $this->conf['table'],
+                            implode(',', $values),
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
                             $id);
-        if (MDB::isError($res = $this->dbh->query($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->query($query);
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
 
         return true;
@@ -617,11 +586,10 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      * @param      integer the new previous ID, if given parent ID will be omitted
      * @return     boolean true on success
      */
-    function copy($id, $parentId = 0, $prevId = 0)
+    function copy($id, $parent_id = 0, $prevId = 0)
     {
-        return Tree::raiseError('TREE_ERROR_NOT_IMPLANTED', 
-                        'copy-method is not implemented yet!'
-                        );
+        return Tree::raiseError(TREE_ERROR_NOT_IMPLEMENTED, null, null,
+                                'copy-method is not implemented yet!');
         // get element tree
         // $this->addTree
     }
@@ -639,13 +607,15 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      */
     function getRoot()
     {
-        $query = sprintf('SELECT * FROM %s WHERE%s %s=1',
-                            $this->table,
+        $query = sprintf('SELECT * FROM %s WHERE%s %s = 1',
+                            $this->conf['table'],
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'));
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
+
         return !$res ? false : $this->_prepareResult($res);
     }
 
@@ -665,48 +635,20 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      */
     function getElement($id)
     {
-        $query = sprintf('SELECT * FROM %s WHERE %s %s=%s',
-                            $this->table,
+        $query = sprintf('SELECT * FROM %s WHERE %s %s = %s',
+                            $this->conf['table'],
                             $this->_getWhereAddOn(),
                             $this->_getColName('id'),
                             $id);
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
+
         if (!$res) {
-            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', "Element with id $id does not exist!");
-        }
-        return $this->_prepareResult($res);
-    }
-
-    // }}}
-    // {{{ getChild()
-
-    /**
-     *
-     *
-     * @access     public
-     * @version    2002/03/02
-     * @param      integer  the ID of the element for which the children
-     *                      shall be returned
-     * @return     mixed   either the data of the requested element or an Tree_Error
-     */
-    function getChild($id)
-    {
-        // subqueries would be cool :-)
-        $curElement = $this->getElement($id);
-        if (Tree::isError($curElement)) {
-            return $curElement;
+            return Tree::raiseError(TREE_ERROR_UNKOWN_ERROR, null, null, "Element with id $id does not exist!");
         }
 
-        $query = sprintf('SELECT * FROM %s WHERE%s %s=%s',
-                            $this->table,
-                            $this->_getWhereAddOn(),
-                            $this->_getColName('left'),
-                            $curElement['left']+1);
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
-        }
         return $this->_prepareResult($res);
     }
 
@@ -725,10 +667,17 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      */
     function getPath($id)
     {
-        $res = $this->dbh->getAll($this->_getPathQuery($id));
-        if (MDB::isError($res)) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $query = $this->_getPathQuery($id);
+        if (PEAR::isError($query)) {
+            /// FIXME return real tree error
+            return false;
         }
+
+        $res = $this->_storage->queryAll($query, array(), false, false);
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
+        }
+
         return $this->_prepareResults($res);
     }
 
@@ -739,19 +688,25 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     {
         // subqueries would be cool :-)
         $curElement = $this->getElement($id);
+        if (PEAR::isError($curElement)) {
+            /// FIXME return real tree error
+            return false;
+        }
+
+        $left = $this->_getColName('left');
         $query = sprintf('SELECT * FROM %s '.
-                            'WHERE %s %s<=%s AND %s>=%s '.
+                            'WHERE %s %s <= %s AND %s >= %s '.
                             'ORDER BY %s',
                             // set the FROM %s
-                            $this->table,
+                            $this->conf['table'],
                             // set the additional where add on
                             $this->_getWhereAddOn(),
                             // render 'left<=curLeft'
-                            $this->_getColName('left'),  $curElement['left'],
+                            $left,  $curElement['left'],
                             // render right>=curRight'
                             $this->_getColName('right'), $curElement['right'],
                             // set the order column
-                            $this->_getColName('left'));
+                            $left);
         return $query;
     }
 
@@ -762,11 +717,15 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     {
         $query = $this->_getPathQuery($id);
         // i know this is not really beautiful ...
-        $query = preg_replace('/^select \* /i','SELECT COUNT(*) ',$query);
-        if (MDB::isError($res = $this->dbh->getOne($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $id = $this->_getColName('id');
+        $replace = "SELECT COUNT($id) ";
+        $query = preg_replace('/^select \* /i', $replace, $query);
+        $res = $this->_storage->queryOne($query, 'integer');
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
-        return $res-1;
+
+        return $res - 1;
     }
 
     // }}}
@@ -789,14 +748,16 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
             return $element;
         }
 
-        $query = sprintf('SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
-                            $this->table,
+        $query = sprintf('SELECT * FROM %s WHERE%s (%s = %s OR %s = %s)',
+                            $this->conf['table'],
                             $this->_getWhereAddOn(),
                             $this->_getColName('right'), $element['left'] - 1,
                             $this->_getColName('left'),  $element['left'] - 1);
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
+
         return $this->_prepareResult($res);
     }
 
@@ -816,17 +777,20 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     function getRight($id)
     {
         $element = $this->getElement($id);
-        if (Tree::isError($element))
+        if (Tree::isError($element)) {
             return $element;
+        }
 
-        $query = sprintf('SELECT * FROM %s WHERE%s (%s=%s OR %s=%s)',
-                            $this->table,
+        $query = sprintf('SELECT * FROM %s WHERE%s (%s = %s OR %s = %s)',
+                            $this->conf['table'],
                             $this->_getWhereAddOn(),
                             $this->_getColName('left'),  $element['right'] + 1,
                             $this->_getColName('right'), $element['right'] + 1);
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
+
         return $this->_prepareResult($res);
     }
 
@@ -846,22 +810,57 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      */
     function getParent($id)
     {
+        $idName = $this->_getColName('id');
         $query = sprintf('SELECT
                                 p.*
                             FROM
                                 %s p,%s e
                             WHERE
-                                %s e.%s=p.%s
-                                AND
-                                e.%s=%s',
-                            $this->table,$this->table,
+                                %s e.%s = p.%s
+                              AND
+                                e.%s = %s',
+                            $this->conf['table'], $this->conf['table'],
                             $this->_getWhereAddOn(' AND ', 'p'),
-                            $this->_getColName('parentId'),
-                            $this->_getColName('id'),
-                            $this->_getColName('id'),
+                            $this->_getColName('parent_id'),
+                            $idName,
+                            $idName,
                             $id);
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
+        }
+
+        return $this->_prepareResult($res);
+    }
+
+    // }}}
+    // {{{ getChild()
+
+    /**
+     *
+     *
+     * @access     public
+     * @version    2002/03/02
+     * @param      integer  the ID of the element for which the children
+     *                      shall be returned
+     * @return     mixed   either the data of the requested element or an Tree_Error
+     */
+    function _getChild($id)
+    {
+        // subqueries would be cool :-)
+        $curElement = $this->getElement($id);
+        if (Tree::isError($curElement)) {
+            return $curElement;
+        }
+
+        $query = sprintf('SELECT * FROM %s WHERE%s %s = %s',
+                            $this->conf['table'],
+                            $this->_getWhereAddOn(),
+                            $this->_getColName('left'),
+                            $curElement['left'] + 1);
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
         return $this->_prepareResult($res);
     }
@@ -880,12 +879,24 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      * @param      mixed   (1) int     the id of one element
      *                     (2) array   an array of ids for which
      *                                 the children will be returned
+     * @param      boolean if only the first child should be returned (only used when one id is passed)
      * @param      integer the children of how many levels shall be returned
      * @return     mixed   the array with the data of all children
      *                     or false, if there are none
      */
-    function getChildren($ids, $levels = 1)
+    function getChildren($ids, $oneChild = false, $levels = 1)
     {
+        if ($oneChild) {
+            $res = $this->_getChild($ids);
+            return $res;
+        }
+
+        $id      = $this->_getColName('id');
+        $parent  = $this->_getColName('parent_id');
+        $left    = $this->_getColName('left');
+        $where   = $this->_getWhereAddOn(' AND ', 'c');
+        $orderBy = $this->getOption('order') ? $this->getOption('order') : $left;
+
         $res = array();
         for ($i = 1; $i < $levels + 1; $i++) {
             // if $ids is an array implode the values
@@ -896,57 +907,59 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
                                 FROM
                                     %s c,%s e
                                 WHERE
-                                    %s e.%s=c.%s
-                                    AND
+                                    %s e.%s = c.%s
+                                  AND
                                     e.%s IN (%s) '.
                                 'ORDER BY
                                     c.%s',
-                                $this->table,$this->table,
-                                $this->_getWhereAddOn(' AND ', 'c'),
-                                $this->_getColName('id'),
-                                $this->_getColName('parentId'),
-                                $this->_getColName('id'),
+                                $this->conf['table'], $this->conf['table'],
+                                $where,
+                                $id,
+                                $parent,
+                                $id,
                                 $getIds,
                                 // order by left, so we have it in the order
                                 // as it is in the tree if no 'order'-option
                                 // is given
-                                $this->getOption('order')?
-                                    $this->getOption('order')
-                                    : $this->_getColName('left')
+                                $orderBy
                        );
-            if (MDB::isError($_res = $this->dbh->getAll($query))) {
-                return Tree::raiseError('TREE_ERROR_DB_ERROR', $_res->getMessage());
+            $_res = $this->_storage->queryAll($query, array(), false, false);
+            if (PEAR::isError($_res)) {
+                return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $_res->getMessage());
             }
 
             // Column names are now unmapped
             $_res = $this->_prepareResults($_res);
 
+            if ($levels > 1) {
+                $ids = array();
+            }
+
             // we use the id as the index, to make the use easier esp.
             // for multiple return-values
             $tempRes = array();
             foreach ($_res as $aRes) {
+                ///FIXME This part might be replace'able with key'ed array return
                 $tempRes[$aRes['id']] = $aRes;
-            }
-            $_res = $tempRes;
-
-            if ($levels > 1) {
-                $ids = array();
-                foreach ($_res as $aRes) {
-                    $ids[] = $aRes[$this->_getColName('id')];
+                // If there are more levels requested then get the id for the next level
+                if ($levels > 1) {
+                    $ids[] = $aRes[$id];
                 }
             }
-            $res = array_merge($res, $_res);
+
+            $res = array_merge($res, $tempRes);
 
             // quit the for-loop if there are no children in the current level
-            if (!sizeof($ids)) {
+            if (!count($ids)) {
                 break;
             }
         }
+
         return $res;
     }
 
     // }}}
-    // {{{ getNext()
+    // {{{ nextSibling()
 
     /**
      * get the next element on the same level
@@ -960,34 +973,37 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      *                     or false, if there is no next
      *                     or Tree_Error
      */
-    function getNext($id)
+    function nextSibling($id)
     {
+        $parent = $this->_getColName('parent_id');
         $query = sprintf('SELECT
                                 n.*
                             FROM
-                                %s n,%s e
+                                %s n, %s e
                             WHERE
-                                %s e.%s=n.%s-1
-                            AND
-                                e.%s=n.%s
-                            AND
-                                e.%s=%s',
-                            $this->table, $this->table,
+                                %s e.%s = n.%s - 1
+                              AND
+                                e.%s = n.%s
+                              AND
+                                e.%s = %s',
+                            $this->conf['table'], $this->conf['table'],
                             $this->_getWhereAddOn(' AND ', 'n'),
                             $this->_getColName('right'),
                             $this->_getColName('left'),
-                            $this->_getColName('parentId'),
-                            $this->_getColName('parentId'),
+                            $parent,
+                            $parent,
                             $this->_getColName('id'),
                             $id);
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
+
         return !$res ? false : $this->_prepareResult($res);
     }
 
     // }}}
-    // {{{ getPrevious()
+    // {{{ previousSibling()
 
     /**
      * get the previous element on the same level
@@ -1001,29 +1017,32 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      *                     or false, if there is no previous
      *                     or a Tree_Error
      */
-    function getPrevious($id)
+    function previousSibling($id)
     {
+        $parent = $this->_getColName('parent_id');
         $query = sprintf('SELECT
                                 p.*
                             FROM
-                                %s p,%s e
+                                %s p, %s e
                             WHERE
-                                %s e.%s=p.%s+1
-                                AND
-                                    e.%s=p.%s
-                                AND
-                                    e.%s=%s',
-                            $this->table,$this->table,
+                                %s e.%s = p.%s + 1
+                              AND
+                                e.%s = p.%s
+                              AND
+                                e.%s = %s',
+                            $this->conf['table'], $this->conf['table'],
                             $this->_getWhereAddOn(' AND ', 'p'),
                             $this->_getColName('left'),
                             $this->_getColName('right'),
-                            $this->_getColName('parentId'),
-                            $this->_getColName('parentId'),
+                            $parent,
+                            $parent,
                             $this->_getColName('id'),
                             $id);
-        if (MDB::isError($res = $this->dbh->getRow($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryRow($query, array());
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
+
         return !$res ? false : $this->_prepareResult($res);
     }
 
@@ -1046,13 +1065,23 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
         // check simply if the left and right of the child are within the
         // left and right of the parent, if so it definitly is a child :-)
         $parent = $this->getElement($id);
+        if (PEAR::isError($parent)) {
+            /// FIXME return real tree error
+            return false;
+        }
+
         $child  = $this->getElement($childId);
+        if (PEAR::isError($child)) {
+            /// FIXME return real tree error
+            return false;
+        }
 
         if ($parent['left'] < $child['left']
             && $parent['right'] > $child['right'])
         {
             return true;
         }
+
         return false;
     }
 
@@ -1069,25 +1098,28 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      */
     function getDepth()
     {
+        $left  = $this->_getColName('left');
+        $right = $this->_getColName('right');
         // FIXXXME TODO!!!
         $query = sprintf('SELECT COUNT(*) FROM %s p, %s e '.
                             'WHERE %s (e.%s BETWEEN p.%s AND p.%s) AND '.
                             '(e.%s BETWEEN p.%s AND p.%s)',
-                            $this-> table,$this->table,
+                            $this->conf['table'], $this->conf['table'],
                             // first line in where
                             $this->_getWhereAddOn(' AND ','p'),
-                            $this->_getColName('left'),$this->_getColName('left'),
-                            $this->_getColName('right'),
+                            $left, $left, $right,
                             // second where line
-                            $this->_getColName('right'),$this->_getColName('left'),
-                            $this->_getColName('right')
+                            $right, $left, $right
                             );
-        if (MDB::isError($res=$this->dbh->getOne($query))) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+        $res = $this->_storage->queryOne($query, 'integer');
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
+
         if (!$res) {
             return false;
         }
+
         return $this->_prepareResult($res);
     }
 
@@ -1106,6 +1138,9 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     function hasChildren($id)
     {
         $element = $this->getElement($id);
+        if (PEAR::isError($element)) {
+            return false;
+        }
         // if the diff between left and right > 1 then there are children
         return ($element['right'] - $element['left']) > 1;
     }
@@ -1137,79 +1172,81 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     // in preference to only the id?
     {
         if ($separator == '') {
-            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 
+            return Tree::raiseError(TREE_ERROR_UNKOWN_ERROR, null, null,
                 'getIdByPath: Empty separator not allowed');
         }
+
         if ($path == $separator) {
-            $root = $this->getRoot();
-            if (Tree::isError($root)) {
+            if (Tree::isError($root = $this->getRoot())) {
                 return $root;
             }
             return $root['id'];
         }
-        if (!($colname=$this->_getColName($nodeName))) {
-            return Tree::raiseError('TREE_ERROR_UNKOWN_ERROR', 
+
+        if (!($colname = $this->_getColName($nodeName))) {
+            return Tree::raiseError(TREE_ERROR_UNKOWN_ERROR, null, null,
                 'getIdByPath: Invalid node name');
         }
+
         if ($startId != 0) {
             // If the start node has no child, returns false
             // hasChildren calls getElement. Not very good right
             // now. See the TODO
             $startElem = $this->getElement($startId);
-            if (!is_array($startElem) || Tree::isError($startElem)) {
+            if (Tree::isError($startElem)) {
                 return $startElem;
             }
+
             // No child? return
             if (!is_array($startElem)) {
                 return null;
             }
+
             $rangeStart = $startElem['left'];
             $rangeEnd   = $startElem['right'];
             // Not clean, we should call hasChildren, but I do not
             // want to call getELement again :). See TODO
-            $startHasChild = ($rangeEnd-$rangeStart) > 1 ? true : false;
-            $cwd = '/'.$this->getPathAsString($startId);
+            $startHasChild = ($rangeEnd - $rangeStart) > 1 ? true : false;
+            $cwd = '/' . $this->getPathAsString($startId);
         } else {
             $cwd = '/';
             $startHasChild = false;
         }
+
         $t = $this->_preparePath($path, $cwd, $separator);
         if (Tree::isError($t)) {
             return $t;
         }
-        list($elems, $sublevels) = $t;
-        $cntElems = sizeof($elems);
-        $where = '';
 
-        $query = 'SELECT '
-                .$this->_getColName('id')
-                .' FROM '
-                .$this->table
-                .' WHERE '
-                .$colname;
-        if ($cntElems == 1) {
-            $query .= "='".$elems[0]."'";
-        } else {
-            $query .= "='".$elems[$cntElems-1]."'";
-        }
+        list($elems, $sublevels) = $t;
+        $cntElems = count($elems);
+
+        $query = '
+            SELECT '
+                . $this->_getColName('id') .
+            ' FROM '
+                . $this->conf['table'] .
+            ' WHERE '
+                . $colname;
+
+        $element = $cntElems == 1 ? $elems[0] : $elems[$cntElems - 1];
+        $query .= ' = ' . $this->_storage->quote($element, 'text');
+
         if ($startHasChild) {
-            $where  .= ' AND ('.
-                        $this->_getColName('left').'>'.$rangeStart.
+            $query  .= ' AND ('.
+                        $this->_getColName('left').' > '.$rangeStart.
                         ' AND '.
-                        $this->_getColName('right').'<'.$rangeEnd.')';
+                        $this->_getColName('right').' < '.$rangeEnd.')';
         }
-        $res = $this->dbh->getOne($query);
-        if (MDB::isError($res)) {
-            return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+
+        $res = $this->_storage->queryOne($query, 'integer');
+        if (PEAR::isError($res)) {
+            return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
         }
-        return ($res ? (int)$res : false);
+        return $res ? (int)$res : false;
     }
 
     // }}}
-
-    //
-    //  PRIVATE METHODS
-    //
 
     // {{{ _getWhereAddOn()
     /**
@@ -1223,8 +1260,8 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      */
     function _getWhereAddOn($addAfter = ' AND ', $tableName = '')
     {
-        if ($where=$this->getOption('whereAddOn')) {
-            return ' '.($tableName ? $tableName.'.' : '')." $where$addAfter ";
+        if (!empty($this->conf['whereAddOn'])) {
+            return ' ' . ($tableName ? $tableName . '.' : '') . $this->conf['whereAddOn'] . $addAfter;
         }
         return '';
     }
@@ -1239,14 +1276,14 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
     }
 
     // }}}
-    // {{{ getNode()
+    // {{{ getBranch()
 
     /**
      * gets the tree under the given element in one array, sorted
      * so you can go through the elements from begin to end and list them
      * as they are in the tree, where every child (until the deepest) is retreived
      *
-     * @see        &_getNode()
+     * @see        &_getBranch()
      * @access     public
      * @version    2001/12/17
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
@@ -1256,7 +1293,7 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
      *                                  be retreived
      * @return     array    sorted as listed in the tree
      */
-    function &getNode($startId = 0, $depth = 0)
+    function &getBranch($startId = 0, $depth = 0)
     {
 //FIXXXME use getChildren()
         if ($startId) {
@@ -1271,10 +1308,10 @@ class Tree_Dynamic_MDBnested extends Tree_OptionsMDB
 }
 
 /*
-* Local Variables:
-* mode: php
-* tab-width: 4
-* c-basic-offset: 4
-* End:
-*/
-?> 
+ * Local Variables:
+ * mode: php
+ * tab-width: 4
+ * c-basic-offset: 4
+ * End:
+ */
+?>

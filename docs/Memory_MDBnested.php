@@ -1,58 +1,14 @@
 <?php
 //  $Id$
 
-ini_set('error_reporting',E_ALL);
-
-    /**
-    *   this is a helper function, so i dont have to write so many prints :-)
-    *   @param  array   $para   the result returned by some method, that will be dumped
-    *   @param  string  $string the explaining string
-    */
-    function dumpHelper($para, $string = '', $addArray = false)
-    {
-        global $tree, $element;
-
-        if ($addArray) {
-            eval( "\$res=array(".$para.');' );
-        } else {
-            eval( "\$res=".$para.';' );
-        }
-        echo  '<b>'.$para.' </b><i><u><span style="color: #008000">'.$string.'</span></u></i><br />';
-        // this method dumps to the screen, since print_r or var_dump dont
-        // work too good here, because the inner array is recursive
-        // well, it looks ugly but one can see what is meant :-)
-        $tree->varDump($res);
-        echo '<br />';
-
-    }
-
-    /**
-    *   dumps the entire structure nicely
-    *   @param  string  $string the explaining string
-    */
-    function dumpAllNicely($string = '')
-    {
-        global $tree;
-
-        echo '<i><u><span style="color: #008000">'.$string.'</span></u></i><br />';
-        $all = $tree->getNode();   // get the entire structure sorted as the tree is, so we can simply foreach through it and show it
-        foreach($all as $aElement) {
-            for ($i = 0; $i < $aElement['level']; $i++) {
-                echo '&nbsp; &nbsp; ';
-            }
-            echo '<span style="color: red">'.$aElement['name'].'</span> ===&gt; ';
-            $tree->varDump(array($aElement));
-        }
-        echo '<br />';
-
-    }
+include_once 'funcs.php';
 
 
     /*
 
         use this to build the db table
 
-        CREATE TABLE Memory_Nested_MDB (
+        CREATE TABLE Memory_nestedTree (
             id int(11) NOT NULL default '0',
             name varchar(255) NOT NULL default '',
             l int(11) NOT NULL default '0',
@@ -61,7 +17,6 @@ ini_set('error_reporting',E_ALL);
             comment varchar(255) NOT NULL default '',
             PRIMARY KEY  (id)
         );
-
 
         This example demonstrates how to manage trees
         that are saved in a DB, it uses a very simple
@@ -78,10 +33,6 @@ ini_set('error_reporting',E_ALL);
     require_once 'Tree/Tree.php';
 
     // define the DB-table where the data shall be read from
-    $options = array('table' =>  'Memory_Nested_MDB'
-                        ,'whereAddOn' => "comment=''"
-                    );
-
     // calling 'setupMemory' means to retreive a class, which works on trees,
     // that are temporarily stored in the memory, in an array
     // this means the entire tree is available at all time !!!
@@ -92,9 +43,22 @@ ini_set('error_reporting',E_ALL);
     // use the nested DB schema, which is actually implemented in Dynamic/DBnested
     // the class Memory/DBnested is only kind of a wrapper to read the entire tree
     // and let u work on it, which to use should be chosen on case by case basis
-    $tree = Tree::setupMemory('MDBnested',         
-                                'mysql://root@localhost/tree_test',  // the DSN
-                                $options);          // pass the options we had assigned up there
+$config = array(
+    'type' => 'Nested',
+    'storage' => array(
+        'name' => 'MDB',
+        'dsn' => 'mysql://root:hamstur@localhost/tree_test',
+        // 'connection' =>
+    ),
+    'options' => array(
+        'table' => 'nestedTree',
+        'order' =>  'id',
+        'fields' => array(),
+        'whereAddOn' => "comment=''"
+    ),
+);
+
+$tree =& Tree::factoryMemory($config);          // pass the options we had assigned up there
 
     // add a new root element in the tree
     $rootId = $tree->add(array('name' => 'myElement'));
@@ -119,7 +83,7 @@ ini_set('error_reporting',E_ALL);
     // you can also use:    $tree->data[$id]['parent']
 
     $id = $tree->getIdByPath('myElement');
-    dumpHelper('$tree->getChild('.$id.')' , 'dump the child of "myElement"' , true);
+    dumpHelper('$tree->getChildren('.$id.', true)' , 'dump the child of "myElement"' , true);
     // you can also use:    $tree->data[$id]['child']
 
     $id = $tree->getIdByPath('myElement');
@@ -127,11 +91,11 @@ ini_set('error_reporting',E_ALL);
     // you can also use:    $tree->data[$id]['children']
 
     $id = $tree->getIdByPath('myElement/subElement');
-    dumpHelper('$tree->getNext('.$id.')' , 'dump the "next" of "myElement/subElement"' , true);
+    dumpHelper('$tree->nextSibling('.$id.')' , 'dump the "next" of "myElement/subElement"' , true);
     // you can also use:    $tree->data[$id]['next']
 
     $id = $tree->getIdByPath('myElement/anotherSubElement');
-    dumpHelper('$tree->getPrevious('.$id.')' , 'dump the "previous" of "myElement/anotherSubElement"' , true);
+    dumpHelper('$tree->previousSibling('.$id.')' , 'dump the "previous" of "myElement/anotherSubElement"' , true);
     // you can also use:    $tree->data[$id]['previous']
 
     $id = $tree->getIdByPath('myElement');
@@ -141,18 +105,18 @@ ini_set('error_reporting',E_ALL);
     $id = $tree->getIdByPath('myElement');
     $element = $tree->data[$id]['child']['next']; // refer to the second child of 'myElement'
     dumpHelper('$element[\'id\']' , 'demo2 of using the internal array, for referencing tree-nodes, see the code');
-/*
+
     $id = $tree->getIdByPath('myElement/anotherSubElement');
-    $tree->move( $id , 0 );
+    $tree->move($id , 0);
     $tree->setup(); // rebuild the structure again, since we had changed it
     dumpAllNicely( 'dump all, after "myElement/anotherSubElement" was moved under the root' );
 
     $moveId = $tree->getIdByPath('myElement');
     $id = $tree->getIdByPath('anotherSubElement');
-    $tree->move( $moveId , $id );
+    $tree->move($moveId , $id);
     $tree->setup(); // rebuild the structure again, since we had changed it
     dumpAllNicely( 'dump all, after "myElement" was moved under the "anotherSubElement"' );
-*/
+
     $tree->setRemoveRecursively(true);
     $tree->remove($rootId);
     echo '<span style="color: red">ALL ELEMENTS HAVE BEEN REMOVED (uncomment this part to keep them in the DB after running this test script)</span>';

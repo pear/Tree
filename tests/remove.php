@@ -1,7 +1,5 @@
 <?php
-//
 //  $Id$
-//
 
 require_once 'UnitTest.php';
 
@@ -26,24 +24,26 @@ class tests_remove extends UnitTest
     {
         $tree = $this->getMemoryDBnested();        
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
-        $parentId = $tree->getParentId(5);
+        $parent = $tree->getParent(5);
         $ret = $tree->move(5, 5);
         $tree->setup();
         // be sure true is returned
         $this->assertTrue($ret);
-        $this->assertEquals($parentId, $tree->getParentId(5));
+        $parent1 = $tree->getParent(5);
+        $this->assertEquals($parent['id'], $parent1['id']);
     }
 
     function test_MemoryMDBnestedNoAction()
     {
         $tree = $this->getMemoryMDBnested();        
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
-        $parentId = $tree->getParentId(5);
+        $parent = $tree->getParent(5);
         $ret = $tree->move(5, 5);
         $tree->setup();
         // be sure true is returned
         $this->assertTrue($ret);
-        $this->assertEquals($parentId, $tree->getParentId(5));
+        $parent1 = $tree->getParent(5);
+        $this->assertEquals($parent['id'], $parent1['id']);
     }
 
     // do this for XML
@@ -52,29 +52,17 @@ class tests_remove extends UnitTest
 
     // do this for DBsimple
   
-    // do this for DynamicDBnested
-    function test_DynamicDBnested()
+    // do this for DynamicSQLnested
+    function test_DynamicSQLnested()
     {
-        $tree =& $this->getDynamicDBnested();
+        $tree =& $this->getDynamicSQLnested();
         $ret = $tree->remove(5);
 
         // be sure true is returned
         $this->assertTrue($ret);
         // and check if the element doesnt exist anymore ... this is not 100% sure, since the 
         // returned error message is a string :-(
-        $this->assertFalse(Tree::isError($tree->getElement(5)));
-    }
-
-    function test_DynamicMDBnested()
-    {
-        $tree =& $this->getDynamicMDBnested();
-        $ret = $tree->remove(5);
-
-        // be sure true is returned
-        $this->assertTrue($ret);
-        // and check if the element doesnt exist anymore ... this is not 100% sure, sicne the 
-        // returned error message is a string :-(
-        $this->assertFalse(Tree::isError($tree->getElement(5)));
+        $this->assertTrue(Tree::isError($tree->getElement(5)));
     }
 }
 

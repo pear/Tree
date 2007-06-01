@@ -3,12 +3,12 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2005 The PHP Group                                |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.02 of the PHP license,      |
+// | This source file is subject to version 3.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
 // | available at through the world-wide-web at                           |
-// | http://www.php.net/license/2_02.txt.                                 |
+// | http://www.php.net/license/3_0.txt.                                  |
 // | If you did not receive a copy of the PHP license and are unable to   |
 // | obtain it through the world-wide-web, please send a note to          |
 // | license@php.net so we can mail you a copy immediately.               |
@@ -30,7 +30,6 @@ require_once 'XML/Parser.php';
  */
 class Tree_Memory_XML extends XML_Parser
 {
-
     /**
      * @var array   the first element has to be empty, so we can use
      *              the parentId=0 as "no parent"
@@ -72,9 +71,9 @@ class Tree_Memory_XML extends XML_Parser
      * @author     Wolfram Kriesing <wolfram@kriesing.de>
      * @return     boolean     true on success
      */
-    function Tree_Memory_XML($dsn, $options)
+    function Tree_Memory_XML($config)
     {
-        $handle = $dsn;
+        $handle = $config['storage']['dsn'];
 
         $this->XML_Parser();
 
@@ -100,12 +99,12 @@ class Tree_Memory_XML extends XML_Parser
      */
     function startHandler($parser, $element, $attribs)
     {
-        $elementBeforeId = sizeof($this->data) - 1;
-        $curId = sizeof($this->data);
+        $elementBeforeId = count($this->data) - 1;
+        $curId = count($this->data);
 
         $this->data[$curId]['id'] = $curId;
-        $this->data[$curId]['name'] = $this->_toLower?
-                                        strtolower($element):$element;
+        $this->data[$curId]['name'] = $this->_toLower ?
+                                        strtolower($element) : $element;
         $this->data[$curId]['level'] = $this->level;
         $this->data[$curId]['attributes'] = $attribs;
         if ($this->_toLower) {
@@ -168,11 +167,11 @@ class Tree_Memory_XML extends XML_Parser
 # ANSWER: if you call xml_parse($parser, "foo ", false) and then
 #         xml_parse($parser, "bar", true), callbacks are done once
 #         for each xml_parse() call.
-        if (!isset($this->data[ sizeof($this->data)-1 ]['cdata'])) {
-            $this->data[ sizeof($this->data)-1 ]['cdata'] = '';
+        if (!isset($this->data[count($this->data) - 1]['cdata'])) {
+            $this->data[count($this->data) - 1]['cdata'] = '';
         }
 #print "cdata = '$cdata'\r\n";
-        $this->data[ sizeof($this->data)-1 ]['cdata'].= $cdata;
+        $this->data[count($this->data) - 1]['cdata'].= $cdata;
     }
 
     // }}}
@@ -188,7 +187,7 @@ class Tree_Memory_XML extends XML_Parser
      */
     function defaultHandler($parser, $cdata)
     {
-        // $this->data[ sizeof($this->data)-1 ]['cdata'] = $cdata;
+        // $this->data[ count($this->data)-1 ]['cdata'] = $cdata;
         // not in use yet :-( is that ok??
     }
 
@@ -252,7 +251,7 @@ class Tree_Memory_XML extends XML_Parser
 /*    function add($newValues)
     {
         // add the data in the internal structure $this->data
-        $this->data[sizeof($this->data)] = $newValues;
+        $this->data[count($this->data)] = $newValues;
 
 # i am thinking if it might be a good solution to walk the data-array
 # and write each line singlely until the one to add comes, write it and

@@ -1,7 +1,5 @@
 <?php
-//
 //  $Id$
-//
 
 require_once 'DB.php';
 require_once 'PHPUnit.php';
@@ -10,12 +8,14 @@ class UnitTest extends PhpUnit_TestCase
 {
     function setUp()
     {
-        // common setup, setup the table structure and data in the db
-        // (this actually also does the tearDown, since we have the DROP TABLE queries in the setup too
+        // common factory, factory the table structure and data in the db
+        // (this actually also does the tearDown, since we have the DROP TABLE queries in the factory too
         require 'sql.php'; 
         $db = DB::connect(DB_DSN);
+
         foreach ($dbStructure[$db->phptype]['setup'] as $aQuery) {
-            if (DB::isError($ret = $db->query($aQuery))) {
+            $ret = $db->query($aQuery);
+            if (DB::isError($ret)) {
                 die($ret->getUserInfo());
             }
         }
@@ -39,30 +39,72 @@ class UnitTest extends PhpUnit_TestCase
     
     function &getMemoryDBnested()
     {
-        $tree = Tree::setup('Memory_DBnested', DB_DSN, array('table' => TABLE_TREENESTED));
+        $config = array(
+            'container' => 'Memory',
+            'type' => 'Nested',
+            'storage' => array(
+                'name' => 'DB',
+                'dsn' => DB_DSN,
+                // 'connection' =>
+            ),
+            'options' => array(
+                'table' => TABLE_TREENESTED,
+                'order' =>  'id',
+                'fields' => array(
+                    'comment' => array('type' => 'text', 'name' => 'comment'),
+                ),
+            ),
+        );
+        $tree = Tree::factory($config);
         $tree->setup();
         return $tree;
     }
     
-    function &getDynamicDBnested()
+    function &getDynamicSQLnested($name = 'DB')
     {
-        $tree = Tree::setup('Dynamic_DBnested', DB_DSN, array('table' => TABLE_TREENESTED));
+        $config = array(
+            'container' => 'Dynamic',
+            'type' => 'Nested',
+            'storage' => array(
+                'name' => $name,
+                'dsn' => DB_DSN,
+                // 'connection' =>
+            ),
+            'options' => array(
+                'table' => TABLE_TREENESTED,
+                'order' =>  'id',
+                'fields' => array(
+                    'comment' => array('type' => 'text', 'name' => 'comment'),
+                ),
+            ),
+        );
+        $tree = Tree::factory($config);
+
         return $tree;
     }
  
     function &getMemoryMDBnested()
     {
-        $tree = Tree::setup('Memory_MDBnested', DB_DSN, array('table' => TABLE_TREENESTED));
+        $config = array(
+            'container' => 'Memory',
+            'type' => 'Nested',
+            'storage' => array(
+                'name' => 'MDB',
+                'dsn' => DB_DSN,
+                // 'connection' =>
+            ),
+            'options' => array(
+                'table' => TABLE_TREENESTED,
+                'order' =>  'id',
+                'fields' => array(
+                    'comment' => array('type' => 'text', 'name' => 'comment'),
+                ),
+            ),
+        );
+        $tree = Tree::factory($config);
         $tree->setup();
         return $tree;
     }
-    
-    function &getDynamicMDBnested()
-    {
-        $tree = Tree::setup('Dynamic_MDBnested', DB_DSN, array('table' => TABLE_TREENESTED));
-        return $tree;
-    } 
-    
 }
 
 ?>

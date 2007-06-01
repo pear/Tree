@@ -1,18 +1,22 @@
 <?php
 //
 //  $Log$
+//  Revision 1.1  2003/01/30 17:18:24  cain
+//  - moved all examples to docs
+//  - and make them work properly
+//
 //  Revision 1.1  2002/08/23 17:18:28  cain
 //  - a good example to show how the tree works
 //
 //
 
-require_once('Tree/Memory.php');
+require_once 'Tree/Memory.php';
 
 
 class treeClass extends Tree_Memory
 {
 
-    function getPathAsString( $id )
+    function getPathAsString($id)
     {
         return preg_replace('/Root\s-\s/','',parent::getPathAsString( $id , ' - ' ));
     }
@@ -34,25 +38,22 @@ class treeClass extends Tree_Memory
     *   @return     mixed   an array if the node shall be visible
     *                       nothing if the node shall not be shown
     */
-    function _walkForGettingVisibleFolders( $node )
+    function _walkForGettingVisibleFolders($node)
     {
         global $session;
 
-        if( $node['id']==$this->getRootId() )
+        if ($node['id'] == $this->getRootId()) {
             return $node;
-
-        $parentsIds = $this->getParentsIds($node['id']);
-        if( !@$this->_unfoldAll )
-        {
-            foreach( $parentsIds as $aParentId )
-            {
-                if( !@$session->temp->openProjectFolders[$aParentId] &&
-                    $aParentId!=$node['id'])    // dont check the node itself, since we only look if the parents are openend, then this $node is shown!
-                    return false;
-            }
         }
-        else
-        {
+        $parentsIds = $this->getParentsIds($node['id']);
+        if (!@$this->_unfoldAll) {
+            foreach ($parentsIds as $aParentId) {
+                if (!@$session->temp->openProjectFolders[$aParentId] &&
+                    $aParentId != $node['id']) {   // dont check the node itself, since we only look if the parents are openend, then this $node is shown!
+                    return false;
+                }
+            }
+        } else {
             // if all folders shall be unfolded save the unfold-ids in the session
             $session->temp->openProjectFolders[$node['id']] = $node['id'];
         }
@@ -71,32 +72,24 @@ class treeClass extends Tree_Memory
     function getAllVisible()
     {
         $this->unfoldHandler();
-        return $this->walk( array(&$this,'_walkForGettingVisibleFolders') , 0 , 'ifArray' );
+        return $this->walk(array(&$this, '_walkForGettingVisibleFolders'), 0, 'ifArray');
     }
 
     function unfoldHandler()
     {
         global $session;
 
-        if( @$_REQUEST['unfoldAll'] )
-        {
+        if (@$_REQUEST['unfoldAll']) {
             $this->_unfoldAll = true;
         }
 
-        if( @$_REQUEST['unfold'] )
-        {
-            if( @$session->temp->openProjectFolders[$_REQUEST['unfold']] )
-            {
+        if (@$_REQUEST['unfold']) {
+            if (@$session->temp->openProjectFolders[$_REQUEST['unfold']]) {
                 unset($session->temp->openProjectFolders[$_REQUEST['unfold']]);
-            }
-            else
-            {
+            } else {
                 $session->temp->openProjectFolders[$_REQUEST['unfold']] = $_REQUEST['unfold'];
             }
         }
     }
-
-
 }
-
 ?>

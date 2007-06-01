@@ -4,10 +4,52 @@ TODO
   use cached results. i.e. when calling getElement(2) three times, normally it would read
   the data from the DB 3 times, but with a cache it could use cached results.
   of course not cached permanently only for the current script life time
-- about Cache, add a per "transaction" cache. That means, when the users call a complex 
+- about Cache, add a per "transaction" cache. That means, when the users call a complex
   method (getIdByPath), cache the result during the read "transaction", lock?
-- setOption('columnNameMaps') doesnt work i.e. here
-    $tree->setOption('columnNameMaps',array('myComment'=>'comment'));
-    $tree->setOption('columnNameMaps',array('comment'=>'comment'));
-  because we dont have the column name as the array key, so we cant overwrite it :-(
-  this is really stupid
+
+  http://www.phpguru.org/Tree2/
+   * http://www.phpguru.org/article.php?ne_id=18
+  http://cvs.iworks.at/cvs.php/Tree
+  http://wiki.iworks.at/index.php?area=Tree&page=HomePage
+  http://cvs.iworks.at/cvs.php/Gadget/Tree?login=2&rt=Gadget
+  Move to another architecture, talk to Mike and Lorenzo about joining in.
+
+- Remove nodes recrusivly always.
+- Do not require the whole setup process after add/edit/remove/move/copy in memory
+  note sure tho what to do with memory <-> dynamic
+- because I removed things like parent, next, previous and such fromt the $data array
+  then I must fix _getElementId(removed) to cope with that and every other function related to this
+- Find a better way to deal with getParent and such when there is no result
+- remove buildStructure and add the level code to were I make the structure now and unset parent_id also in the data array
+- Add Transactions
+- New storage container approach
+- setData in all containers
+- Fully implement Array container
+- Fix structure thing, walk is having some issue, doesn't give errors anymore but there are issues
+- Fix getChildren
+- Enhance getAllChildren[ids]
+- Implement levels to getChildren
+- Reimplement get*Id and remove get* and have only one getNode or getData or what ever
+
+Profile this whole thing with APD when I get it to work or xdebug
+
+
+Open your favourite browser,
+and google for "joe celko" and "nested set"
+
+http://www.intelligententerprise.com/001020/celko.jhtml?_requestid=27476
+http://www.dbmsmag.com/9603d06.html
+http://www.dbmsmag.com/9604d06.html
+http://www.ibase.ru/devinfo/DBMSTrees/sqltrees.html
+
+Suggested books (both of them are excellent):
+http://www.amazon.com/exec/obidos/ASIN/0262032937/
+http://www.amazon.com/exec/obidos/ASIN/1558609202/
+
+
+http://www.msci.memphis.edu/~giri/7713/f99/l2/dferebee.htm
+
+Good naming thign http://www.cross-browser.com/cbe/docs/core_om.html
+
+http://www.entwickler.com/itr/online_artikel/psecom,id,387,nodeid,114.html
+file:///home/dufuz/Desktop/traer.html

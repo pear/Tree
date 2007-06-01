@@ -1,5 +1,5 @@
 <!--
-    $Id: index.tpl,v 1.1 2003-01-30 17:18:24 cain Exp $
+    $Id: index.tpl,v 1.2 2007-06-01 23:38:16 dufuz Exp $
 -->
 
 <html>
@@ -55,6 +55,8 @@
     work on: &nbsp;
     <input type="submit" value="DB" name="use_DB">
     &nbsp;
+    <input type="submit" value="MDB" name="use_MDB">
+    &nbsp;
     <input type="submit" value="Filesystem" name="use_Filesystem">
     &nbsp;
     <input type="submit" value="XML" name="use_XML">
@@ -68,7 +70,7 @@
     {if( @$session->use == 'DB' )}
         $tree = new treeClass( 'DBnested' , 'mysql://root@localhost/test' , array('table'=&gt;TABLE_TREE , 'order' =&gt;  'name') );
     {else}
-        $tree = new treeClass( 'Filesystem' , '/home/cain/tmp' ,array('order' =&gt;  'name') );
+        $tree = new treeClass( 'Filesystem' , '/tmp' ,array('order' =&gt;  'name') );
     </code>
 
     <hr>
@@ -76,7 +78,7 @@
     <table align="left">
         {foreach( $allVisibleFolders as $aFolder )}
             { $class=''}
-            {if( in_array($aFolder['id'],$session->data) )}
+            {if( in_array($aFolder['id'], $session->data) )}
                 { $class=' class="selected"'}
             <tr>
                 <td {$class}>

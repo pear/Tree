@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP Version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2005 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.02 of the PHP license,      |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -33,6 +33,9 @@
  * I also thought about hashing the path name but then the add method is
  * not that easy to implement ... may be one day :-)
  *
+ * Use the System class
+ * http://cvs.php.net/pear-core/System.php
+ *
  * @access     public
  * @author     Wolfram Kriesing <wolfram@kriesing.de>
  * @version    2001/06/27
@@ -45,9 +48,9 @@
      * @access public
      * @var    array   saves the options passed to the constructor
      */
-    var $options =  array(
+    var $conf =  array(
                         'order'     => '',
-                        'columnNameMaps' => array(),
+                        'fields' => array(),
                     );
 
     // {{{ Tree_Memory_Filesystem()
@@ -61,7 +64,7 @@
      * @param      string  $dsn    the path on the filesystem
      * @param      array   $options  additional options you can set
      */
-    function Tree_Memory_Filesystem ($path, $options = array())
+    function Tree_Memory_Filesystem($path, $options = array())
     {
         $this->_path = $path;
         // not in use currently
@@ -203,7 +206,7 @@
      */
     function _prepareResult($result)
     {
-        $map = $this->getOption('columnNameMaps');
+        $map = $this->getOption('fields');
         if ($map) {
             foreach ($map as $key => $columnName) {
                 $result[$key] = $result[$columnName];

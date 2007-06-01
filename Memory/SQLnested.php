@@ -18,18 +18,17 @@
 //
 //  $Id$
 
-require_once 'Tree/Dynamic/MDBnested.php';
+require_once 'Tree/Dynamic/SQLnested.php';
 
 /**
-*
-*
-*   @access     public
-*   @author
-*   @package    Tree
-*/
-class Tree_Memory_MDBnested extends Tree_Dynamic_MDBnested
+ *
+ *
+ *   @access     public
+ *   @author
+ *   @package    Tree
+ */
+class Tree_Memory_SQLnested extends Tree_Dynamic_SQLnested
 {
-
     /**
      * retreive all the data from the db and prepare the data so the structure
      * can be built in the parent class
@@ -46,27 +45,28 @@ class Tree_Memory_MDBnested extends Tree_Dynamic_MDBnested
         if ($res == null) {
             //
             $whereAddOn = '';
-            if ($this->options['whereAddOn']) {
-                $whereAddOn = 'WHERE '.$this->getOption('whereAddOn');
+            if ($this->conf['whereAddOn']) {
+                $whereAddOn = 'WHERE '.$this->conf['whereAddOn'];
             }
 
             //
             $orderBy = 'left';
-            if ($order = $this->getOption('order')) {
+            if ($order = $this->conf['order']) {
                 $orderBy = $order;
             }
 
             // build the query this way, that the root, which has no parent
-            // (parentId=0) is first
+            // (parent_id=0) is first
             $query = sprintf('SELECT * FROM %s %s ORDER BY %s',
-                                $this->table,
+                                $this->conf['table'],
                                 $whereAddOn,
                                 // sort by the left-column, so we have the data
                                 //sorted as it is supposed to be :-)
                                 $this->_getColName($orderBy)
                                 );
-            if (MDB::isError($res = $this->dbh->getAll($query))) {
-                return Tree::raiseError('TREE_ERROR_DB_ERROR', $res->getMessage());
+            $res = $this->_storage->queryAll($query, array(), false, false);
+            if (PEAR::isError($res)) {
+                return Tree::raiseError(TREE_ERROR_DB_ERROR, null, null, $res->getMessage());
             }
         }
 
@@ -75,4 +75,4 @@ class Tree_Memory_MDBnested extends Tree_Dynamic_MDBnested
 
 }
 
-?> 
+?>

@@ -1,18 +1,10 @@
 <?php
-//
 //  $Id$
-//
 
 require_once 'UnitTest.php';
 
 class tests_getElement extends UnitTest
 {
-    /**
-    *   There was a bug when we mapped column names, especially when we mapped 
-    *   a column to the same name as the column. We check this here too.
-    *
-    *
-    */
     function test_MemoryDBnested()
     {
         $tree = $this->getMemoryDBnested();        
@@ -20,14 +12,6 @@ class tests_getElement extends UnitTest
         $tree->setup();
         $actual = $tree->getElement(3);
         $this->assertEquals('PEAR rulez', $actual['comment']);
-
-        $tree->setOption('columnNameMaps', array('comment' => 'comment'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['comment']);
-    
-        $tree->setOption('columnNameMaps', array('myComment' => 'comment'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['myComment']);
     }
 
     function test_MemoryMDBnested()
@@ -38,13 +22,10 @@ class tests_getElement extends UnitTest
         $actual = $tree->getElement(3);
         $this->assertEquals('PEAR rulez', $actual['comment']);
 
-        $tree->setOption('columnNameMaps', array('comment' => 'comment'));
+        $tree->setOption('fields', array('comment' => array('type' => 'text', 'name' => 'myComment')));
+        $tree->setup();
         $actual = $tree->getElement(3);
         $this->assertEquals('PEAR rulez', $actual['comment']);
-    
-        $tree->setOption('columnNameMaps', array('myComment' => 'comment'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['myComment']);
     }
 
     // do this for XML
@@ -53,37 +34,30 @@ class tests_getElement extends UnitTest
 
     // do this for DBsimple
     
-    // do this for DynamicDBnested
+    // do this for Dynamic[M]DB[2]nested
     function test_DynamicDBnested()
     {
-        $tree =& $this->getDynamicDBnested();
-        $tree->update(3, array('comment' => 'PEAR rulez'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['comment']);
-
-        $tree->setOption('columnNameMaps', array('comment' => 'comment'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['comment']);
-    
-        $tree->setOption('columnNameMaps', array('myComment' => 'comment'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['myComment']);
+        $tree =& $this->getDynamicSQLnested('DB');
+        $this->_test_DynamicSQLnested($tree);
     }
 
     function test_DynamicMDBnested()
     {
-        $tree =& $this->getDynamicMDBnested();
+        $tree =& $this->getDynamicSQLnested('MDB');
+        $this->_test_DynamicSQLnested($tree);
+    }
+
+    function test_DynamicMDB2nested()
+    {
+        $tree =& $this->getDynamicSQLnested('MDB2');
+        $this->_test_DynamicSQLnested($tree);
+    }
+
+    function _test_DynamicSQLnested(&$tree)
+    {
         $tree->update(3, array('comment' => 'PEAR rulez'));
         $actual = $tree->getElement(3);
         $this->assertEquals('PEAR rulez', $actual['comment']);
-
-        $tree->setOption('columnNameMaps', array('comment' => 'comment'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['comment']);
-    
-        $tree->setOption('columnNameMaps', array('myComment' => 'comment'));
-        $actual = $tree->getElement(3);
-        $this->assertEquals('PEAR rulez', $actual['myComment']);
     }
 
     /**
@@ -91,44 +65,43 @@ class tests_getElement extends UnitTest
     *
     *
     */
-    function test_DynamicDBnestedEmptyTree()
+    function test_DynamicSQLnestedEmptyTree()
     {
-        $tree = Tree::setup('Dynamic_DBnested', DB_DSN, array('table' => TABLE_TREENESTED));
-        $tree->remove($tree->getRootId());
-        
-        $tree = Tree::setup('Memory_DBnested', DB_DSN, array('table' => TABLE_TREENESTED));
-        $tree->setup();
-        $id = $tree->add(array('name' => 'Start'));
-        $tree->setup();
-        $el = $tree->getElement($id);
-        $this->assertEquals('Start', $el['name']);
-        $tree->remove($tree->getRootId());
-        
-        $tree = Tree::setup('Dynamic_DBnested', DB_DSN, array('table' => TABLE_TREENESTED));
-        $id = $tree->add(array('name' => 'StartDyn'));
-        $el = $tree->getElement($id);
-        $this->assertEquals('StartDyn', $el['name']);
-    }    
+        $config = array(
+            'container' => 'Dynamic',
+            'type' => 'Nested',
+            'storage' => array(
+                'name' => 'DB',
+                'dsn' => DB_DSN,
+                // 'connection' =>
+            ),
+            'options' => array(
+                'table' => TABLE_TREENESTED,
+                'order' =>  'id',
+                'fields' => array(),
+            ),
+        );
 
-    function test_DynamicMDBnestedEmptyTree()
-    {
-        $tree = Tree::setup('Dynamic_MDBnested', DB_DSN, array('table' => TABLE_TREENESTED));
-        $tree->remove($tree->getRootId());
-        
-        $tree = Tree::setup('Memory_MDBnested', DB_DSN, array('table' => TABLE_TREENESTED));
+        $tree = Tree::factory($config);
+        $root = $tree->getRoot();
+        $tree->remove($root['id']);
+
+        $config['container'] = 'Memory';
+        $tree = Tree::factory($config);
         $tree->setup();
         $id = $tree->add(array('name' => 'Start'));
         $tree->setup();
         $el = $tree->getElement($id);
         $this->assertEquals('Start', $el['name']);
-        $tree->remove($tree->getRootId());
-        
-        $tree = Tree::setup('Dynamic_MDBnested', DB_DSN, array('table' => TABLE_TREENESTED));
+        $root = $tree->getRoot();
+        $tree->remove($root['id']);
+
+        $config['container'] = 'Dynamic';
+        $tree = Tree::factory($config);
         $id = $tree->add(array('name' => 'StartDyn'));
         $el = $tree->getElement($id);
         $this->assertEquals('StartDyn', $el['name']);
-    } 
-        
+    }
 }
 
 ?>
