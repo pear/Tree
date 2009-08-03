@@ -179,7 +179,7 @@ class Tree_Memory extends Tree
         include_once 'Tree/Memory/' . $name . $type . '.php';
         $className = 'Tree_Memory_' . $name . $type;
 
-        $this->dataClass =& new $className($config);
+        $this->dataClass = new $className($config);
     }
 
     // }}}
