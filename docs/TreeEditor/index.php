@@ -25,13 +25,13 @@ ini_set('error_reporting', E_ALL);
 
     // session stuff to save the opened folders etc.
     session_start();
-    if (!session_is_registered('session')) {
+    if (empty($_SESSION['session'])) {
         $session = new stdClass;    // standard PHP-class constructor
-        session_register('session');
+        $_SESSION['session'] = $session;
         $session->use = 'Filesystem';
     } else {
          // since the class is read from the session it is not automatically made global
-        $session = &$_SESSION['session'];
+        $session = $_SESSION['session'];
     }
     $session->data = array();
     
