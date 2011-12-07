@@ -2,9 +2,17 @@
 //  $Id$
 
 require_once 'DB.php';
-require_once 'PHPUnit.php';
 
-class UnitTest extends PhpUnit_TestCase
+if ($fp = @fopen('PHPUnit/Autoload.php', 'r', true)) {
+    require_once 'PHPUnit/Autoload.php';
+} elseif ($fp = @fopen('PHPUnit/Framework.php', 'r', true)) {
+    require_once 'PHPUnit/Framework.php';
+} else {
+    die("skip could not find PHPUnit");
+}
+fclose($fp);
+
+class UnitTest extends PHPUnit_Framework_TestCase
 {
     function setUp()
     {
