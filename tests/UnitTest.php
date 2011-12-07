@@ -20,6 +20,9 @@ class UnitTest extends PHPUnit_Framework_TestCase
         // (this actually also does the tearDown, since we have the DROP TABLE queries in the factory too
         require 'sql.php'; 
         $db = DB::connect(DB_DSN);
+        if (PEAR::isError($db)) {
+            $this->markTestSkipped($db->getMessage());
+        }
 
         foreach ($dbStructure[$db->phptype]['setup'] as $aQuery) {
             $ret = $db->query($aQuery);
