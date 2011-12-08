@@ -70,6 +70,27 @@ from either structure to another (from XML into DB/MDB).
  </notes>
  <contents>
   <dir name="/">
+   <dir name="Tree">
+    <dir name="Dynamic">
+     <file baseinstalldir="Tree" name="SQLnested.php" role="php" />
+    </dir> <!-- /Dynamic -->
+    <dir name="Memory">
+     <file baseinstalldir="Tree" name="Array.php" role="php" />
+     <file baseinstalldir="Tree" name="Filesystem.php" role="php" />
+     <file baseinstalldir="Tree" name="SQLnested.php" role="php" />
+     <file baseinstalldir="Tree" name="SQLsimple.php" role="php" />
+     <file baseinstalldir="Tree" name="XML.php" role="php" />
+    </dir> <!-- /Memory -->
+    <dir name="Storage">
+     <file baseinstalldir="Tree" name="DB.php" role="php" />
+     <file baseinstalldir="Tree" name="MDB.php" role="php" />
+     <file baseinstalldir="Tree" name="MDB2.php" role="php" />
+     <file baseinstalldir="Tree" name="SQL.php" role="php" />
+    </dir> <!-- /Storage -->
+    <file baseinstalldir="Tree" name="Memory.php" role="php" />
+    <file baseinstalldir="Tree" name="Storage.php" role="php" />
+    <file baseinstalldir="Tree" name="Tree.php" role="php" />
+   </dir> <!-- /Tree -->
    <dir name="docs">
     <dir name="TreeEditor">
      <file baseinstalldir="Tree" name="closedFolder.gif" role="doc" />
@@ -100,22 +121,6 @@ from either structure to another (from XML into DB/MDB).
     <file baseinstalldir="Tree" name="Memory_XML.php" role="doc" />
     <file baseinstalldir="Tree" name="nested_tree.sql" role="doc" />
    </dir> <!-- /docs -->
-   <dir name="Dynamic">
-    <file baseinstalldir="Tree" name="SQLnested.php" role="php" />
-   </dir> <!-- /Dynamic -->
-   <dir name="Memory">
-    <file baseinstalldir="Tree" name="Array.php" role="php" />
-    <file baseinstalldir="Tree" name="Filesystem.php" role="php" />
-    <file baseinstalldir="Tree" name="SQLnested.php" role="php" />
-    <file baseinstalldir="Tree" name="SQLsimple.php" role="php" />
-    <file baseinstalldir="Tree" name="XML.php" role="php" />
-   </dir> <!-- /Memory -->
-   <dir name="Storage">
-    <file baseinstalldir="Tree" name="DB.php" role="php" />
-    <file baseinstalldir="Tree" name="MDB.php" role="php" />
-    <file baseinstalldir="Tree" name="MDB2.php" role="php" />
-    <file baseinstalldir="Tree" name="SQL.php" role="php" />
-   </dir> <!-- /Storage -->
    <dir name="tests">
     <file baseinstalldir="Tree" name="getElement.php" role="test" />
     <file baseinstalldir="Tree" name="getIdByPath.php" role="test" />
@@ -127,9 +132,6 @@ from either structure to another (from XML into DB/MDB).
     <file baseinstalldir="Tree" name="sql.php" role="test" />
     <file baseinstalldir="Tree" name="UnitTest.php" role="test" />
    </dir> <!-- /tests -->
-   <file baseinstalldir="Tree" name="Memory.php" role="php" />
-   <file baseinstalldir="Tree" name="Storage.php" role="php" />
-   <file baseinstalldir="Tree" name="Tree.php" role="php" />
   </dir> <!-- / -->
  </contents>
  <dependencies>
