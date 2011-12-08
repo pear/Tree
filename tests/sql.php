@@ -6,8 +6,9 @@ $dbStructure = array(
         'setup' => array(
                 "DROP TABLE IF EXISTS ".TABLE_TREENESTED.";"
                 ,"DROP TABLE IF EXISTS ".TABLE_TREENESTED."_seq;"
+
                 ,"CREATE TABLE ".TABLE_TREENESTED." (
-                   id int(11) NOT NULL default '0',
+                    id int(11) NOT NULL default '0',
                     name varchar(255) NOT NULL default '',
                     l int(11) NOT NULL default '0',
                     r int(11) NOT NULL default '0',
@@ -24,14 +25,13 @@ $dbStructure = array(
             ),
 
         'tearDown'  =>  array(
-                "DROP TABLE IF EXISTS ".TABLE_TREENESTED."",
-                "DROP TABLE IF EXISTS ".TABLE_TREENESTED."_seq"
+                "DROP TABLE IF EXISTS ".TABLE_TREENESTED.";"
+                ,"DROP TABLE IF EXISTS ".TABLE_TREENESTED."_seq;"
         )
     ),
 
     'pgsql' =>  array(
         'setup' =>  array(),
         'tearDown' => array()
-    )        
+    ),
 );
-?>
