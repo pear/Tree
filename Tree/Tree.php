@@ -426,7 +426,8 @@ class Tree
      */
     function &raiseError($code = null, $mode = null, $options = null, $userinfo = null)
     {
-        return PEAR::raiseError(null, $code, $mode, $options, $userinfo, 'Tree_Error', true);
+        $tmp = PEAR::raiseError(null, $code, $mode, $options, $userinfo, 'Tree_Error', true);
+        return $tmp;
     }
 
     /**
