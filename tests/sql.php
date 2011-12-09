@@ -35,3 +35,5 @@ $dbStructure = array(
         'tearDown' => array()
     ),
 );
+
+$dbStructure['mysqli'] = $dbStructure['mysql'];

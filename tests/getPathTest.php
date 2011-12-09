@@ -1,9 +1,9 @@
 <?php
 //  $Id$
 
-require_once 'UnitTest.php';
+require_once 'TreeHelper.php';
 
-class tests_getPath extends UnitTest
+class tests_getPathTest extends TreeHelper
 {
     // check if we get the right ID, for the given path
     function test_MemoryDBnested()
@@ -14,6 +14,10 @@ class tests_getPath extends UnitTest
 
     function test_MemoryMDBnested()
     {
+        if (!$this->has_mdb) {
+            $this->markTestSkipped('MDB is not installed');
+        }
+
         $tree =& $this->getMemoryMDBnested();        
         $this->_testPath($tree);
     }

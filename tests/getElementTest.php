@@ -1,9 +1,9 @@
 <?php
 //  $Id$
 
-require_once 'UnitTest.php';
+require_once 'TreeHelper.php';
 
-class tests_getElement extends UnitTest
+class tests_getElementTest extends TreeHelper
 {
     function test_MemoryDBnested()
     {
@@ -16,6 +16,10 @@ class tests_getElement extends UnitTest
 
     function test_MemoryMDBnested()
     {
+        if (!$this->has_mdb) {
+            $this->markTestSkipped('MDB is not installed');
+        }
+
         $tree = $this->getMemoryMDBnested();        
         $tree->update(3, array('comment' => 'PEAR rulez'));
         $tree->setup();
@@ -43,12 +47,20 @@ class tests_getElement extends UnitTest
 
     function test_DynamicMDBnested()
     {
+        if (!$this->has_mdb) {
+            $this->markTestSkipped('MDB is not installed');
+        }
+
         $tree =& $this->getDynamicSQLnested('MDB');
         $this->_test_DynamicSQLnested($tree);
     }
 
     function test_DynamicMDB2nested()
     {
+        if (!$this->has_mdb2) {
+            $this->markTestSkipped('MDB2 is not installed');
+        }
+
         $tree =& $this->getDynamicSQLnested('MDB2');
         $this->_test_DynamicSQLnested($tree);
     }
@@ -72,7 +84,7 @@ class tests_getElement extends UnitTest
             'type' => 'Nested',
             'storage' => array(
                 'name' => 'DB',
-                'dsn' => DB_DSN,
+                'dsn' => $this->dsn,
                 // 'connection' =>
             ),
             'options' => array(

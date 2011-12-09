@@ -122,15 +122,16 @@ from either structure to another (from XML into DB/MDB).
     <file baseinstalldir="Tree" name="nested_tree.sql" role="doc" />
    </dir> <!-- /docs -->
    <dir name="tests">
-    <file baseinstalldir="Tree" name="getElement.php" role="test" />
-    <file baseinstalldir="Tree" name="getIdByPath.php" role="test" />
-    <file baseinstalldir="Tree" name="getLevel.php" role="test" />
-    <file baseinstalldir="Tree" name="getPath.php" role="test" />
-    <file baseinstalldir="Tree" name="index.php" role="test" />
-    <file baseinstalldir="Tree" name="move.php" role="test" />
-    <file baseinstalldir="Tree" name="remove.php" role="test" />
+    <file baseinstalldir="Tree" name="getElementTest.php" role="test" />
+    <file baseinstalldir="Tree" name="getIdByPathTest.php" role="test" />
+    <file baseinstalldir="Tree" name="getLevelTest.php" role="test" />
+    <file baseinstalldir="Tree" name="getPathTest.php" role="test" />
+    <file baseinstalldir="Tree" name="moveTest.php" role="test" />
+    <file baseinstalldir="Tree" name="removeTest.php" role="test" />
     <file baseinstalldir="Tree" name="sql.php" role="test" />
-    <file baseinstalldir="Tree" name="UnitTest.php" role="test" />
+    <file baseinstalldir="Tree" name="TreeHelper.php" role="test">
+     <tasks:replace from="@include_path@" to="php_dir" type="pear-config" />
+    </file>
    </dir> <!-- /tests -->
   </dir> <!-- / -->
  </contents>

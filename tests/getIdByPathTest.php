@@ -1,9 +1,9 @@
 <?php
 //  $Id$
 
-require_once 'UnitTest.php';
+require_once 'TreeHelper.php';
 
-class tests_getIdByPath extends UnitTest
+class tests_getIdByPathTest extends TreeHelper
 {
     // check if we get the right ID, for the given path
     function test_MemoryDBnested()
@@ -16,6 +16,10 @@ class tests_getIdByPath extends UnitTest
 
     function test_MemoryMDBnested()
     {
+        if (!$this->has_mdb) {
+            $this->markTestSkipped('MDB is not installed');
+        }
+
         $tree = $this->getMemoryMDBnested();
         $id = $tree->getIdByPath('Root/child 2/child 2_2');
         
@@ -33,6 +37,8 @@ class tests_getIdByPath extends UnitTest
     {
         $tree = $this->getDynamicSQLnested();
         $id = $tree->getIdByPath('/Root/child 2/child 2_2');
+
+        $this->markTestIncomplete();
 
         $this->assertEquals(5, $id, 'This is not implemented, yet!!! (This test should fail ... for now)');
     }

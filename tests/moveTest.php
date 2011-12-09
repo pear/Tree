@@ -1,9 +1,9 @@
 <?php
 //  $Id$
 
-require_once 'UnitTest.php';
+require_once 'TreeHelper.php';
 
-class tests_move extends UnitTest
+class tests_moveTest extends TreeHelper
 {
     // check if we get the right ID, for the given path
     function test_MemoryDBnested()
@@ -12,8 +12,13 @@ class tests_move extends UnitTest
         $ret = $tree->move(5, 1);
         $tree->setup();
 
-        // be sure true is returned
-        $this->assertTrue($ret);
+        // Avoid PHPUnit exhausting memory if $ret is a large array or object.
+        if (is_bool($ret)) {
+            $this->assertTrue($ret);
+        } else {
+            $this->fail('Expected TRUE but got a ' . gettype($ret));
+        }
+
         // and check if the move succeeded, by checking the new parentId
         $parent = $tree->getParent(5);
         $this->assertEquals(1, $parent['id']);
@@ -21,12 +26,21 @@ class tests_move extends UnitTest
 
     function test_MemoryMDBnested()
     {
+        if (!$this->has_mdb) {
+            $this->markTestSkipped('MDB is not installed');
+        }
+
         $tree = $this->getMemoryMDBnested();        
         $ret = $tree->move(5, 1);
         $tree->setup();
 
-        // be sure true is returned
-        $this->assertTrue($ret);
+        // Avoid PHPUnit exhausting memory if $ret is a large array or object.
+        if (is_bool($ret)) {
+            $this->assertTrue($ret);
+        } else {
+            $this->fail('Expected TRUE but got a ' . gettype($ret));
+        }
+
         // and check if the move succeeded, by checking the new parentId
         $parent = $tree->getParent(5);
         $this->assertEquals(1, $parent['id']);
@@ -39,21 +53,37 @@ class tests_move extends UnitTest
         $parent = $tree->getParent(5);
         $ret = $tree->move(5, 5);
         $tree->setup();
-        // be sure true is returned
-        $this->assertTrue($ret);
+
+        // Avoid PHPUnit exhausting memory if $ret is a large array or object.
+        if (is_bool($ret)) {
+            $this->assertTrue($ret);
+        } else {
+            $this->fail('Expected TRUE but got a ' . gettype($ret));
+        }
+
         $parent1 = $tree->getParent(5);
         $this->assertEquals($parent['id'], $parent1['id']);
     }
 
     function test_MemoryMDBnestedNoAction()
     {
+        if (!$this->has_mdb) {
+            $this->markTestSkipped('MDB is not installed');
+        }
+
         $tree = $this->getMemoryMDBnested();        
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $parent = $tree->getParent(5);
         $ret = $tree->move(5, 5);
         $tree->setup();
-        // be sure true is returned
-        $this->assertTrue($ret);
+
+        // Avoid PHPUnit exhausting memory if $ret is a large array or object.
+        if (is_bool($ret)) {
+            $this->assertTrue($ret);
+        } else {
+            $this->fail('Expected TRUE but got a ' . gettype($ret));
+        }
+
         $parent1 = $tree->getParent(5);
         $this->assertEquals($parent['id'], $parent1['id']);
     }
@@ -70,8 +100,13 @@ class tests_move extends UnitTest
         $tree =& $this->getDynamicSQLnested();
         $ret = $tree->move(5, 1);
 
-        // be sure true is returned
-        $this->assertTrue($ret);
+        // Avoid PHPUnit exhausting memory if $ret is a large array or object.
+        if (is_bool($ret)) {
+            $this->assertTrue($ret);
+        } else {
+            $this->fail('Expected TRUE but got a ' . gettype($ret));
+        }
+
         // and check if the move succeeded, by checking the new parentId
         $parent = $tree->getParent(5);
         $this->assertEquals(1, $parent['id']);
@@ -83,8 +118,14 @@ class tests_move extends UnitTest
 //        $id = $tree->getIdByPath('/Root/child 2/child 2_2');
         $parent = $tree->getParent(5);
         $ret = $tree->move(5, 5);
-        // be sure true is returned
-        $this->assertTrue($ret);
+
+        // Avoid PHPUnit exhausting memory if $ret is a large array or object.
+        if (is_bool($ret)) {
+            $this->assertTrue($ret);
+        } else {
+            $this->fail('Expected TRUE but got a ' . gettype($ret));
+        }
+
         $parent1 = $tree->getParent(5);
         $this->assertEquals($parent['id'], $parent1['id']);
     } 
