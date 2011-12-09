@@ -1,7 +1,7 @@
 <?php
 //  $Id$
 
-require_once 'TreeHelper.php';
+require_once dirname(__FILE__) . '/TreeHelper.php';
 
 class tests_getPathTest extends TreeHelper
 {
