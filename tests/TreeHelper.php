@@ -21,7 +21,9 @@ if (!defined('TABLE_TREENESTED')) {
             . PATH_SEPARATOR . ini_get('include_path'));
     }
 
-    if (!empty($_ENV['MYSQL_TEST_USER'])) {
+    if (empty($_ENV['MYSQL_TEST_USER'])) {
+        $dsn = 'mysqli://root:hamstur@localhost/test';
+    } else {
         $dsn = array(
             'phptype' => 'mysqli',
             'username' => $_ENV['MYSQL_TEST_USER'],
@@ -37,8 +39,6 @@ if (!defined('TABLE_TREENESTED')) {
             'socket' => empty($_ENV['MYSQL_TEST_SOCKET'])
                     ? null : $_ENV['MYSQL_TEST_SOCKET'],
         );
-    } else {
-        $dsn = 'mysqli://root:hamstur@localhost/test';
     }
 
     define('DB_DSN', serialize($dsn));
