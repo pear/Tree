@@ -1,0 +1,33 @@
+{
+    "authors": [
+        {
+            "email": "wolfram@kriesing.de",
+            "name": "Wolfram Kriesing",
+            "role": "Lead"
+        },
+        {
+            "email": "helgi@trance.is",
+            "name": "Helgi \u00deormar",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "./"
+        ]
+    },
+    "description": "More info available on: http://pear.php.net/package/Tree",
+    "license": "PHP License",
+    "name": "pear/tree",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Tree",
+        "source": "https://github.com/pear/Tree"
+    },
+    "type": "library",
+    "require": {
+        "pear/pear_exception": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
